@@ -127,6 +127,8 @@ Trader CLI: Normal terminal (no elevation needed)
   - `PROJECT_STATUS.md` - Where we are now (ALWAYS check this first)
   - `SDK_INTEGRATION_GUIDE.md` - How to use SDK (READ THIS!)
   - `RULES_TO_SDK_MAPPING.md` - What SDK provides vs what we build
+  - `RULE_CATEGORIES.md` - Rule types: Trade-by-Trade vs Timer vs Hard Lockout (CRITICAL!)
+  - `CONFIG_FORMATS.md` - Complete YAML config examples (all 13 rules)
   - `SECURITY_MODEL.md` - Windows UAC security (CRITICAL!)
   - `TESTING_GUIDE.md` - TDD approach
 

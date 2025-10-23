@@ -76,6 +76,8 @@ A real-time trading risk management system that protects your capital by:
 - **[PROJECT_STATUS.md](docs/current/PROJECT_STATUS.md)** - Complete project status & progress
 - **[SDK_INTEGRATION_GUIDE.md](docs/current/SDK_INTEGRATION_GUIDE.md)** - How we use Project-X SDK (critical!)
 - **[RULES_TO_SDK_MAPPING.md](docs/current/RULES_TO_SDK_MAPPING.md)** - Rule specs → SDK mapping (what we build!)
+- **[RULE_CATEGORIES.md](docs/current/RULE_CATEGORIES.md)** - 3 rule types: Trade-by-Trade vs Timer vs Hard Lockout
+- **[CONFIG_FORMATS.md](docs/current/CONFIG_FORMATS.md)** - Complete YAML config examples (all 13 rules)
 - **[SECURITY_MODEL.md](docs/current/SECURITY_MODEL.md)** - Windows UAC security (why it's unkillable!)
 - **[TESTING_GUIDE.md](docs/current/TESTING_GUIDE.md)** - TDD approach & testing guide
 
