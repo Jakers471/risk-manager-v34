@@ -44,17 +44,62 @@ A real-time trading risk management system that protects your capital by:
 - Level 2 market data analysis
 - 59+ technical indicators
 
+### Windows UAC Security (Virtually Unkillable)
+- Runs as Windows Service (auto-start on boot)
+- Protected by Windows UAC (no custom passwords)
+- Trader cannot kill service without admin rights
+- Config files protected by Windows ACL
+- Only Windows admin password can override
+- OS-level security (industry standard approach)
+
 ## 📚 Documentation
 
-**Start here**: [docs/INDEX.md](docs/INDEX.md) - Complete documentation navigation
+### 🚀 **START HERE**
 
-### Quick Links
-- **[Status & Issues](STATUS.md)** - Current status and known issues
-- **[Implementation Plan](docs/implementation/plan_2025-10-23.md)** - 5-week roadmap
-- **[SDK Integration Complete](docs/progress/phase_2-1_complete_2025-10-23.md)** - Latest milestone
-- **[Architecture v2](docs/PROJECT_DOCS/architecture/system_architecture_v2.md)** - System design
+**For Claude AI**:
+- **[CLAUDE.md](CLAUDE.md)** - AI entry point (READ THIS FIRST!)
+  - What to read and in what order
+  - Quick 2-minute start guide
+  - Critical SDK-first approach explanation
 
-All documentation is organized with dates for easy versioning. See [docs/INDEX.md](docs/INDEX.md) for the complete structure.
+**For Humans**:
+1. Read this README
+2. See [docs/current/PROJECT_STATUS.md](docs/current/PROJECT_STATUS.md) - Complete status (~30% done)
+3. See [docs/STATUS.md](docs/STATUS.md) - Windows/WSL setup guide
+
+---
+
+### 📖 Current Documentation
+
+**Location**: `docs/current/` (always up-to-date)
+
+- **[PROJECT_STATUS.md](docs/current/PROJECT_STATUS.md)** - Complete project status & progress
+- **[SDK_INTEGRATION_GUIDE.md](docs/current/SDK_INTEGRATION_GUIDE.md)** - How we use Project-X SDK (critical!)
+- **[RULES_TO_SDK_MAPPING.md](docs/current/RULES_TO_SDK_MAPPING.md)** - Rule specs → SDK mapping (what we build!)
+- **[SECURITY_MODEL.md](docs/current/SECURITY_MODEL.md)** - Windows UAC security (why it's unkillable!)
+- **[TESTING_GUIDE.md](docs/current/TESTING_GUIDE.md)** - TDD approach & testing guide
+
+### 🛠️ Developer Guides
+
+**Location**: `docs/dev-guides/`
+
+- **[QUICK_REFERENCE.md](docs/dev-guides/QUICK_REFERENCE.md)** - Common commands & tasks
+
+### 📋 Original Specifications
+
+**Location**: `docs/PROJECT_DOCS/` (written before SDK existed)
+
+- **[46 Specification Documents](docs/PROJECT_DOCS/)** - Complete original specs (345KB)
+- **[INTEGRATION_NOTE.md](docs/PROJECT_DOCS/INTEGRATION_NOTE.md)** - How specs map to SDK
+- **[Architecture v2](docs/PROJECT_DOCS/architecture/system_architecture_v2.md)** - Original system design
+- **[12 Risk Rules](docs/PROJECT_DOCS/rules/)** - Detailed rule specifications
+
+### 📦 Archive
+
+**Location**: `docs/archive/`
+
+- Old versions of documentation (dated folders)
+- Previous session notes
 
 ---
 
