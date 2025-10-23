@@ -201,7 +201,42 @@ See: `docs/current/PROJECT_STATUS.md` for complete details
 
 ## 🔧 Common Tasks Reference
 
-### Run Tests
+### Run Tests (Interactive Menu)
+```bash
+# Interactive test runner with report generation
+python3 run_tests.py
+
+# Or quick command:
+./test
+```
+
+**Menu Features**:
+- Run all tests / unit / integration / specific files
+- Coverage reports (terminal + HTML)
+- Verbose mode
+- Test by keyword
+- **Auto-saves reports to `test_reports/latest.txt`**
+
+### When User Says "Fix Test Errors"
+```bash
+# 1. Read the latest test report
+cat test_reports/latest.txt
+
+# The report contains:
+# - Full pytest output
+# - Failures with tracebacks
+# - Warnings
+# - Summary statistics
+```
+
+**Workflow**:
+1. User runs tests via menu → Auto-saves to `test_reports/latest.txt`
+2. User says "fix test errors"
+3. AI reads `test_reports/latest.txt`
+4. AI identifies failures and fixes them
+5. Repeat until all tests pass
+
+### Run Tests Manually
 ```bash
 wsl
 cd ~/risk-manager-v34-wsl

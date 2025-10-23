@@ -4,11 +4,13 @@ Test Runner for Risk Manager V34
 
 Interactive menu for running pytest with various options.
 Preserves pytest's native colorful output.
+Automatically saves test results to test_reports/ for AI review.
 """
 
 import subprocess
 import sys
 from pathlib import Path
+from datetime import datetime
 
 # ANSI color codes for the menu
 CYAN = "\033[96m"
@@ -17,6 +19,62 @@ YELLOW = "\033[93m"
 RED = "\033[91m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
+
+# Test reports directory
+REPORTS_DIR = Path(__file__).parent / "test_reports"
+
+
+def ensure_reports_dir():
+    """Ensure test_reports directory exists."""
+    REPORTS_DIR.mkdir(exist_ok=True)
+
+
+def save_test_report(output: str, description: str, exit_code: int):
+    """
+    Save test results to report files.
+
+    Saves to:
+    - test_reports/latest.txt (always overwritten)
+    - test_reports/YYYY-MM-DD_HH-MM-SS.txt (timestamped)
+
+    Args:
+        output: Test output (stdout + stderr)
+        description: Description of test run
+        exit_code: pytest exit code
+    """
+    ensure_reports_dir()
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    status = "PASSED" if exit_code == 0 else "FAILED"
+
+    # Format report
+    report = f"""{'=' * 80}
+Risk Manager V34 - Test Report
+{'=' * 80}
+Test Run: {description}
+Timestamp: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+Status: {status}
+Exit Code: {exit_code}
+{'=' * 80}
+
+{output}
+
+{'=' * 80}
+End of Report
+{'=' * 80}
+"""
+
+    # Save to latest.txt (always overwritten)
+    latest_path = REPORTS_DIR / "latest.txt"
+    latest_path.write_text(report, encoding="utf-8")
+
+    # Save to timestamped file
+    timestamped_path = REPORTS_DIR / f"{timestamp}_{status.lower()}.txt"
+    timestamped_path.write_text(report, encoding="utf-8")
+
+    print(f"\n{GREEN}📄 Test report saved:{RESET}")
+    print(f"   {BOLD}Latest:{RESET} test_reports/latest.txt")
+    print(f"   {BOLD}Archive:{RESET} test_reports/{timestamp}_{status.lower()}.txt")
 
 
 def print_header():
@@ -40,12 +98,13 @@ def print_menu():
     print(f"  {GREEN}[9]{RESET} Run last failed tests only")
     print(f"  {YELLOW}[v]{RESET} Run in VERBOSE mode (shows each test)")
     print(f"  {YELLOW}[c]{RESET} Check COVERAGE status")
+    print(f"  {YELLOW}[r]{RESET} View last test REPORT")
     print(f"  {RED}[q]{RESET} Quit\n")
 
 
 def run_pytest(args: list[str], description: str) -> int:
     """
-    Run pytest with given arguments.
+    Run pytest with given arguments and save report.
 
     Args:
         args: List of pytest arguments
@@ -61,16 +120,49 @@ def run_pytest(args: list[str], description: str) -> int:
     # Build command
     cmd = ["uv", "run", "pytest"] + args
 
-    # Run pytest and preserve its output (including colors)
+    # Run pytest and capture output
     try:
-        result = subprocess.run(cmd, cwd=Path(__file__).parent)
+        # Run with captured output for report
+        result = subprocess.run(
+            cmd,
+            cwd=Path(__file__).parent,
+            capture_output=True,
+            text=True,
+        )
+
+        # Display output to user (with colors)
+        output_combined = result.stdout + result.stderr
+        print(output_combined)
+
+        # Save report
+        save_test_report(output_combined, description, result.returncode)
+
         return result.returncode
+
     except KeyboardInterrupt:
         print(f"\n\n{YELLOW}Tests interrupted by user{RESET}")
         return 1
     except Exception as e:
-        print(f"\n{RED}Error running tests: {e}{RESET}")
+        error_msg = f"Error running tests: {e}"
+        print(f"\n{RED}{error_msg}{RESET}")
+        save_test_report(error_msg, description, 1)
         return 1
+
+
+def view_latest_report():
+    """View the latest test report."""
+    latest_path = REPORTS_DIR / "latest.txt"
+
+    if not latest_path.exists():
+        print(f"\n{YELLOW}No test reports found. Run tests first!{RESET}")
+        return
+
+    print(f"\n{CYAN}{'─' * 70}{RESET}")
+    print(f"{BOLD}Latest Test Report{RESET}")
+    print(f"{CYAN}{'─' * 70}{RESET}\n")
+
+    report = latest_path.read_text(encoding="utf-8")
+    print(report)
 
 
 def get_test_files() -> list[Path]:
@@ -84,6 +176,7 @@ def get_test_files() -> list[Path]:
 def main():
     """Main test runner loop."""
     verbose_mode = False
+    ensure_reports_dir()
 
     while True:
         print_header()
@@ -204,6 +297,12 @@ def main():
             )
             if result.returncode != 0:
                 print(f"\n{YELLOW}No coverage data. Run tests with coverage first (option 5 or 6){RESET}")
+            input(f"\n{BOLD}Press Enter to continue...{RESET}")
+            continue
+
+        elif choice == "r":
+            # View latest report
+            view_latest_report()
             input(f"\n{BOLD}Press Enter to continue...{RESET}")
             continue
 
