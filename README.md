@@ -44,6 +44,20 @@ A real-time trading risk management system that protects your capital by:
 - Level 2 market data analysis
 - 59+ technical indicators
 
+## 📚 Documentation
+
+**Start here**: [docs/INDEX.md](docs/INDEX.md) - Complete documentation navigation
+
+### Quick Links
+- **[Status & Issues](STATUS.md)** - Current status and known issues
+- **[Implementation Plan](docs/implementation/plan_2025-10-23.md)** - 5-week roadmap
+- **[SDK Integration Complete](docs/progress/phase_2-1_complete_2025-10-23.md)** - Latest milestone
+- **[Architecture v2](docs/PROJECT_DOCS/architecture/system_architecture_v2.md)** - System design
+
+All documentation is organized with dates for easy versioning. See [docs/INDEX.md](docs/INDEX.md) for the complete structure.
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites

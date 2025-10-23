@@ -1,0 +1,65 @@
+# Documentation Structure Reference
+
+This file documents the organization of all markdown files in this project.
+
+## Root Level (Keep Minimal)
+- README.md          - Project overview (ALWAYS CURRENT)
+- STATUS.md          - Current status and issues (ALWAYS CURRENT)
+- .docs-structure    - This file (reference only)
+
+## docs/ Directory (All Other Docs)
+- INDEX.md                              - Main navigation hub
+- summary_{YYYY-MM-DD}.md              - Project snapshots
+- implementation/plan_{YYYY-MM-DD}.md  - Implementation roadmaps
+- progress/phase_X_complete_{YYYY-MM-DD}.md - Milestone docs
+- PROJECT_DOCS/                         - v2 architecture specifications
+
+## Naming Convention
+All dated documents: {name}_{YYYY-MM-DD}.md
+
+Examples:
+- summary_2025-10-23.md
+- plan_2025-10-23.md
+- phase_2-1_complete_2025-10-23.md
+
+## What Goes Where?
+
+### Root Level
+- ONLY: README.md, STATUS.md
+- WHY: Quick access to essential info
+
+### docs/
+- EVERYTHING ELSE
+- WHY: Organized, versioned, navigable
+
+### docs/implementation/
+- Implementation plans and roadmaps
+- Technical design docs
+
+### docs/progress/
+- Completed milestone documentation
+- Phase completion summaries
+
+### docs/PROJECT_DOCS/
+- Reference architecture (from v1 project)
+- Rule specifications
+- Module specifications
+
+## For AI Assistants
+
+When creating new docs:
+1. Check if it's essential → Root (README or STATUS only)
+2. Everything else → docs/ with date suffix
+3. Update docs/INDEX.md with new doc
+4. Use relative links
+
+## For Developers
+
+Start here: README.md → docs/INDEX.md → Follow links
+
+## Archive Policy
+
+Old docs are kept with [ARCHIVED] prefix:
+- [ARCHIVED]_plan_2025-10-15.md
+
+This preserves history without confusion.
