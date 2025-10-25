@@ -1,0 +1,813 @@
+# Implementation Foundation - Risk Manager V34
+
+**THE MASTER DOCUMENT - Everything connects here**
+
+**Last Updated**: 2025-10-25
+**Purpose**: Comprehensive foundation that prevents Project #34 from failing like #1-33
+**Read This**: Before implementing ANY feature
+
+---
+
+## Table of Contents
+
+1. [Executive Summary](#executive-summary)
+2. [The 33-Project Failure Pattern](#the-33-project-failure-pattern)
+3. [The Foundation Solution](#the-foundation-solution)
+4. [Complete Development Workflow](#complete-development-workflow)
+5. [Documentation Architecture](#documentation-architecture)
+6. [Testing Integration](#testing-integration)
+7. [Runtime Validation Integration](#runtime-validation-integration)
+8. [Definition of Done 2.0](#definition-of-done-20)
+9. [Quick Reference Links](#quick-reference-links)
+
+---
+
+## Executive Summary
+
+### What This Document Is
+
+**The master foundation** that ties together:
+- **Wave 1**: Feature inventory (what exists)
+- **Wave 2**: Gap analysis (what's missing)
+- **Wave 3**: Unified specifications (what to build)
+- **Wave 4**: Runtime validation (prove it works)
+- **Roadmap**: Implementation plan
+- **Guidelines**: How to build
+- **Testing**: TDD workflow
+- **Contracts**: All interfaces
+
+### Why This Exists
+
+**Problem**: 33 previous attempts to build this risk manager failed with same pattern:
+```
+Tests pass ✅ → Deploy → Runtime doesn't work ❌ → Project abandoned
+```
+
+**Solution**: Comprehensive foundation where:
+1. Tests validate logic (TDD)
+2. **Runtime validation proves it works** (MANDATORY)
+3. Documentation guides every step
+4. Nothing gets skipped
+
+### Success Criteria
+
+Project #34 succeeds if:
+- ✅ Every feature has passing tests
+- ✅ Every feature has passing smoke tests (exit code 0)
+- ✅ Every feature is observable in logs
+- ✅ Agents can find information in <30 seconds
+- ✅ No confusion about workflow
+
+---
+
+## The 33-Project Failure Pattern
+
+### What Happened (Every Time)
+
+```
+Day 1-7: Build features, write tests
+  → Tests pass ✅
+  → Feels complete
+  → Roadmap updated
+  → Git committed
+
+Day 8: Deploy to staging
+  → System starts
+  → Nothing happens
+  → No events processed
+  → No clear errors
+  → Logs show "everything working"
+
+Day 9-10: Debug for hours
+  → Can't find issue
+  → System just... doesn't work
+  → Give up, start over
+```
+
+### Root Cause
+
+**Traditional testing validates LOGIC, not LIVENESS**
+
+- ✅ Unit tests prove functions work
+- ✅ Integration tests prove components interact
+- ❌ **Nothing proves system is actually alive**
+
+### The Gap
+
+**Missing validation**: After tests pass, does the system actually run?
+
+Projects #1-33 skipped this step → All failed
+
+---
+
+## The Foundation Solution
+
+### Three-Layer Validation
+
+```
+Layer 1: Test Logic (TDD)
+  ├─> Unit tests (fast, isolated)
+  ├─> Integration tests (real SDK)
+  └─> E2E tests (full workflows)
+  → Result: Logic is correct ✅
+
+Layer 2: Validate Runtime (MANDATORY) ← NEW
+  ├─> Smoke test (8s boot validation)
+  ├─> 8-checkpoint logging (observable)
+  └─> Trace mode (async debugging)
+  → Result: System is alive ✅
+
+Layer 3: Deploy Confidently
+  └─> Both Layer 1 and 2 passed
+  → Result: It actually works ✅
+```
+
+### Key Innovation
+
+**Runtime validation is MANDATORY, not optional**
+
+Can't mark feature "complete" without:
+1. Tests passing (Layer 1)
+2. Smoke test exit code 0 (Layer 2)
+3. Observable logs (Layer 2)
+
+---
+
+## Complete Development Workflow
+
+### Overview (10 Steps)
+
+```
+1. Pick feature (IMPLEMENTATION_ROADMAP.md)
+2. Read spec (docs/specifications/unified/)
+3. Check contract (CONTRACTS_REFERENCE.md)
+4. Write tests (TDD - RED)
+5. Implement feature (GREEN)
+6. Refactor (CLEAN)
+7. Add logging (OBSERVABLE) ← Critical for runtime
+8. Run smoke test (PROVE IT WORKS) ← MANDATORY
+9. Update roadmap (TRACK PROGRESS)
+10. Commit + push (SAVE WORK)
+```
+
+### Step-by-Step Details
+
+#### Step 1: Pick Feature from Roadmap
+
+**File**: `/IMPLEMENTATION_ROADMAP.md`
+
+**Actions**:
+1. Check "Next Priority" phase
+2. Find first unchecked `[ ]` item
+3. Note dependencies/blockers
+4. Note referenced spec paths
+
+**Example**:
+```markdown
+### MOD-003: Timer Manager (1 week)
+Priority: CRITICAL (blocks MOD-002 and 4 rules)
+
+- [ ] Create `src/risk_manager/state/timer_manager.py`
+  - Spec: docs/specifications/unified/architecture/MODULES_SUMMARY.md (MOD-003)
+  - Contract: CONTRACTS_REFERENCE.md (TimerManager API)
+```
+
+**You picked**: MOD-003 Timer Manager
+
+---
+
+#### Step 2: Read Specifications (3 Documents)
+
+**A) Unified Spec (Detailed Requirements)**
+
+**Location**: `docs/specifications/unified/`
+
+**Example**: For MOD-003, read:
+- `docs/specifications/unified/architecture/MODULES_SUMMARY.md` (MOD-003 section)
+
+**Contains**:
+- Complete specification
+- Examples
+- Config format
+- Database schema
+- Test requirements
+
+**B) Contract (Interfaces & Schemas)**
+
+**Location**: `/CONTRACTS_REFERENCE.md`
+
+**Example**: For MOD-003, check TimerManager API
+
+**Contains**:
+- Exact method signatures
+- Parameter types
+- Return types
+- Database schemas
+
+**C) Gap Analysis (Context)**
+
+**Location**: `docs/analysis/wave2-gap-analysis/`
+
+**Example**: For state managers, read:
+- `02-STATE-MANAGEMENT-GAPS.md`
+
+**Contains**:
+- What's missing
+- Effort estimates
+- Dependencies
+
+---
+
+#### Step 3: Write Tests First (TDD)
+
+**ALWAYS write tests before implementation**
+
+**Testing Guide**: `docs/foundation/TESTING_INTEGRATION.md`
+
+**Actions**:
+1. Create test file: `tests/unit/test_state/test_timer_manager.py`
+2. Write test cases (AAA pattern: Arrange, Act, Assert)
+3. Run tests (they should FAIL - RED)
+4. Check results: `cat test_reports/latest.txt`
+
+**Example**:
+```python
+# tests/unit/test_state/test_timer_manager.py
+import pytest
+from risk_manager.state.timer_manager import TimerManager
+
+def test_create_countdown_timer():
+    """Test creating a countdown timer."""
+    # Arrange
+    manager = TimerManager(db_path=":memory:")
+
+    # Act
+    timer_id = manager.create_timer(
+        name="daily_reset",
+        duration_seconds=86400
+    )
+
+    # Assert
+    assert timer_id is not None
+    assert manager.get_timer(timer_id).name == "daily_reset"
+```
+
+**Run tests**:
+```bash
+python run_tests.py
+# Select: [2] Unit tests
+# Result: FAIL (no implementation yet) - RED ✅
+```
+
+---
+
+#### Step 4: Implement Feature
+
+**Follow the spec EXACTLY**
+
+**Check Contracts**:
+- Internal interfaces: `CONTRACTS_REFERENCE.md` → Internal Interfaces
+- External interfaces (SDK): `CONTRACTS_REFERENCE.md` → External Interfaces
+- Schemas: `CONTRACTS_REFERENCE.md` → Schemas
+
+**Example**:
+```python
+# src/risk_manager/state/timer_manager.py
+from datetime import datetime, timedelta
+import sqlite3
+
+class TimerManager:
+    """Manages countdown timers and schedules."""
+
+    def __init__(self, db_path: str):
+        """Initialize timer manager with database."""
+        self.db_path = db_path
+        self._init_schema()
+
+    def create_timer(self, name: str, duration_seconds: int) -> str:
+        """Create a countdown timer."""
+        timer_id = self._generate_timer_id()
+        expires_at = datetime.now() + timedelta(seconds=duration_seconds)
+
+        # Store in database (schema from CONTRACTS_REFERENCE.md)
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                "INSERT INTO timers (id, name, expires_at) VALUES (?, ?, ?)",
+                (timer_id, name, expires_at.timestamp())
+            )
+
+        return timer_id
+```
+
+---
+
+#### Step 5: Run Tests (They Should Pass - GREEN)
+
+```bash
+python run_tests.py
+# Select: [2] Unit tests
+# Result: PASS - GREEN ✅
+
+# Check results
+cat test_reports/latest.txt
+# Should show: All tests passing
+```
+
+---
+
+#### Step 6: Refactor (If Needed)
+
+- Clean up code
+- Remove duplication
+- Add docstrings
+- Follow Python best practices
+
+**Tests still pass after refactoring** ✅
+
+---
+
+#### Step 7: Add Logging (CRITICAL)
+
+**Logging Guide**: `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md`
+
+**Requirements** (based on feature type):
+
+**For Core Features** (manager, engine, enforcement):
+- Use 8-checkpoint system
+- Add to existing checkpoints
+
+**For State Managers** (our example):
+- Entry/exit logging
+- State change logging
+- Error logging
+
+**Example**:
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+class TimerManager:
+    def create_timer(self, name: str, duration_seconds: int) -> str:
+        """Create a countdown timer."""
+        logger.info(f"Creating timer: name={name}, duration={duration_seconds}s")
+
+        timer_id = self._generate_timer_id()
+        expires_at = datetime.now() + timedelta(seconds=duration_seconds)
+
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                "INSERT INTO timers (id, name, expires_at) VALUES (?, ?, ?)",
+                (timer_id, name, expires_at.timestamp())
+            )
+
+        logger.info(f"✅ Timer created: id={timer_id}, expires={expires_at}")
+        return timer_id
+```
+
+**Why this matters**: Without logging, you can't see it working in runtime!
+
+---
+
+#### Step 8: Run Smoke Test (MANDATORY)
+
+**THIS IS THE CRITICAL STEP THAT PROJECTS #1-33 SKIPPED**
+
+**What it does**: Boots system, validates first event fires within 8 seconds
+
+**How to run**:
+```bash
+python run_tests.py
+# Select: [s] Runtime SMOKE
+```
+
+**Exit codes**:
+- `0` = SUCCESS → System is alive, continue to Step 9 ✅
+- `1` = EXCEPTION → Read logs, fix error, repeat ❌
+- `2` = STALLED → No events within 8s, check subscriptions ❌
+
+**If exit code 1 or 2**:
+1. Read logs: `python run_tests.py` → `[l]`
+2. Find last checkpoint: `grep "Checkpoint" data/logs/risk_manager.log | tail -1`
+3. Debug using protocol: `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md`
+4. Fix issue
+5. Repeat smoke test until exit code 0
+
+**YOU CANNOT CONTINUE WITHOUT EXIT CODE 0**
+
+---
+
+#### Step 9: Update Roadmap
+
+**File**: `/IMPLEMENTATION_ROADMAP.md`
+
+**Actions**:
+1. Change `[ ]` to `[x]` for completed items
+2. Update "Last Updated" timestamp
+3. Update progress percentages (if phase complete)
+
+**Example**:
+```markdown
+### MOD-003: Timer Manager (1 week)
+- [x] Create `src/risk_manager/state/timer_manager.py` ← DONE
+- [x] Implement database schema
+- [x] Add timer configuration support
+- [x] Write unit tests for TimerManager
+- [x] Smoke test passing (exit code 0) ← MANDATORY CHECKBOX
+```
+
+---
+
+#### Step 10: Commit & Push
+
+```bash
+# Stage files
+git add -A
+
+# Commit with descriptive message
+git commit -m "Implemented MOD-003: Timer Manager
+
+- Created timer_manager.py with countdown timer support
+- Added database schema for timers table
+- Integrated with config/timers.yaml
+- Added 20 unit tests (all passing)
+- Smoke test passing (exit code 0)
+- Coverage: 92%
+
+Refs: docs/specifications/unified/architecture/MODULES_SUMMARY.md (MOD-003)
+
+🤖 Generated with Claude Code"
+
+# Push to remote
+git push
+```
+
+**Feature is now COMPLETE** ✅
+
+---
+
+## Documentation Architecture
+
+### How Everything Connects
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  FOUNDATION (docs/foundation/)                              │
+│  └─> You are here (IMPLEMENTATION_FOUNDATION.md)            │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ├─> What to Build
+                            │   ├─> /IMPLEMENTATION_ROADMAP.md
+                            │   └─> docs/specifications/unified/
+                            │
+                            ├─> How to Build
+                            │   ├─> /AGENT_GUIDELINES.md
+                            │   └─> /CONTRACTS_REFERENCE.md
+                            │
+                            ├─> Why (Context)
+                            │   ├─> docs/analysis/wave1/ (inventory)
+                            │   ├─> docs/analysis/wave2/ (gaps)
+                            │   └─> docs/analysis/wave3/ (conflicts)
+                            │
+                            ├─> Testing
+                            │   ├─> docs/foundation/TESTING_INTEGRATION.md
+                            │   ├─> run_tests.py
+                            │   └─> test_reports/latest.txt
+                            │
+                            └─> Runtime Validation
+                                ├─> docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md
+                                ├─> python run_tests.py → [s]
+                                └─> data/logs/risk_manager.log
+```
+
+### Document Hierarchy
+
+**Tier 1: Foundation** (START HERE)
+- `docs/foundation/IMPLEMENTATION_FOUNDATION.md` ← You are here
+- `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md`
+- `docs/foundation/TESTING_INTEGRATION.md`
+- `docs/foundation/QUICK_REFERENCE.md`
+
+**Tier 2: Workflow**
+- `/IMPLEMENTATION_ROADMAP.md` ← What to build next
+- `/AGENT_GUIDELINES.md` ← How to build it
+- `/CONTRACTS_REFERENCE.md` ← All interfaces
+
+**Tier 3: Specifications**
+- `docs/specifications/unified/` ← Detailed requirements
+  - `architecture/` - System modules
+  - `rules/` - 13 risk rules
+  - `configuration/` - Config schemas
+  - `testing/` - Test requirements
+
+**Tier 4: Analysis (Context)**
+- `docs/analysis/wave1-feature-inventory/` - What exists
+- `docs/analysis/wave2-gap-analysis/` - What's missing
+- `docs/analysis/wave3-spec-consolidation/` - Conflict resolutions
+- `docs/analysis/wave4-runtime-validation/` - Runtime strategy
+
+**Tier 5: Results**
+- `test_reports/latest.txt` ← Most recent test results
+- `data/logs/risk_manager.log` ← Runtime logs
+
+---
+
+## Testing Integration
+
+### Complete Testing Strategy
+
+See: `docs/foundation/TESTING_INTEGRATION.md` for full details
+
+**Quick summary**:
+
+#### 1. Unit Tests (60% of tests)
+- Fast, isolated, mocked
+- Run: `python run_tests.py` → `[2]`
+- Coverage: 90%+ target
+
+#### 2. Integration Tests (30% of tests)
+- Real SDK, real database
+- Run: `python run_tests.py` → `[3]`
+- Validates component interaction
+
+#### 3. E2E Tests (10% of tests)
+- Full workflows
+- Run: `python run_tests.py` → `[4]`
+- Validates end-to-end scenarios
+
+#### 4. Runtime Validation (MANDATORY)
+- Smoke test (8s boot validation)
+- Run: `python run_tests.py` → `[s]`
+- **Exit code 0 required to mark feature complete**
+
+### Test Reports
+
+**Auto-saved to**:
+- `test_reports/latest.txt` (most recent, always check this)
+- `test_reports/YYYY-MM-DD_HH-MM-SS_passed.txt` (timestamped)
+- `test_reports/YYYY-MM-DD_HH-MM-SS_failed.txt` (timestamped)
+
+**Read results**:
+```bash
+cat test_reports/latest.txt
+```
+
+---
+
+## Runtime Validation Integration
+
+### The 8-Checkpoint System
+
+See: `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md` for full details
+
+**Quick summary**:
+
+```
+🚀 Checkpoint 1: Service Start (manager.py)
+✅ Checkpoint 2: Config Loaded (manager.py)
+✅ Checkpoint 3: SDK Connected (manager.py)
+✅ Checkpoint 4: Rules Initialized (manager.py)
+✅ Checkpoint 5: Event Loop Running (engine.py)
+📨 Checkpoint 6: Event Received (engine.py) ← LIVENESS PROOF
+🔍 Checkpoint 7: Rule Evaluated (engine.py)
+⚠️ Checkpoint 8: Enforcement Triggered (enforcement.py)
+```
+
+**Purpose**: Find exactly where runtime fails
+
+**When to use**:
+- **Core features** (manager, engine, enforcement): Use checkpoints
+- **State managers**: Entry/exit + state change logging
+- **Risk rules**: Checkpoint 7 (evaluate) + Checkpoint 8 (enforce)
+- **SDK integration**: Connection + subscription logging
+
+### Smoke Test (MANDATORY)
+
+**What it validates**:
+- System boots without errors
+- All 8 checkpoints complete
+- First event fires within 8s
+- No deadlocks or hangs
+
+**Exit codes**:
+- `0` = Success (system is alive)
+- `1` = Exception (check logs for stack trace)
+- `2` = Stalled (check which checkpoint failed)
+
+**Debugging when smoke test fails**:
+```bash
+# 1. Read logs
+python run_tests.py → [l]
+
+# 2. Find last checkpoint
+grep "Checkpoint" data/logs/risk_manager.log | tail -1
+
+# 3. Diagnose (see RUNTIME_VALIDATION_INTEGRATION.md)
+# - Checkpoint 1-5: Boot failure
+# - Checkpoint 6: No events (MOST COMMON)
+# - Checkpoint 7-8: Rule/enforcement issue
+
+# 4. Fix and repeat
+python run_tests.py → [s]
+```
+
+---
+
+## Definition of Done 2.0
+
+### Old Definition (Projects #1-33)
+
+A feature was "complete" when:
+1. ✅ Tests passing
+2. ✅ Roadmap updated
+3. ✅ Committed
+
+**Problem**: No runtime validation → All projects failed
+
+### New Definition (Project #34)
+
+A feature is **NOT complete** until:
+
+1. ✅ **Unit tests passing**
+   - 90%+ coverage
+   - All edge cases tested
+   - Run: `python run_tests.py` → `[2]`
+
+2. ✅ **Integration tests passing** (if applicable)
+   - Real SDK connection
+   - Real database
+   - Run: `python run_tests.py` → `[3]`
+
+3. ✅ **Logging added**
+   - Core features: 8-checkpoint system
+   - State managers: Entry/exit + state changes
+   - Risk rules: Checkpoint 7 + 8
+   - Observable in logs
+
+4. ✅ **Smoke test passing (exit code 0)** ← MANDATORY
+   - System boots
+   - First event fires within 8s
+   - Run: `python run_tests.py` → `[s]`
+   - **Cannot skip this step**
+
+5. ✅ **Feature observable in logs**
+   - Can see it working
+   - `grep "<feature>" data/logs/risk_manager.log`
+
+6. ✅ **Roadmap updated**
+   - All checkboxes checked (including smoke test)
+   - `/IMPLEMENTATION_ROADMAP.md`
+
+7. ✅ **Git commit + push**
+   - Descriptive message
+   - References specs
+
+### Feature Complete Checklist
+
+**Before marking feature complete, verify**:
+
+```markdown
+## Feature Complete Checklist
+
+- [ ] Unit tests written (TDD)
+- [ ] Unit tests passing (90%+ coverage)
+- [ ] Integration tests written (if applicable)
+- [ ] Integration tests passing (if applicable)
+- [ ] Logging added (see RUNTIME_VALIDATION_INTEGRATION.md)
+- [ ] Smoke test run
+- [ ] Smoke test exit code 0 ✅ MANDATORY
+- [ ] Feature visible in logs
+- [ ] Roadmap updated (all checkboxes)
+- [ ] Git commit with descriptive message
+- [ ] Git push to remote
+
+**If any checkbox unchecked, feature is NOT complete.**
+```
+
+---
+
+## Quick Reference Links
+
+### Essential Files
+
+**Foundation** (start here):
+- `docs/foundation/IMPLEMENTATION_FOUNDATION.md` ← You are here
+- `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md` ← Logging + smoke tests
+- `docs/foundation/TESTING_INTEGRATION.md` ← Complete testing guide
+- `docs/foundation/QUICK_REFERENCE.md` ← One-page cheat sheet
+
+**Workflow**:
+- `/IMPLEMENTATION_ROADMAP.md` ← What to build
+- `/AGENT_GUIDELINES.md` ← How to build
+- `/CONTRACTS_REFERENCE.md` ← All interfaces
+
+**Specifications**:
+- `docs/specifications/unified/` ← Detailed requirements
+
+**Results**:
+- `test_reports/latest.txt` ← Latest test results
+- `data/logs/risk_manager.log` ← Runtime logs
+
+### Common Commands
+
+```bash
+# Run unit tests
+python run_tests.py → [2]
+
+# Run integration tests
+python run_tests.py → [3]
+
+# Run smoke test (MANDATORY)
+python run_tests.py → [s]
+
+# View logs
+python run_tests.py → [l]
+
+# Check latest test results
+cat test_reports/latest.txt
+
+# Find last checkpoint
+grep "Checkpoint" data/logs/risk_manager.log | tail -1
+```
+
+---
+
+## Success Metrics
+
+**Project #34 succeeds if**:
+
+1. ✅ **Zero features marked complete without smoke test passing**
+   - Every feature has exit code 0 before roadmap checkbox
+
+2. ✅ **All features observable in logs**
+   - Can see every feature working
+   - Grep-able, searchable logs
+
+3. ✅ **Runtime validation is mandatory**
+   - Cannot skip
+   - Part of Definition of Done
+
+4. ✅ **Agents find information in <30 seconds**
+   - Clear navigation
+   - Foundation ties everything together
+
+5. ✅ **Deployment succeeds**
+   - System boots and works
+   - Events fire
+   - Rules enforce
+   - **Unlike projects #1-33** ✅
+
+---
+
+## Critical Reminders
+
+### Do's
+
+✅ **DO** read this foundation document first
+✅ **DO** write tests before implementation (TDD)
+✅ **DO** add logging for every feature
+✅ **DO** run smoke test before marking complete
+✅ **DO** check `test_reports/latest.txt` for results
+✅ **DO** verify feature in logs
+✅ **DO** update roadmap only after smoke test passes
+
+### Don'ts
+
+❌ **DON'T** skip smoke test (projects #1-33 failed this way)
+❌ **DON'T** mark feature complete without exit code 0
+❌ **DON'T** implement without reading specs
+❌ **DON'T** ignore contracts (use exact signatures)
+❌ **DON'T** skip logging (feature must be observable)
+❌ **DON'T** assume tests passing = runtime works
+
+---
+
+## Conclusion
+
+**This foundation prevents Project #34 from failing like #1-33**
+
+**How**:
+1. Comprehensive documentation architecture
+2. Clear development workflow (10 steps)
+3. TDD testing integration
+4. **MANDATORY runtime validation** ← The critical difference
+5. Definition of Done 2.0
+
+**Result**: Features that actually work in runtime, not just in tests
+
+---
+
+**Next Steps**:
+
+1. Read `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md` (logging + smoke tests)
+2. Read `docs/foundation/TESTING_INTEGRATION.md` (complete testing guide)
+3. Read `docs/foundation/QUICK_REFERENCE.md` (one-page cheat sheet)
+4. Pick feature from `/IMPLEMENTATION_ROADMAP.md`
+5. Follow 10-step workflow above
+6. Build amazing features that **actually work** ✅
+
+---
+
+**Last Updated**: 2025-10-25
+**Version**: 2.0 (with mandatory runtime validation)
+**Maintained By**: Wave 4 Researcher 4 (Foundation Consolidation)

@@ -8,17 +8,36 @@
 
 ---
 
+## 🆕 Foundation Integration
+
+**This roadmap is now part of the unified foundation.**
+
+**Before implementing**:
+1. Read `docs/foundation/IMPLEMENTATION_FOUNDATION.md` ← MASTER
+2. Read `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md` ← Logging
+3. Read `docs/foundation/TESTING_INTEGRATION.md` ← Testing
+
+**Key updates**:
+- Every feature has runtime validation checkbox
+- Every feature has logging requirement
+- Smoke tests are MANDATORY
+- Can't mark [x] without exit code 0
+
+---
+
 ## ⚠️ HOW TO USE THIS DOCUMENT
 
 **For AI Agents**:
-1. Read `AGENT_GUIDELINES.md` first
-2. Check "Next Priority" phase below
-3. Pick unchecked [ ] item to work on
-4. Read referenced specs (paths provided)
-5. Build the feature
-6. Update checkbox to [x] when complete
-7. Update "Last Updated" timestamp above
-8. Commit with message: "Implemented [feature-name]"
+1. Read `docs/foundation/IMPLEMENTATION_FOUNDATION.md` first
+2. Read `AGENT_GUIDELINES.md` for workflow
+3. Check "Next Priority" phase below
+4. Pick unchecked [ ] item to work on
+5. Read referenced specs (paths provided)
+6. Build the feature
+7. **Run smoke test (MANDATORY - exit code 0 required)**
+8. Update checkbox to [x] when complete
+9. Update "Last Updated" timestamp above
+10. Commit with message: "Implemented [feature-name]"
 
 **For Developers**:
 - This is your single source of truth for what needs building
@@ -74,6 +93,17 @@
   - Test guide: `docs/specifications/unified/testing-strategy.md`
   - Target: 20 tests, 90%+ coverage
   - Run: `python run_tests.py` → [2] Unit tests
+
+- [ ] **Add logging (see RUNTIME_VALIDATION_INTEGRATION.md)**
+  - Entry/exit logging for timer operations
+  - State change logging (timer created, fired, canceled)
+  - Observable in logs
+
+- [ ] **Run smoke test - MANDATORY (exit code 0 required)**
+  - Command: `python run_tests.py` → [s]
+  - Must see: Exit code 0
+  - Verify: Feature visible in logs
+  - Cannot mark complete without this
 
 ---
 

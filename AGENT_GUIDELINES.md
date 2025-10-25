@@ -4,13 +4,32 @@
 
 ---
 
+## 🎯 Foundation Integration
+
+**NEW**: This project now has a unified foundation.
+
+**Start with**:
+1. Read `docs/foundation/IMPLEMENTATION_FOUNDATION.md` ← THE master document
+2. Read `docs/foundation/QUICK_REFERENCE.md` ← One-page cheat sheet
+3. Then return here for detailed workflow
+
+**Key Updates**:
+- Runtime validation is MANDATORY
+- Smoke tests can't be skipped
+- Logging is required for every feature
+- Foundation ties everything together
+
+---
+
 ## 🎯 Your Mission
 
 Implement Risk Manager V34 features according to:
-1. **Unified specifications** (single source of truth)
-2. **Implementation roadmap** (what to build, in what order)
-3. **Contracts** (internal/external interfaces)
-4. **Test requirements** (coverage targets)
+1. **Foundation docs** (master system integration)
+2. **Unified specifications** (single source of truth)
+3. **Implementation roadmap** (what to build, in what order)
+4. **Contracts** (internal/external interfaces)
+5. **Test requirements** (coverage targets)
+6. **Runtime validation** (smoke tests MANDATORY)
 
 ---
 
@@ -134,7 +153,31 @@ cat test_reports/latest.txt
 
 ---
 
-### Step 7: Run Integration Tests
+### Step 7: Runtime Validation (PROVE IT WORKS) ← UPDATED
+
+**MANDATORY**: Can't mark complete without this.
+
+**See**: `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md` for complete guide.
+
+**Quick steps**:
+```bash
+# Run smoke test
+python run_tests.py → [s] Runtime SMOKE
+
+# Check exit code
+# 0 = SUCCESS → Continue to Step 8
+# 1/2 = FAIL → Debug using protocol, fix, repeat
+
+# Debug if needed
+cat data/logs/risk_manager.log
+grep "Checkpoint" data/logs/risk_manager.log | tail -1
+```
+
+**Can't skip this step.**
+
+---
+
+### Step 8: Run Integration Tests
 
 **If feature integrates with SDK or database**:
 
@@ -148,7 +191,7 @@ cat test_reports/latest.txt
 
 ---
 
-### Step 8: Update the Roadmap
+### Step 9: Update the Roadmap
 
 **CRITICAL**: Update `IMPLEMENTATION_ROADMAP.md`
 
@@ -160,11 +203,12 @@ cat test_reports/latest.txt
 ```markdown
 ### MOD-003: Timer Manager
 - [x] **Create `src/risk_manager/state/timer_manager.py`** ← YOU DID THIS
+- [x] **Smoke test passing (exit code 0)** ← MUST BE CHECKED
 ```
 
 ---
 
-### Step 9: Commit Your Changes
+### Step 10: Commit Your Changes
 
 ```bash
 # Stage files
@@ -539,18 +583,23 @@ git push
 
 ---
 
-## ✅ Definition of Done
+## ✅ Definition of Done (Version 2.0 - WITH RUNTIME VALIDATION)
 
-**A feature is complete when**:
+**A feature is NOT complete until**:
 
 1. ✅ Implementation matches unified spec exactly
 2. ✅ Follows contracts from `CONTRACTS_REFERENCE.md`
 3. ✅ Unit tests written and passing (90%+ coverage)
 4. ✅ Integration tests written and passing (if applicable)
 5. ✅ E2E tests written and passing (if applicable)
-6. ✅ `IMPLEMENTATION_ROADMAP.md` updated (checkbox checked)
-7. ✅ Git commit with descriptive message
-8. ✅ Changes pushed to remote
+6. ✅ **Smoke test passing (exit code 0)** ← NEW & MANDATORY
+7. ✅ **Logging added (feature observable)** ← NEW & MANDATORY
+8. ✅ **Feature visible in logs** ← NEW & MANDATORY
+9. ✅ `IMPLEMENTATION_ROADMAP.md` updated (checkbox checked)
+10. ✅ Git commit with descriptive message
+11. ✅ Changes pushed to remote
+
+**Can't skip steps 6-8** - See `docs/foundation/RUNTIME_VALIDATION_INTEGRATION.md`
 
 ---
 
