@@ -1,0 +1,191 @@
+# AGENT TEMPLATE STRUCTURE FOR RISK-MANAGER
+# Based on SDK analysis: test-orchestrator, python-developer, integration-tester,
+# code-standards-enforcer, release-manager
+
+## AGENT FILE STRUCTURE (YAML + MARKDOWN)
+
+### FRONTMATTER (YAML - Required)
+```yaml
+---
+name: agent-name                    # Lowercase, hyphenated
+description: >                      # Single line, focused summary
+  What this agent does. Key specializations. When to use it.
+tools: Read, Write, Edit, Glob, Grep, Bash, TodoWrite  # Comma-separated
+model: sonnet                       # or haiku for lighter tasks
+color: blue                         # UI identification
+---
+```
+
+### BODY SECTIONS (MARKDOWN - Standard Pattern)
+
+#### 1. PURPOSE (Required)
+Single paragraph explaining agent's role and focus area.
+
+#### 2. CORE RESPONSIBILITIES (Required)
+Bullet list of 6-10 specific responsibilities:
+- Action-oriented items
+- Measurable or verifiable outcomes
+- Domain-specific tasks
+
+#### 3. KEY PRINCIPLES (Optional but Recommended)
+Critical behavioral rules or constraints:
+- What NOT to do
+- Important boundaries
+- Coordination protocols
+
+#### 4. TECHNICAL EXPERTISE (For developer agents)
+Bullet list of technologies, patterns, libraries:
+- **Category**: specific items
+- Use bold for categories
+
+#### 5. TOOLS AND COMMANDS (For developer agents)
+```bash
+# Organized by category
+# Essential Commands
+command examples
+
+# Testing/Analysis/Build commands
+more examples
+```
+
+#### 6. MCP SERVER ACCESS (Optional)
+List required and optional MCP servers:
+- `mcp__server-name` - Purpose/usage
+- Mark CRITICAL if essential
+
+#### 7. DEVELOPMENT/WORKFLOW PATTERNS (Context-specific)
+Code examples showing proper patterns:
+```python
+# ✅ CORRECT
+good_example()
+
+# ❌ WRONG
+bad_example()
+```
+
+#### 8. COORDINATION PATTERNS (For orchestrator agents)
+Step-by-step workflows showing agent handoffs:
+```
+1. agent-1: Task description
+2. agent-2: Task description
+3. agent-3: Validation/check
+```
+
+#### 9. QUALITY/COMPLIANCE RULES (For enforcer agents)
+Checklist format with specific criteria:
+- [ ] Requirement 1
+- [ ] Requirement 2
+- Use specific metrics where possible
+
+#### 10. BEST PRACTICES (Required)
+DO/DON'T format:
+### DO
+- Positive actions
+### DON'T
+- Anti-patterns to avoid
+
+---
+
+## RISK-MANAGER AGENT TYPES NEEDED
+
+### 1. RISK-RULE-DEVELOPER
+- Writing new risk rules
+- TDD for risk logic
+- Decimal precision handling
+- PnL calculations
+- Event-driven patterns
+
+### 2. CONFIGURATION-SPECIALIST
+- YAML validation
+- Schema compliance
+- Config transformations
+- Migration between versions
+- Environment-specific configs
+
+### 3. INTEGRATION-ORCHESTRATOR
+- TradeStation API testing
+- SignalR connection management
+- Mock market data generation
+- Order lifecycle simulation
+- Multi-account scenarios
+
+### 4. COMPLIANCE-AUDITOR
+- Rule coverage verification
+- Logging completeness
+- Security checks
+- Performance limits
+- Configuration safety
+
+### 5. DEPLOYMENT-COORDINATOR
+- Database migrations
+- Config template generation
+- Health check scripts
+- Rollback procedures
+- Production validation
+
+---
+
+## COMMON PATTERNS ACROSS AGENTS
+
+### FILE ORGANIZATION
+- Never save to root folder
+- Use appropriate subdirectories:
+  /src - Source code
+  /tests - Test files
+  /docs - Documentation
+  /config - Configuration
+  /scripts - Utility scripts
+
+### TOOL USAGE
+- Read: Inspect existing files
+- Write: Create new files (rare)
+- Edit: Modify existing files (preferred)
+- Glob: Find files by pattern
+- Grep: Search file contents
+- Bash: Run commands
+- TodoWrite: Track tasks (batched)
+
+### COORDINATION HOOKS
+Pre-work:
+  npx claude-flow@alpha hooks pre-task --description "[task]"
+
+During work:
+  npx claude-flow@alpha hooks post-edit --file "[file]"
+
+Post-work:
+  npx claude-flow@alpha hooks post-task --task-id "[task]"
+
+### QUALITY STANDARDS
+- Test coverage targets
+- Performance requirements
+- Documentation standards
+- Type safety requirements
+- Security compliance
+
+---
+
+## TEMPLATE USAGE NOTES
+
+1. Start with YAML frontmatter - required fields
+2. Purpose section - keep focused, single paragraph
+3. Responsibilities - 6-10 bullets, specific
+4. Include code examples for developer agents
+5. Include workflows for orchestrator agents
+6. Include checklists for enforcer agents
+7. Always include Best Practices section
+8. Keep under 600 lines total
+9. Use consistent formatting (✅/❌ for examples)
+10. Link related agents in coordination patterns
+
+---
+
+## NEXT STEPS
+
+Use this template to create:
+1. risk-rule-developer.md
+2. configuration-specialist.md
+3. integration-orchestrator.md
+4. compliance-auditor.md
+5. deployment-coordinator.md
+
+Each should be ~300-500 lines, focused on risk-manager specifics.

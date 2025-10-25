@@ -132,7 +132,7 @@ README.md
 │   ├── Basic Risk Protection
 │   ├── Advanced Rules
 │   └── AI-Powered Monitoring
-├── Built-in Risk Rules (9 rules)
+├── Built-in Risk Rules (12 rules)
 ├── AI Features (3 capabilities)
 ├── Monitoring & Dashboards
 ├── Configuration Examples

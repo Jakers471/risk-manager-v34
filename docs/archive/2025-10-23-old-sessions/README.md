@@ -32,7 +32,7 @@ These docs were created before we:
 
 ### For Development
 - **[docs/dev-guides/QUICK_REFERENCE.md](../dev-guides/QUICK_REFERENCE.md)** - Commands
-- **[docs/current/TESTING_GUIDE.md](../current/TESTING_GUIDE.md)** - TDD guide
+- **[docs/testing/TESTING_GUIDE.md](../../testing/TESTING_GUIDE.md)** - TDD guide
 
 ---
 
