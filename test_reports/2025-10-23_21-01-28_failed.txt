@@ -1,0 +1,96 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: All tests
+Timestamp: 2025-10-23 21:01:28
+Status: FAILED
+Exit Code: 1
+================================================================================
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 19 items
+
+tests/unit/test_core/test_events.py::TestEventBus::test_create_event_bus PASSED [  5%]
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_to_event FAILED [ 10%]
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_multiple_callbacks FAILED [ 15%]
+tests/unit/test_core/test_events.py::TestEventBus::test_unsubscribe_from_event FAILED [ 21%]
+tests/unit/test_core/test_events.py::TestRiskEvent::test_create_event FAILED [ 26%]
+tests/unit/test_core/test_events.py::TestRiskEvent::test_event_has_timestamp FAILED [ 31%]
+tests/unit/test_core/test_events.py::TestEventType::test_event_types_exist FAILED [ 36%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_tracker_initializes PASSED [ 42%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_get_daily_pnl_returns_zero_for_new_account PASSED [ 47%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_add_trade_pnl_updates_daily_total PASSED [ 52%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_pnl_survives_restart PASSED [ 57%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_multiple_accounts_tracked_independently PASSED [ 63%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl PASSED [ 68%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_different_dates_tracked_separately PASSED [ 73%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_increments PASSED [ 78%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl PASSED [ 84%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_zero_pnl_trades PASSED [ 89%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_large_pnl_values PASSED [ 94%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_get_all_account_pnls PASSED [100%]
+
+=================================== FAILURES ===================================
+_____________________ TestEventBus.test_subscribe_to_event _____________________
+tests/unit/test_core/test_events.py:29: in test_subscribe_to_event
+    bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RiskEvent.__init__() got an unexpected keyword argument 'type'
+________________ TestEventBus.test_subscribe_multiple_callbacks ________________
+tests/unit/test_core/test_events.py:48: in test_subscribe_multiple_callbacks
+    bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RiskEvent.__init__() got an unexpected keyword argument 'type'
+___________________ TestEventBus.test_unsubscribe_from_event ___________________
+tests/unit/test_core/test_events.py:63: in test_unsubscribe_from_event
+    bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RiskEvent.__init__() got an unexpected keyword argument 'type'
+_______________________ TestRiskEvent.test_create_event ________________________
+tests/unit/test_core/test_events.py:74: in test_create_event
+    type=EventType.TRADE_EXECUTED,
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: type object 'EventType' has no attribute 'TRADE_EXECUTED'
+____________________ TestRiskEvent.test_event_has_timestamp ____________________
+tests/unit/test_core/test_events.py:84: in test_event_has_timestamp
+    event = RiskEvent(
+E   TypeError: RiskEvent.__init__() got an unexpected keyword argument 'type'
+_____________________ TestEventType.test_event_types_exist _____________________
+tests/unit/test_core/test_events.py:99: in test_event_types_exist
+    EventType.ORDER_UPDATED,
+    ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: type object 'EventType' has no attribute 'ORDER_UPDATED'. Did you mean: 'ORDER_PLACED'?
+=============================== warnings summary ===============================
+tests/unit/test_state/test_pnl_tracker.py: 12 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/database.py:82: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    (1, datetime.utcnow().isoformat()),
+
+tests/unit/test_state/test_pnl_tracker.py: 23 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:63: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:194: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_to_event
+FAILED tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_multiple_callbacks
+FAILED tests/unit/test_core/test_events.py::TestEventBus::test_unsubscribe_from_event
+FAILED tests/unit/test_core/test_events.py::TestRiskEvent::test_create_event
+FAILED tests/unit/test_core/test_events.py::TestRiskEvent::test_event_has_timestamp
+FAILED tests/unit/test_core/test_events.py::TestEventType::test_event_types_exist
+================== 6 failed, 13 passed, 37 warnings in 3.56s ===================
+
+
+================================================================================
+End of Report
+================================================================================

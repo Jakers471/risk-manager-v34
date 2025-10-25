@@ -12,6 +12,7 @@
 - ✅ **DO** use paths and check actual files for current state
 - ✅ **DO** use `ls`, `find`, `pytest --collect-only` to see structure
 - ✅ **DO** read `docs/current/PROJECT_STATUS.md` for latest progress
+- ✅ **DO** check `test_reports/latest.txt` for most recent test results
 
 **Reason**: Hard-coded structures go stale immediately. Always check the actual files.
 
@@ -23,28 +24,321 @@ This file tells Claude AI exactly what to read and in what order to get up to sp
 
 **Last Updated**: 2025-10-23
 **Project**: Risk Manager V34
-**Environment**: WSL2 Ubuntu (`~/risk-manager-v34-wsl`)
+**Location**: `C:\Users\jakers\Desktop\risk-manager-v34\`
+**Environment**: Windows WSL2
 
 ---
 
-## 📖 Quick Start (First 2 Minutes)
+## 📖 Quick Start (First 5 Minutes)
 
 ### 1. Read These Files IN ORDER:
 
 ```
-1. docs/current/PROJECT_STATUS.md          (2 min) - Current state & progress
-2. docs/current/SDK_INTEGRATION_GUIDE.md   (3 min) - How we use Project-X SDK
-3. docs/current/MULTI_SYMBOL_SUPPORT.md    (2 min) - Account-wide risk across symbols
-4. docs/dev-guides/QUICK_REFERENCE.md      (1 min) - Commands & common tasks
+Priority 1 - Project Status (2 min):
+  1. docs/current/PROJECT_STATUS.md       - Current state & progress
+  2. test_reports/latest.txt              - Most recent test results
+
+Priority 2 - Testing System (3 min):
+  3. docs/testing/README.md               - Testing navigation
+  4. docs/testing/TESTING_GUIDE.md        - Core testing reference
+  5. docs/testing/RUNTIME_DEBUGGING.md    - Runtime validation system
+
+Priority 3 - SDK Integration (3 min):
+  6. docs/current/SDK_INTEGRATION_GUIDE.md  - How we use Project-X SDK
+  7. docs/current/MULTI_SYMBOL_SUPPORT.md   - Account-wide risk
+
+Priority 4 - API Reference (For Coding/Testing):
+  8. SDK_API_REFERENCE.md                   - Actual SDK & our API contracts
+  9. SDK_ENFORCEMENT_FLOW.md                - Complete enforcement wiring
+  10. TEST_RUNNER_FINAL_FIXES.md            - Test runner behavior & fixes
 ```
 
-**After reading these 4 files, you will know**:
-- ✅ What's been built (25% complete)
-- ✅ What the SDK handles for us
-- ✅ How multi-symbol trading works (MNQ, ES, GC, etc.)
+**After reading these 10 files, you will know**:
+- ✅ What's been built and what's working
+- ✅ Current test status (passing/failing)
+- ✅ How testing and runtime debugging work
+- ✅ How the SDK is integrated
+- ✅ **Actual API contracts** (prevent test/code mismatches)
+- ✅ **Enforcement flow** (how violations trigger SDK actions)
+- ✅ **Test runner behavior** (why tests were failing/fixed)
 - ✅ What we still need to build
 - ✅ Exactly where we left off
-- ✅ What to do next
+
+---
+
+## 🧪 Testing System Overview
+
+### Interactive Test Runner Menu
+
+**Command**: `python run_tests.py`
+
+**Location**: Root directory (`run_tests.py`)
+
+#### Menu Structure:
+
+```
+╔════════════════════════════════════════════════════════════╗
+║  Risk Manager V34 - Test Runner                           ║
+╚════════════════════════════════════════════════════════════╝
+
+Test Selection:
+  [1] Run ALL tests
+  [2] Run UNIT tests only
+  [3] Run INTEGRATION tests only
+  [4] Run E2E tests only
+  [5] Run SLOW tests only
+  [6] Run tests with COVERAGE report
+  [7] Run tests with COVERAGE + HTML report
+  [8] Run specific test file
+  [9] Run tests matching keyword
+  [0] Run last failed tests only
+
+Runtime Checks:
+  [s] Runtime SMOKE (DRY-RUN, fail-fast, 8s timeout)
+  [r] Runtime SOAK (30-60s DRY-RUN)
+  [t] Runtime TRACE (ASYNC_DEBUG=1, deep debug)
+  [l] View/Tail LOGS
+  [e] Env/Config SNAPSHOT
+  [g] GATE: Tests + Smoke combo
+
+Utilities:
+  [v] Run in VERBOSE mode (shows each test)
+  [c] Check COVERAGE status
+  [p] View last test REPORT
+  [h] Help - Testing with AI
+  [q] Quit
+```
+
+### Test Reports Auto-Save
+
+**Every test run automatically saves to**:
+- `test_reports/latest.txt` - Always the most recent run (overwritten)
+- `test_reports/YYYY-MM-DD_HH-MM-SS_passed.txt` - Timestamped pass
+- `test_reports/YYYY-MM-DD_HH-MM-SS_failed.txt` - Timestamped fail
+
+**Usage Pattern**:
+```bash
+# User runs tests
+python run_tests.py
+# → Select option → Report auto-saves
+
+# AI reads latest results
+Read test_reports/latest.txt
+
+# The report contains:
+# - Full pytest output with colors
+# - Pass/fail status
+# - Exit code
+# - Timestamp
+# - Complete tracebacks for failures
+```
+
+### Runtime Reliability Pack
+
+**NEW: Prevents "Tests Green But Runtime Broken" Problem**
+
+The Runtime Reliability Pack provides 5 capabilities:
+
+#### 1. **Smoke Test** (`[s]` in menu)
+- **What**: Boots system and validates first event fires within 8 seconds
+- **Exit Codes**:
+  - `0` = Success (first event observed)
+  - `1` = Exception occurred (see logs)
+  - `2` = Boot stalled (no events within timeout)
+- **When**: After test suite passes, before deployment
+
+#### 2. **Soak Test** (`[r]` in menu)
+- **What**: Extended 30-60s runtime validation
+- **Why**: Catches memory leaks, deadlocks, resource exhaustion
+- **When**: Before major deployments
+
+#### 3. **Trace Mode** (`[t]` in menu)
+- **What**: Deep async task debugging (ASYNC_DEBUG=1)
+- **Output**: `runtime_trace.log` with all pending tasks
+- **When**: Service starts but hangs/stalls
+
+#### 4. **Log Viewer** (`[l]` in menu)
+- **What**: Stream logs in real-time or view last 100 lines
+- **Location**: `data/logs/risk_manager.log`
+- **When**: Debugging runtime issues
+
+#### 5. **Env Snapshot** (`[e]` in menu)
+- **What**: Shows configuration, env vars, Python version
+- **When**: Configuration troubleshooting
+
+**Implementation**:
+- **Source**: `src/runtime/` (1,316 lines across 6 files)
+- **Tests**: `tests/runtime/` (70 tests across 5 files)
+- **Docs**: `docs/testing/RUNTIME_DEBUGGING.md` (36KB comprehensive guide)
+
+---
+
+## 🔍 8-Checkpoint Logging System
+
+**Location**: SDK logging integrated in:
+- `src/risk_manager/core/manager.py` - Checkpoints 1-4
+- `src/risk_manager/core/engine.py` - Checkpoints 5-7
+- `src/risk_manager/sdk/enforcement.py` - Checkpoint 8
+
+**The 8 Strategic Checkpoints**:
+
+```
+Checkpoint 1: 🚀 Service Start
+  └─ Log: "Risk Manager starting..."
+  └─ Where: manager.py:start()
+
+Checkpoint 2: ✅ Config Loaded
+  └─ Log: "Config loaded: X rules"
+  └─ Where: manager.py:_load_config()
+
+Checkpoint 3: ✅ SDK Connected
+  └─ Log: "SDK connected: account_id"
+  └─ Where: manager.py:_connect_sdk()
+
+Checkpoint 4: ✅ Rules Initialized
+  └─ Log: "Rules initialized: X rules"
+  └─ Where: manager.py:_initialize_rules()
+
+Checkpoint 5: ✅ Event Loop Running
+  └─ Log: "Event loop running"
+  └─ Where: engine.py:start()
+
+Checkpoint 6: 📨 Event Received
+  └─ Log: "Event received: {event}"
+  └─ Where: engine.py:handle_event()
+
+Checkpoint 7: 🔍 Rule Evaluated
+  └─ Log: "Rule evaluated: {rule} {result}"
+  └─ Where: engine.py:handle_event()
+
+Checkpoint 8: ⚠️ Enforcement Triggered
+  └─ Log: "Enforcement triggered: {action}"
+  └─ Where: enforcement.py:enforce()
+```
+
+**Reading Logs**:
+```bash
+# View logs via menu
+python run_tests.py → [l]
+
+# Or directly
+cat data/logs/risk_manager.log | grep "🚀\|✅\|📨\|🔍\|⚠️"
+
+# Find where it stopped
+cat data/logs/risk_manager.log | tail -20
+```
+
+---
+
+## 📁 Project Structure
+
+**Critical Directories** (use paths, don't cache structure):
+
+### Source Code
+```
+src/
+├── risk_manager/         # Core risk management system
+│   ├── core/            # Manager, engine, events (with SDK logging)
+│   ├── rules/           # Risk rule implementations
+│   ├── sdk/             # SDK integration layer (with enforcement logging)
+│   ├── state/           # State management
+│   ├── ai/              # AI integration
+│   ├── integrations/    # External integrations
+│   └── monitoring/      # Monitoring & metrics
+└── runtime/             # Runtime reliability capabilities ⭐ NEW
+    ├── smoke_test.py    # Boot validation (exit codes 0/1/2)
+    ├── heartbeat.py     # Liveness monitoring (1s intervals)
+    ├── async_debug.py   # Task dump for deadlock detection
+    ├── post_conditions.py # System wiring validation
+    └── dry_run.py       # Deterministic mock event generator
+```
+
+### Tests
+```
+tests/
+├── unit/                # Unit tests (fast, mocked)
+├── integration/         # Integration tests (real SDK)
+├── runtime/             # Runtime reliability tests ⭐ NEW
+│   ├── test_smoke.py    # 13 smoke test scenarios
+│   ├── test_heartbeat.py
+│   ├── test_async_debug.py
+│   ├── test_post_conditions.py
+│   └── test_dry_run.py
+├── fixtures/            # Shared test fixtures
+└── conftest.py          # Pytest configuration
+```
+
+### Documentation
+```
+docs/
+├── current/             # Active documentation
+│   ├── PROJECT_STATUS.md           # ⭐ START HERE - Current state
+│   ├── SDK_INTEGRATION_GUIDE.md    # How we use SDK
+│   ├── MULTI_SYMBOL_SUPPORT.md     # Account-wide risk
+│   ├── RULE_CATEGORIES.md          # Rule types
+│   ├── CONFIG_FORMATS.md           # YAML examples
+│   └── SECURITY_MODEL.md           # Windows UAC security
+├── testing/             # Testing documentation ⭐ NEW
+│   ├── README.md                   # Testing navigation
+│   ├── TESTING_GUIDE.md            # Core testing reference
+│   ├── RUNTIME_DEBUGGING.md        # Runtime reliability guide
+│   └── WORKING_WITH_AI.md          # AI workflow
+├── dev-guides/          # Developer guides
+├── PROJECT_DOCS/        # Original specifications (pre-SDK)
+└── archive/             # Archived old versions
+```
+
+### Test Reports
+```
+test_reports/            # Auto-generated test reports ⭐ NEW
+├── README.md            # Report format documentation
+├── latest.txt           # ⭐ Most recent test run (ALWAYS CHECK THIS)
+└── YYYY-MM-DD_HH-MM-SS_*.txt  # Timestamped archives
+```
+
+### Agent Guidelines
+```
+.claude/
+├── agents/              # Custom agent definitions
+├── commands/            # Custom slash commands
+└── prompts/             # Agent protocols
+    └── runtime-guidelines.md  # ⭐ Runtime testing protocols
+```
+
+### Configuration
+```
+config/
+├── risk_config.yaml     # Risk rules configuration
+├── accounts.yaml        # Account mappings
+└── *.yaml.template      # Configuration templates
+```
+
+---
+
+## 📚 Essential Documentation Paths
+
+### Must Read First
+- `docs/current/PROJECT_STATUS.md` - **START HERE** - Current progress
+- `test_reports/latest.txt` - **CHECK THIS** - Most recent test results
+
+### Testing & Debugging
+- `docs/testing/TESTING_GUIDE.md` - Core testing reference
+- `docs/testing/RUNTIME_DEBUGGING.md` - Runtime reliability guide ⭐ NEW
+- `docs/testing/WORKING_WITH_AI.md` - AI workflow including runtime debugging
+- `test_reports/README.md` - Test report format documentation
+- `.claude/prompts/runtime-guidelines.md` - Agent runtime testing protocols
+
+### SDK Integration
+- `docs/current/SDK_INTEGRATION_GUIDE.md` - How to use Project-X SDK
+- `docs/current/RULES_TO_SDK_MAPPING.md` - What SDK provides vs what we build
+
+### Architecture
+- `docs/current/MULTI_SYMBOL_SUPPORT.md` - Account-wide risk across symbols
+- `docs/current/RULE_CATEGORIES.md` - Rule types (CRITICAL!)
+- `docs/current/SECURITY_MODEL.md` - Windows UAC security
+
+### Configuration
+- `docs/current/CONFIG_FORMATS.md` - Complete YAML config examples
 
 ---
 
@@ -120,52 +414,226 @@ Trader CLI: Normal terminal (no elevation needed)
 
 ---
 
-## 📁 Documentation Structure
+## 🧪 Key Understanding #3: Testing Hierarchy
 
-**Key Documentation Locations** (use these paths, don't cache the structure):
+### The Testing Pyramid
 
-### Active Documentation
-- `docs/current/` - All current/active documentation
-  - `PROJECT_STATUS.md` - Where we are now (ALWAYS check this first)
-  - `SDK_INTEGRATION_GUIDE.md` - How to use SDK (READ THIS!)
-  - `MULTI_SYMBOL_SUPPORT.md` - Account-wide risk across symbols (MNQ, ES, GC, etc.)
-  - `RULES_TO_SDK_MAPPING.md` - What SDK provides vs what we build
-  - `RULE_CATEGORIES.md` - Rule types: Trade-by-Trade vs Timer vs Hard Lockout (CRITICAL!)
-  - `CONFIG_FORMATS.md` - Complete YAML config examples (all 13 rules)
-  - `SECURITY_MODEL.md` - Windows UAC security (CRITICAL!)
-  - `TESTING_GUIDE.md` - TDD approach
-
-### Developer Guides
-- `docs/dev-guides/` - Developer reference guides
-  - `QUICK_REFERENCE.md` - Commands & common tasks
-
-### Original Specifications
-- `docs/PROJECT_DOCS/` - Original specs (pre-SDK)
-  - `INTEGRATION_NOTE.md` - Explains spec → SDK mapping
-  - `rules/` - 12 risk rule specifications
-  - `architecture/` - Original architecture docs
-
-### Old Versions
-- `docs/archive/` - Previous versions (dated folders)
-
-### Tests
-- `tests/` - TDD test suite
-  - `conftest.py` - Pytest configuration
-  - `unit/` - Unit tests
-  - `integration/` - Integration tests
-
-### Generate Current Structure
-**Need a snapshot of the current file structure?**
-
-```bash
-# Generate structure documentation
-python scripts/generate_structure.py
-
-# Save to file
-python scripts/generate_structure.py --output docs/current/STRUCTURE_SNAPSHOT.md
+```
+        /\
+       /E2E\        10% - Full system, realistic scenarios
+      /------\
+     /  Integ \     30% - Real SDK, component interaction
+    /----------\
+   / Unit Tests \   60% - Fast, isolated, mocked
+  /--------------\
 ```
 
-**⚠️ Don't hard-code file trees - use `ls` or `find` or the script above**
+### Runtime Validation Layer ⭐ NEW
+
+**Beyond Pytest**: Runtime Reliability Pack prevents "tests green but runtime broken"
+
+```
+Step 1: pytest (automated)
+  └─ [2] Unit tests
+  └─ [3] Integration tests
+  └─ [4] E2E tests
+  └─ ✅ All pass
+
+Step 2: Runtime validation (enforced liveness)
+  └─ [s] Smoke Test ← Proves first event fires within 8s
+  └─ Exit code 0 = Actually works!
+  └─ Exit code 1 = Exception (fix it)
+  └─ Exit code 2 = Boot stalled (check subscriptions)
+
+Step 3: Deploy
+  └─ Confident it works!
+```
+
+**Why Both?**
+- **pytest** validates logic correctness
+- **Runtime Pack** validates system liveness
+- **Together** prevent "tests pass but nothing happens"
+
+---
+
+## 🔧 Common Tasks Reference
+
+### ⚠️ BEFORE Writing Code or Tests - Read API Contracts!
+
+**CRITICAL**: Always check actual API signatures to prevent test/code mismatches!
+
+```bash
+# 1. Check our API contracts
+Read SDK_API_REFERENCE.md
+
+# 2. Check actual implementation
+from risk_manager.core.events import RiskEvent
+import inspect
+print(inspect.signature(RiskEvent.__init__))
+
+# 3. Verify enum values exist
+from risk_manager.core.events import EventType
+print([e.name for e in EventType])
+```
+
+**Common Mistakes to Avoid**:
+- ❌ Using `RiskEvent(type=...)` → ✅ Use `RiskEvent(event_type=...)`
+- ❌ Using `EventType.TRADE_EXECUTED` → ✅ Check if it exists first!
+- ❌ Using `PnLTracker(account_id=...)` → ✅ Use `PnLTracker(db=...)`
+
+**See**: `SDK_API_REFERENCE.md` for all actual API contracts
+
+---
+
+### Run Tests (Interactive Menu)
+```bash
+# Interactive test runner with report generation
+python run_tests.py
+
+# Menu auto-saves reports to:
+# - test_reports/latest.txt (most recent)
+# - test_reports/YYYY-MM-DD_HH-MM-SS_passed.txt (timestamped)
+```
+
+**Key Menu Options**:
+- `[2]` - Unit tests (fast, use this most often)
+- `[3]` - Integration tests (requires SDK connection)
+- `[s]` - Runtime smoke test (validates boot + first event)
+- `[g]` - Gate test (unit + integration + smoke combo)
+- `[p]` - View last test report
+
+### When User Says "Fix Test Errors"
+```bash
+# 1. Read the latest test report
+Read test_reports/latest.txt
+
+# The report contains:
+# - Full pytest output with colors
+# - Failures with complete tracebacks
+# - Warnings
+# - Summary statistics
+# - Exit code
+```
+
+**Workflow**:
+1. User runs tests via menu → Auto-saves to `test_reports/latest.txt`
+2. User says "fix test errors"
+3. AI reads `test_reports/latest.txt`
+4. AI identifies failures and fixes them
+5. Repeat until all tests pass
+
+### When Tests Pass But Runtime Fails
+
+**Symptom**: Tests green ✅ but service starts and nothing happens
+
+**Solution**: Run Runtime Smoke Test
+```bash
+python run_tests.py
+# Select [s] Runtime SMOKE
+
+# Check exit code:
+# 0 = Success (first event observed)
+# 1 = Exception (read logs for stack trace)
+# 2 = Boot stalled (check event subscriptions)
+```
+
+**Debug with 8 Checkpoints**:
+```bash
+# View logs
+python run_tests.py → [l]
+
+# Find where it stopped
+# Look for last emoji checkpoint:
+# 🚀 ✅ ✅ ✅ ✅ 📨 🔍 ⚠️
+#         ^^^ Stopped at checkpoint 3 (SDK connected)
+```
+
+**Read the guide**:
+```bash
+Read docs/testing/RUNTIME_DEBUGGING.md
+# Contains complete troubleshooting flowchart
+```
+
+### Run Runtime Checks
+
+```bash
+# Smoke test (8s boot validation)
+python run_tests.py → [s]
+
+# Soak test (30-60s stability)
+python run_tests.py → [r]
+
+# Trace mode (deep async debug)
+python run_tests.py → [t]
+
+# View logs
+python run_tests.py → [l]
+
+# Config snapshot
+python run_tests.py → [e]
+
+# Gate: Tests + Smoke combo
+python run_tests.py → [g]
+```
+
+### Run Tests Manually
+```bash
+# Run pytest directly (colors preserved)
+pytest
+
+# With coverage
+pytest --cov
+
+# Specific marker
+pytest -m unit
+pytest -m integration
+pytest -m runtime
+
+# Collect only (see available tests)
+pytest --collect-only
+```
+
+### Test API Connection
+```bash
+uv run python test_connection.py
+```
+
+### Check Project Status
+```bash
+# Read current status document
+cat docs/current/PROJECT_STATUS.md
+
+# Check latest test results
+cat test_reports/latest.txt
+
+# See what's implemented
+find src -name "*.py" -type f | wc -l
+
+# See all available tests
+pytest --collect-only
+```
+
+---
+
+## 📊 Progress Tracking
+
+**⚠️ For current progress, ALWAYS check: `docs/current/PROJECT_STATUS.md`**
+
+That file contains:
+- Up-to-date completion percentages
+- What's implemented vs what's missing
+- File-by-file inventory
+- Next priorities
+
+**⚠️ For latest test results, ALWAYS check: `test_reports/latest.txt`**
+
+That file contains:
+- Most recent pytest run
+- Pass/fail status
+- Exit code
+- Complete failure tracebacks
+
+**Don't rely on cached progress data - it goes stale immediately.**
 
 ---
 
@@ -176,155 +644,39 @@ python scripts/generate_structure.py --output docs/current/STRUCTURE_SNAPSHOT.md
 ```markdown
 **Last Session**: 2025-10-23
 
-**Status**: Foundation complete (25%), SDK integrated, connection verified
+**Reading Status**:
+1. ✅ Read `docs/current/PROJECT_STATUS.md` to see current progress
+2. ✅ Read `test_reports/latest.txt` to see latest test results
 
-**What's Working** ✅:
-- Core async architecture (manager, engine, events)
-- SDK integration (Project-X-Py v3.5.9)
-- API connected (account PRAC-V2-126244-84184528)
-- 2 of 12 risk rules implemented
-- Comprehensive test coverage setup ready
+**Status**: [Check PROJECT_STATUS.md for completion percentage]
 
-**What's Next** ⏳:
-1. Build CLI system (Trader + Admin)
-2. YAML config management
-3. State persistence (SQLite)
-4. Complete remaining 10 risk rules
-5. Windows Service wrapper
+**Latest Test Results**: [Check test_reports/latest.txt]
+- All tests passing: ✅/❌
+- Exit code: X
+- Failures: X
 
-**Current Priority**: Build Trader CLI (view-only status interface)
+**What's Working** (from PROJECT_STATUS.md):
+- [List from PROJECT_STATUS.md]
+
+**What's Next** (from PROJECT_STATUS.md):
+- [Next priorities from PROJECT_STATUS.md]
+
+**Testing System**:
+- ✅ Interactive test runner menu (`python run_tests.py`)
+- ✅ Auto-save reports to `test_reports/latest.txt`
+- ✅ Runtime Reliability Pack (smoke, soak, trace, logs, env)
+- ✅ 8-checkpoint logging system for runtime debugging
 
 See: `docs/current/PROJECT_STATUS.md` for complete details
 ```
 
 ---
 
-## 🔧 Common Tasks Reference
-
-### Run Tests (Interactive Menu)
-```bash
-# Interactive test runner with report generation
-python3 run_tests.py
-
-# Or quick command:
-./test
-```
-
-**Menu Features**:
-- Run all tests / unit / integration / specific files
-- Coverage reports (terminal + HTML)
-- Verbose mode
-- Test by keyword
-- **Auto-saves reports to `test_reports/latest.txt`**
-
-### When User Says "Fix Test Errors"
-```bash
-# 1. Read the latest test report
-cat test_reports/latest.txt
-
-# The report contains:
-# - Full pytest output
-# - Failures with tracebacks
-# - Warnings
-# - Summary statistics
-```
-
-**Workflow**:
-1. User runs tests via menu → Auto-saves to `test_reports/latest.txt`
-2. User says "fix test errors"
-3. AI reads `test_reports/latest.txt`
-4. AI identifies failures and fixes them
-5. Repeat until all tests pass
-
-### Run Tests Manually
-```bash
-wsl
-cd ~/risk-manager-v34-wsl
-uv run pytest
-uv run pytest --cov  # With coverage
-```
-
-### Test API Connection
-```bash
-wsl
-cd ~/risk-manager-v34-wsl
-uv run python test_connection.py
-```
-
-### Run Examples
-```bash
-wsl
-cd ~/risk-manager-v34-wsl
-uv run python examples/01_basic_usage.py
-```
-
-### Check Project Status
-```bash
-# Read current status document
-cat docs/current/PROJECT_STATUS.md
-
-# See what's implemented
-find src -name "*.py" -type f | wc -l
-
-# Run full test suite
-uv run pytest -v
-```
-
----
-
-## 📊 Progress at a Glance
-
-**⚠️ For current progress, ALWAYS check: `docs/current/PROJECT_STATUS.md`**
-
-That file contains:
-- Up-to-date completion percentages
-- What's implemented vs what's missing
-- File-by-file inventory
-- Next priorities
-
-**Don't rely on cached progress data - it goes stale immediately.**
-
----
-
 ## 🎯 Next Implementation Task
 
-### Option A: Build Trader CLI (Recommended)
-**File**: `src/cli/trader/status_screen.py`
-**Time**: 3-4 hours
-**Impact**: High - immediate visibility
-**Guide**: `docs/current/IMPLEMENTATION_ROADMAP.md` - Phase 1.2
+**Check `docs/current/PROJECT_STATUS.md` for current priorities.**
 
-### Option B: Set Up TDD Testing
-**Files**: `tests/unit/`, `tests/conftest.py`
-**Time**: 2-3 hours
-**Impact**: High - enables safe development
-**Guide**: `docs/current/TESTING_GUIDE.md`
-
-### Option C: YAML Config System
-**Files**: `src/config/*.py`, `config/*.yaml`
-**Time**: 2-3 hours
-**Impact**: High - enables configuration
-**Guide**: `docs/current/IMPLEMENTATION_ROADMAP.md` - Phase 1.1
-
----
-
-## 📚 Detailed Documentation
-
-### For Complete Project Understanding
-1. `docs/current/PROJECT_STATUS.md` - Complete inventory
-2. `docs/current/PROJECT_STRUCTURE.md` - File tree
-3. `docs/current/SDK_INTEGRATION_GUIDE.md` - How we use SDK
-4. `docs/current/IMPLEMENTATION_ROADMAP.md` - What to build
-
-### For Original Requirements
-1. `docs/PROJECT_DOCS/summary/project_overview.md` - Vision
-2. `docs/PROJECT_DOCS/architecture/system_architecture_v2.md` - Original design
-3. `docs/PROJECT_DOCS/INTEGRATION_NOTE.md` - How specs map to SDK
-
-### For Implementation
-1. `docs/dev-guides/QUICK_REFERENCE.md` - Commands
-2. `docs/current/TESTING_GUIDE.md` - TDD approach
-3. `docs/dev-guides/CONTRIBUTING.md` - How to add features
+The priorities change as work progresses. Always check the live document.
 
 ---
 
@@ -343,27 +695,68 @@ That file contains:
 - **Risk Layer**: We add risk management on top
 - **Async**: Modern async/await throughout
 - **Event-Driven**: SDK events → Risk rules → Enforcement
+- **Logged**: 8 strategic checkpoints for runtime debugging ⭐ NEW
 
-### Key Decision
-**Don't reimplement what SDK provides. Use SDK, add risk logic.**
+### Key Decisions
+1. **Don't reimplement what SDK provides. Use SDK, add risk logic.**
+2. **Write tests first (TDD). Run pytest before runtime checks.**
+3. **Check test reports FIRST before asking "what's wrong?"**
+4. **Use runtime smoke test to validate deployment readiness**
 
 ---
 
-## 🧪 Test-Driven Development
+## 🧪 Test-Driven Development Workflow
 
 **We use TDD** - Tests written first, then implementation.
-
-**Test Structure**: See `tests/` directory
-- Use `pytest --collect-only` to see all available tests
-- Use `ls -R tests/` to see current test structure
 
 **Workflow**:
 1. Write test first (it fails - RED)
 2. Write minimal code to pass (GREEN)
 3. Refactor (REFACTOR)
-4. Repeat
+4. Run `[s]` smoke test (validate runtime works)
+5. Repeat
 
-**Complete guide**: `docs/current/TESTING_GUIDE.md`
+**Test Structure**: See `tests/` directory
+- Use `pytest --collect-only` to see all available tests
+- Use `ls -R tests/` to see current test structure
+- Check `test_reports/latest.txt` for most recent results
+
+**Complete guides**:
+- `docs/testing/TESTING_GUIDE.md` - Core TDD guide
+- `docs/testing/RUNTIME_DEBUGGING.md` - Runtime validation
+- `docs/testing/WORKING_WITH_AI.md` - AI workflow
+
+---
+
+## 🤖 Agent Guidelines
+
+### For AI Agents Working on This Project
+
+**Before Starting Work**:
+1. ✅ Read `CLAUDE.md` (this file)
+2. ✅ Read `docs/current/PROJECT_STATUS.md` (current state)
+3. ✅ Read `test_reports/latest.txt` (latest test results)
+4. ✅ Read `docs/testing/TESTING_GUIDE.md` (testing approach)
+5. ✅ Read `.claude/prompts/runtime-guidelines.md` (runtime protocols)
+
+**During Work**:
+1. ✅ Write tests first (TDD)
+2. ✅ Run tests via menu: `python run_tests.py`
+3. ✅ Check `test_reports/latest.txt` for results
+4. ✅ Use SDK where possible (don't reinvent)
+5. ✅ Add SDK logging at strategic checkpoints
+6. ✅ Document as you build
+
+**Before Finishing**:
+1. ✅ Run `[g]` Gate test (tests + smoke combo)
+2. ✅ Check exit code 0 for smoke test
+3. ✅ Update `docs/current/PROJECT_STATUS.md`
+4. ✅ Verify all 8 checkpoints log correctly
+
+**Runtime Testing Protocol**:
+- After implementing feature → Write tests → Run tests → Run smoke test
+- If smoke fails → Check logs → Find which checkpoint failed → Fix issue
+- Use `docs/testing/RUNTIME_DEBUGGING.md` troubleshooting flowchart
 
 ---
 
@@ -371,7 +764,8 @@ That file contains:
 
 - [ ] Major architecture changes
 - [ ] Documentation reorganization
-- [ ] New critical files added
+- [ ] New critical features added (like Runtime Reliability Pack)
+- [ ] Testing system changes
 - [ ] Progress milestones (25% → 50% → etc.)
 - [ ] Next priority changes
 
@@ -381,20 +775,29 @@ That file contains:
 
 ### At Start of Session
 - [ ] Read `CLAUDE.md` (this file)
-- [ ] Read `docs/current/PROJECT_STATUS.md`
-- [ ] Read `docs/current/SDK_INTEGRATION_GUIDE.md`
+- [ ] Read `docs/current/PROJECT_STATUS.md` (current state)
+- [ ] Read `test_reports/latest.txt` (latest test results)
+- [ ] Read `docs/testing/README.md` (testing navigation)
 - [ ] Check what tests exist (`pytest --collect-only`)
-- [ ] Understand current priority
 
 ### During Session
 - [ ] Write tests first (TDD)
 - [ ] Use SDK where possible
+- [ ] Add SDK logging at checkpoints if touching core files
+- [ ] Run tests via menu (`python run_tests.py`)
+- [ ] Check `test_reports/latest.txt` after each run
 - [ ] Document as you build
-- [ ] Keep `PROJECT_STATUS.md` updated
+
+### Before Deploying
+- [ ] Run `[g]` Gate test (full suite + smoke)
+- [ ] Verify exit code 0
+- [ ] Check all 8 checkpoints log correctly
+- [ ] Run `[r]` Soak test for major changes
 
 ### End of Session
-- [ ] Run full test suite
-- [ ] Update `docs/current/PROJECT_STATUS.md`
+- [ ] Run full test suite (`python run_tests.py` → `[1]`)
+- [ ] Run smoke test (`[s]`)
+- [ ] Update `docs/current/PROJECT_STATUS.md` if progress made
 - [ ] Archive old docs if major changes
 - [ ] Git commit with clear message
 
@@ -411,12 +814,18 @@ That file contains:
 - Check `docs/current/PROJECT_STATUS.md` for completion status
 
 **Tech Stack**:
-- Python 3.13 async
+- Python 3.12+ async
 - Project-X-Py SDK v3.5.9 (handles all trading)
 - Pydantic (config/validation)
-- SQLite (state persistence - planned)
+- SQLite (state persistence)
 - pytest (TDD testing)
-- Rich + Typer (CLI - planned)
+- Runtime Reliability Pack (runtime validation) ⭐ NEW
+
+**Testing System**:
+- Interactive menu: `python run_tests.py`
+- Auto-save reports: `test_reports/latest.txt`
+- Runtime checks: Smoke, Soak, Trace, Logs, Env
+- 8-checkpoint logging: Find exactly where runtime fails
 
 ---
 
@@ -424,20 +833,16 @@ That file contains:
 
 **Read in this exact order**:
 1. This file (`CLAUDE.md`)
-2. `docs/current/SDK_INTEGRATION_GUIDE.md` - Understand SDK-first approach
+2. `test_reports/latest.txt` - See if tests are passing
 3. `docs/current/PROJECT_STATUS.md` - See what's done
-4. `docs/current/IMPLEMENTATION_ROADMAP.md` - See what's next
+4. `docs/testing/README.md` - Understand testing system
+5. `docs/current/SDK_INTEGRATION_GUIDE.md` - Understand SDK-first approach
 
 **Still confused?**
-- Look at `examples/01_basic_usage.py` - See it working
-- Run `uv run python test_connection.py` - Verify it works
+- Look at `examples/` directory - See it working
+- Run `python run_tests.py → [s]` - Runtime smoke test
+- Read `docs/testing/RUNTIME_DEBUGGING.md` - Complete troubleshooting guide
 - Read `docs/PROJECT_DOCS/INTEGRATION_NOTE.md` - Understand spec history
-
----
-
-**Last Updated**: 2025-10-23
-**Next Update**: After documentation reorganization complete
-**Maintainer**: Update this when project structure changes significantly
 
 ---
 
@@ -445,27 +850,77 @@ That file contains:
 
 **Quick Start**:
 ```bash
-# 1. Enter WSL
-wsl
+# 1. Check latest test results
+cat test_reports/latest.txt
 
-# 2. Navigate to project
-cd ~/risk-manager-v34-wsl
-
-# 3. Read status
+# 2. Read current status
 cat docs/current/PROJECT_STATUS.md
 
-# 4. Pick a task from IMPLEMENTATION_ROADMAP.md
+# 3. Pick a task from PROJECT_STATUS.md
 
-# 5. Write test first
-# Create test in tests/unit/
+# 4. Write test first
+# Create test in tests/unit/ or tests/integration/
 
-# 6. Implement feature
+# 5. Run tests
+python run_tests.py → [2] for unit tests
+
+# 6. Check results
+cat test_reports/latest.txt
+
+# 7. Implement feature
 # Create code in src/
 
-# 7. Run tests
-uv run pytest
+# 8. Run tests again
+python run_tests.py → [2]
 
-# 8. Update PROJECT_STATUS.md when done
+# 9. Run smoke test (validates runtime works)
+python run_tests.py → [s]
+# Check exit code: 0 = good, 1 = exception, 2 = stalled
+
+# 10. Update PROJECT_STATUS.md when done
 ```
 
 **Let's build! 🛡️**
+
+---
+
+**Last Updated**: 2025-10-23
+**Next Update**: When testing system or documentation changes significantly
+**Maintainer**: Update this when project structure or testing system changes
+
+---
+
+## 📋 Quick Reference Card
+
+**Most Important Files for Agents**:
+1. `CLAUDE.md` ← You are here
+2. `docs/current/PROJECT_STATUS.md` ← Current progress
+3. `test_reports/latest.txt` ← Latest test results
+4. `docs/testing/TESTING_GUIDE.md` ← How to test
+5. `docs/testing/RUNTIME_DEBUGGING.md` ← How to debug runtime
+
+**Most Important Commands**:
+1. `python run_tests.py` ← Run tests with menu
+2. `cat test_reports/latest.txt` ← Check latest results
+3. `cat docs/current/PROJECT_STATUS.md` ← Check progress
+4. `pytest --collect-only` ← See available tests
+5. `python run_tests.py → [s]` ← Runtime smoke test
+
+**Exit Codes to Know**:
+- `0` = Success
+- `1` = Exception (check logs)
+- `2` = Boot stalled (check event subscriptions)
+
+**8 Checkpoints to Look For**:
+```
+🚀 Service Start
+✅ Config Loaded
+✅ SDK Connected
+✅ Rules Initialized
+✅ Event Loop Running
+📨 Event Received
+🔍 Rule Evaluated
+⚠️ Enforcement Triggered
+```
+
+**That's everything. Welcome to Risk Manager V34! 🎯**
