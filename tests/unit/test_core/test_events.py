@@ -16,7 +16,7 @@ class TestEventBus:
         bus = EventBus()
         assert bus is not None
 
-    def test_subscribe_to_event(self):
+    async def test_subscribe_to_event(self):
         """Test subscribing to events."""
         bus = EventBus()
         callback_called = False
@@ -26,11 +26,11 @@ class TestEventBus:
             callback_called = True
 
         bus.subscribe(EventType.POSITION_UPDATED, callback)
-        bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+        await bus.publish(RiskEvent(event_type=EventType.POSITION_UPDATED, data={}))
 
         assert callback_called is True
 
-    def test_subscribe_multiple_callbacks(self):
+    async def test_subscribe_multiple_callbacks(self):
         """Test multiple callbacks for same event."""
         bus = EventBus()
         callback_count = 0
@@ -45,11 +45,11 @@ class TestEventBus:
 
         bus.subscribe(EventType.POSITION_UPDATED, callback1)
         bus.subscribe(EventType.POSITION_UPDATED, callback2)
-        bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+        await bus.publish(RiskEvent(event_type=EventType.POSITION_UPDATED, data={}))
 
         assert callback_count == 2
 
-    def test_unsubscribe_from_event(self):
+    async def test_unsubscribe_from_event(self):
         """Test unsubscribing from events."""
         bus = EventBus()
         callback_called = False
@@ -60,7 +60,7 @@ class TestEventBus:
 
         bus.subscribe(EventType.POSITION_UPDATED, callback)
         bus.unsubscribe(EventType.POSITION_UPDATED, callback)
-        bus.publish(RiskEvent(type=EventType.POSITION_UPDATED, data={}))
+        await bus.publish(RiskEvent(event_type=EventType.POSITION_UPDATED, data={}))
 
         assert callback_called is False
 
@@ -71,18 +71,18 @@ class TestRiskEvent:
     def test_create_event(self):
         """Test creating a risk event."""
         event = RiskEvent(
-            type=EventType.TRADE_EXECUTED,
+            event_type=EventType.TRADE_EXECUTED,
             data={"symbol": "MNQ", "pnl": -12.50}
         )
 
-        assert event.type == EventType.TRADE_EXECUTED
+        assert event.event_type == EventType.TRADE_EXECUTED
         assert event.data["symbol"] == "MNQ"
         assert event.data["pnl"] == -12.50
 
     def test_event_has_timestamp(self):
         """Test that events have timestamps."""
         event = RiskEvent(
-            type=EventType.POSITION_UPDATED,
+            event_type=EventType.POSITION_UPDATED,
             data={}
         )
 

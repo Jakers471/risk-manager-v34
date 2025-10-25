@@ -5,17 +5,22 @@ from datetime import datetime
 from typing import Any
 
 from loguru import logger
+from project_x_py.utils import ProjectXLogger
 
 from risk_manager.core.config import RiskConfig
 from risk_manager.core.events import EventBus, EventType, RiskEvent
+
+# Get SDK logger for standardized logging
+sdk_logger = ProjectXLogger.get_logger(__name__)
 
 
 class RiskEngine:
     """Core risk evaluation and enforcement engine."""
 
-    def __init__(self, config: RiskConfig, event_bus: EventBus):
+    def __init__(self, config: RiskConfig, event_bus: EventBus, trading_integration: Any | None = None):
         self.config = config
         self.event_bus = event_bus
+        self.trading_integration = trading_integration  # Reference to TradingIntegration for enforcement
         self.rules: list[Any] = []  # Will be filled with rule objects
         self.running = False
 
@@ -29,6 +34,9 @@ class RiskEngine:
     async def start(self) -> None:
         """Start the risk engine."""
         self.running = True
+
+        # Checkpoint 5: Event loop running
+        sdk_logger.info(f"✅ Event loop running: {len(self.rules)} active rules monitoring events")
         logger.info("Risk Engine started")
 
         await self.event_bus.publish(
@@ -57,9 +65,16 @@ class RiskEngine:
 
     async def evaluate_rules(self, event: RiskEvent) -> None:
         """Evaluate all rules against an event."""
+        # Checkpoint 6: Event received
+        sdk_logger.info(f"📨 Event received: {event.event_type.value} - evaluating {len(self.rules)} rules")
+
         for rule in self.rules:
             try:
                 violation = await rule.evaluate(event, self)
+
+                # Checkpoint 7: Rule evaluated
+                sdk_logger.info(f"🔍 Rule evaluated: {rule.__class__.__name__} - {'VIOLATED' if violation else 'PASSED'}")
+
                 if violation:
                     await self._handle_violation(rule, violation)
             except Exception as e:
@@ -83,10 +98,16 @@ class RiskEngine:
         # Execute enforcement action if specified
         action = violation.get("action")
         if action == "flatten":
+            # Checkpoint 8: Enforcement triggered (flatten)
+            sdk_logger.warning(f"⚠️ Enforcement triggered: FLATTEN ALL - Rule: {rule.__class__.__name__}")
             await self.flatten_all_positions()
         elif action == "pause":
+            # Checkpoint 8: Enforcement triggered (pause)
+            sdk_logger.warning(f"⚠️ Enforcement triggered: PAUSE TRADING - Rule: {rule.__class__.__name__}")
             await self.pause_trading()
         elif action == "alert":
+            # Checkpoint 8: Enforcement triggered (alert)
+            sdk_logger.info(f"⚠️ Enforcement triggered: ALERT - Rule: {rule.__class__.__name__}")
             await self.send_alert(violation)
 
     async def flatten_all_positions(self) -> None:
@@ -104,8 +125,15 @@ class RiskEngine:
             )
         )
 
-        # Implementation will connect to trading integration
-        # For now, just log the action
+        # Execute enforcement via TradingIntegration
+        if self.trading_integration:
+            try:
+                await self.trading_integration.flatten_all()
+                logger.success("✅ All positions flattened via SDK")
+            except Exception as e:
+                logger.error(f"❌ Failed to flatten positions: {e}")
+        else:
+            logger.warning("⚠️ TradingIntegration not connected - enforcement not executed")
 
     async def pause_trading(self) -> None:
         """Pause all trading activity."""

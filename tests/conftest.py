@@ -8,9 +8,41 @@ import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock
 from typing import AsyncGenerator
+import logging
 
 # Import core components for mocking
 from risk_manager.core.events import RiskEvent, EventType
+
+
+# ============================================================================
+# Logging Configuration (loguru → caplog bridge)
+# ============================================================================
+
+@pytest.fixture(autouse=True)
+def setup_loguru_caplog(caplog):
+    """
+    Bridge loguru logs to pytest's caplog.
+
+    This allows caplog.text to capture logs from loguru.logger.
+    """
+    import sys
+    from loguru import logger
+
+    # Remove default handlers
+    logger.remove()
+
+    # Add handler that writes to Python's standard logging
+    # which pytest's caplog can capture
+    logger.add(
+        lambda msg: logging.getLogger().info(msg),
+        level="DEBUG",
+        format="{message}"
+    )
+
+    # Set caplog to capture DEBUG and above
+    caplog.set_level(logging.DEBUG)
+
+    return caplog
 
 
 # ============================================================================

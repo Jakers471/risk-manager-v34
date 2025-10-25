@@ -140,19 +140,28 @@ class TradingIntegration:
         logger.warning(f"Flattening position for {symbol}")
 
         context = self.suite[symbol]
-        positions = await context.positions.get_all_positions()
 
-        for position in positions:
-            if position.size != 0:
-                # Close position by trading opposite side
-                side = 1 if position.size > 0 else 0  # 0=buy, 1=sell
-                await context.orders.place_market_order(
-                    contract_id=position.contractId,
-                    side=side,
-                    size=abs(position.size),
-                )
+        # Use SDK's built-in close_all_positions() method
+        # This is cleaner than manually placing opposite orders
+        try:
+            await context.positions.close_all_positions()
+            logger.info(f"✅ Closed all positions for {symbol} via SDK")
+        except Exception as e:
+            logger.error(f"❌ Failed to close positions for {symbol}: {e}")
+            # Fallback: manual approach if SDK method fails
+            logger.warning(f"Attempting manual position closing for {symbol}")
+            positions = await context.positions.get_all_positions()
 
-                logger.info(f"Closed {symbol} position: {position.size} contracts")
+            for position in positions:
+                if position.size != 0:
+                    # Close position by trading opposite side
+                    side = 1 if position.size > 0 else 0  # 0=buy, 1=sell
+                    await context.orders.place_market_order(
+                        contract_id=position.contractId,
+                        side=side,
+                        size=abs(position.size),
+                    )
+                    logger.info(f"Closed {symbol} position: {position.size} contracts (manual)")
 
     async def flatten_all(self) -> None:
         """Flatten all positions across all instruments."""

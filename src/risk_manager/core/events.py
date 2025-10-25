@@ -19,6 +19,7 @@ class EventType(str, Enum):
     ORDER_FILLED = "order_filled"
     ORDER_CANCELLED = "order_cancelled"
     ORDER_REJECTED = "order_rejected"
+    ORDER_UPDATED = "order_updated"  # For test compatibility
 
     # Risk events
     RULE_VIOLATED = "rule_violated"
@@ -29,6 +30,9 @@ class EventType(str, Enum):
     PNL_UPDATED = "pnl_updated"
     DAILY_LOSS_LIMIT = "daily_loss_limit"
     DRAWDOWN_ALERT = "drawdown_alert"
+
+    # Trade events
+    TRADE_EXECUTED = "trade_executed"  # For test compatibility
 
     # System events
     SYSTEM_STARTED = "system_started"

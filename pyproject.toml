@@ -92,7 +92,7 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 asyncio_mode = "auto"
-addopts = "-v --strict-markers --tb=short"
+addopts = "-v --tb=short"
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",

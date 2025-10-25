@@ -9,8 +9,12 @@ from typing import Any
 
 from loguru import logger
 from project_x_py import TradingSuite
+from project_x_py.utils import ProjectXLogger
 
 from risk_manager.sdk.suite_manager import SuiteManager
+
+# Get SDK logger for standardized logging
+sdk_logger = ProjectXLogger.get_logger(__name__)
 
 
 class EnforcementExecutor:
@@ -48,6 +52,9 @@ class EnforcementExecutor:
         Returns:
             Dictionary with results: {"success": bool, "closed": int, "errors": list}
         """
+        # SDK logging: Enforcement action triggered
+        sdk_logger.warning(f"⚠️ Enforcement triggered: CLOSE ALL POSITIONS - Symbol: {symbol or 'ALL'}")
+
         result = {"success": True, "closed": 0, "errors": []}
 
         if symbol:
@@ -121,6 +128,9 @@ class EnforcementExecutor:
         Returns:
             Dictionary with result: {"success": bool, "error": str | None}
         """
+        # SDK logging: Enforcement action triggered
+        sdk_logger.warning(f"⚠️ Enforcement triggered: CLOSE POSITION - {symbol}/{contract_id}")
+
         result = {"success": True, "error": None}
 
         suite = self.suite_manager.get_suite(symbol)
@@ -206,6 +216,9 @@ class EnforcementExecutor:
         Returns:
             Dictionary with results: {"success": bool, "cancelled": int, "errors": list}
         """
+        # SDK logging: Enforcement action triggered
+        sdk_logger.warning(f"⚠️ Enforcement triggered: CANCEL ALL ORDERS - Symbol: {symbol or 'ALL'}")
+
         result = {"success": True, "cancelled": 0, "errors": []}
 
         if symbol:
@@ -308,6 +321,8 @@ class EnforcementExecutor:
         Returns:
             Dictionary with combined results
         """
+        # SDK logging: Critical enforcement action
+        sdk_logger.warning(f"⚠️ Enforcement triggered: FLATTEN AND CANCEL - Symbol: {symbol or 'ALL'} - CRITICAL ACTION")
         logger.warning(f"FLATTEN AND CANCEL triggered for {symbol or 'ALL instruments'}")
 
         # Close positions

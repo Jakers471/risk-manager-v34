@@ -5,10 +5,14 @@ from pathlib import Path
 from typing import Any
 
 from loguru import logger
+from project_x_py.utils import ProjectXLogger
 
 from risk_manager.core.config import RiskConfig
 from risk_manager.core.engine import RiskEngine
 from risk_manager.core.events import EventBus, EventType, RiskEvent
+
+# Get SDK logger for standardized logging
+sdk_logger = ProjectXLogger.get_logger(__name__)
 
 
 class RiskManager:
@@ -22,12 +26,14 @@ class RiskManager:
     def __init__(self, config: RiskConfig):
         self.config = config
         self.event_bus = EventBus()
-        self.engine = RiskEngine(config, self.event_bus)
 
         # Component references (will be initialized)
         self.trading_integration = None
         self.ai_integration = None
         self.monitoring = None
+
+        # Create engine (trading_integration will be set later)
+        self.engine = RiskEngine(config, self.event_bus, trading_integration=None)
 
         # State
         self.running = False
@@ -36,6 +42,8 @@ class RiskManager:
         # Setup logging
         self._setup_logging()
 
+        # Checkpoint 1: Service start
+        sdk_logger.info("🚀 Risk Manager starting...")
         logger.info("Risk Manager initialized")
 
     def _setup_logging(self) -> None:
@@ -99,6 +107,9 @@ class RiskManager:
         # Create instance
         manager = cls(config)
 
+        # Checkpoint 2: Config loaded
+        sdk_logger.info(f"✅ Config loaded: {len(rules) if rules else 0} custom rules, monitoring {len(instruments) if instruments else 0} instruments")
+
         # Initialize trading integration if instruments provided
         if instruments:
             await manager._init_trading_integration(instruments)
@@ -124,6 +135,13 @@ class RiskManager:
         )
 
         await self.trading_integration.connect()
+
+        # Wire trading_integration into RiskEngine for enforcement
+        self.engine.trading_integration = self.trading_integration
+        logger.info("✅ TradingIntegration wired to RiskEngine for enforcement")
+
+        # Checkpoint 3: SDK connected
+        sdk_logger.info(f"✅ SDK connected: {len(instruments)} instrument(s) - {', '.join(instruments)}")
         logger.info("Trading integration initialized")
 
     async def _init_ai_integration(self) -> None:
@@ -145,6 +163,8 @@ class RiskManager:
         """Add default risk rules based on configuration."""
         from risk_manager.rules import DailyLossRule, MaxPositionRule
 
+        rules_added = []
+
         # Daily loss rule
         if self.config.max_daily_loss < 0:
             self.engine.add_rule(
@@ -153,6 +173,7 @@ class RiskManager:
                     action="flatten",
                 )
             )
+            rules_added.append(f"DailyLossRule(${self.config.max_daily_loss})")
 
         # Max position rule
         if self.config.max_contracts > 0:
@@ -162,6 +183,11 @@ class RiskManager:
                     action="reject",
                 )
             )
+            rules_added.append(f"MaxPositionRule({self.config.max_contracts} contracts)")
+
+        # Checkpoint 4: Rules initialized
+        if rules_added:
+            sdk_logger.info(f"✅ Rules initialized: {len(rules_added)} rules - {', '.join(rules_added)}")
 
     async def start(self) -> None:
         """Start the risk manager."""
