@@ -1,0 +1,243 @@
+================================================================================
+RULES ALIGNMENT AUDIT - VISUAL MATRIX
+================================================================================
+Generated: 2025-10-27
+Mission: Audit ALL 13 rule specifications against SDK event patterns
+
+================================================================================
+OVERALL ALIGNMENT STATUS: 82% (10.5/13 rules aligned)
+================================================================================
+
+┌─────────┬─────────────────────────────┬────────────┬───────────────────────────┐
+│ Rule    │ Name                        │ Status     │ Issues Found              │
+├─────────┼─────────────────────────────┼────────────┼───────────────────────────┤
+│ RULE-001│ Max Contracts               │ ✅ ALIGNED │ None                      │
+│ RULE-002│ Max Contracts Per Instr     │ ✅ ALIGNED │ None                      │
+│ RULE-003│ Daily Realized Loss         │ ✅ ALIGNED │ None                      │
+│ RULE-004│ Daily Unrealized Loss       │ ⚠️  PARTIAL │ Event docs + field name   │
+│ RULE-005│ Max Unrealized Profit       │ ⚠️  PARTIAL │ Event docs + field name   │
+│ RULE-006│ Trade Frequency Limit       │ ✅ ALIGNED │ None                      │
+│ RULE-007│ Cooldown After Loss         │ ✅ ALIGNED │ None                      │
+│ RULE-008│ No Stop-Loss Grace          │ 🔴 BROKEN  │ CRITICAL: Wrong event     │
+│ RULE-009│ Session Block Outside       │ ✅ ALIGNED │ None                      │
+│ RULE-010│ Auth Loss Guard             │ ✅ ALIGNED │ None                      │
+│ RULE-011│ Symbol Blocks               │ ✅ ALIGNED │ None                      │
+│ RULE-012│ Trade Management            │ ⚠️  UNCLEAR │ Missing QUOTE_UPDATE ref  │
+│ RULE-013│ Daily Realized Profit       │ ✅ ALIGNED │ None                      │
+└─────────┴─────────────────────────────┴────────────┴───────────────────────────┘
+
+Legend:
+  ✅ = Fully aligned with SDK patterns
+  ⚠️  = Partially aligned (minor issues)
+  🔴 = Not aligned (critical issues)
+
+================================================================================
+DETAILED ALIGNMENT BREAKDOWN
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Event Subscription Patterns                                                 │
+├─────────┬───────────────────────────────────────────────┬──────────────────┤
+│ Rule    │ Events Used                                   │ Correctness      │
+├─────────┼───────────────────────────────────────────────┼──────────────────┤
+│ RULE-001│ POSITION_OPENED, UPDATED, CLOSED              │ ✅ Correct       │
+│ RULE-002│ POSITION_OPENED, UPDATED, CLOSED              │ ✅ Correct       │
+│ RULE-003│ TRADE_EXECUTED                                │ ✅ Correct       │
+│ RULE-004│ POSITION_OPENED, UPDATED, CLOSED + QUOTE      │ ⚠️  Inconsistent │
+│ RULE-005│ POSITION_OPENED, UPDATED, CLOSED + QUOTE      │ ⚠️  Inconsistent │
+│ RULE-006│ TRADE_EXECUTED                                │ ✅ Correct       │
+│ RULE-007│ TRADE_EXECUTED (profitAndLoss < 0)           │ ✅ Correct       │
+│ RULE-008│ ORDER_PLACED                                  │ 🔴 WRONG!        │
+│ RULE-009│ POSITION_UPDATED + timer + holiday            │ ✅ Correct       │
+│ RULE-010│ ACCOUNT_UPDATED (canTrade)                    │ ✅ Correct       │
+│ RULE-011│ POSITION_OPENED, UPDATED, CLOSED              │ ✅ Correct       │
+│ RULE-012│ POSITION events + "market price updates"      │ ⚠️  Unclear      │
+│ RULE-013│ TRADE_EXECUTED                                │ ✅ Correct       │
+└─────────┴───────────────────────────────────────────────┴──────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Data Field References                                                       │
+├─────────┬───────────────────────────────────────────────┬──────────────────┤
+│ Rule    │ Fields Referenced                             │ Correctness      │
+├─────────┼───────────────────────────────────────────────┼──────────────────┤
+│ RULE-001│ position['type'], position['size']            │ ✅ Correct       │
+│ RULE-002│ position['contractId'], position['size']      │ ✅ Correct       │
+│ RULE-003│ trade_event['profitAndLoss']                  │ ✅ Correct       │
+│ RULE-004│ position_event['avgPrice'] ← WRONG NAME!      │ ⚠️  Wrong name   │
+│ RULE-005│ position_event['avgPrice'] ← WRONG NAME!      │ ⚠️  Wrong name   │
+│ RULE-006│ (counts trades, no specific fields)           │ ✅ Correct       │
+│ RULE-007│ trade_event['profitAndLoss'] < 0              │ ✅ Correct       │
+│ RULE-008│ (no field references - MISSING!)              │ 🔴 Missing       │
+│ RULE-009│ (time-based, no event fields)                 │ ✅ Correct       │
+│ RULE-010│ account_event['canTrade']                     │ ✅ Correct       │
+│ RULE-011│ position['contractId']                        │ ✅ Correct       │
+│ RULE-012│ (no field references - MISSING!)              │ ⚠️  Missing      │
+│ RULE-013│ trade_event['profitAndLoss']                  │ ✅ Correct       │
+└─────────┴───────────────────────────────────────────────┴──────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Event Semantic Accuracy                                                     │
+├─────────┬───────────────────────────────────────────────┬──────────────────┤
+│ Rule    │ Semantic Correctness                          │ Status           │
+├─────────┼───────────────────────────────────────────────┼──────────────────┤
+│ RULE-001│ Position events for position tracking         │ ✅ Correct       │
+│ RULE-002│ Position events for position tracking         │ ✅ Correct       │
+│ RULE-003│ TRADE_EXECUTED has profitAndLoss             │ ✅ Correct       │
+│ RULE-004│ POSITION + QUOTE for unrealized P&L          │ ✅ Correct       │
+│ RULE-005│ POSITION + QUOTE for unrealized P&L          │ ✅ Correct       │
+│ RULE-006│ TRADE_EXECUTED for trade counting            │ ✅ Correct       │
+│ RULE-007│ TRADE_EXECUTED for realized loss             │ ✅ Correct       │
+│ RULE-008│ ORDER_PLACED ≠ position opens!               │ 🔴 WRONG!        │
+│ RULE-009│ POSITION_UPDATED + timer for session          │ ✅ Correct       │
+│ RULE-010│ ACCOUNT_UPDATED for authorization            │ ✅ Correct       │
+│ RULE-011│ Position events for symbol blocking           │ ✅ Correct       │
+│ RULE-012│ POSITION + price for trade management        │ ⚠️  Unclear      │
+│ RULE-013│ TRADE_EXECUTED for realized profit           │ ✅ Correct       │
+└─────────┴───────────────────────────────────────────────┴──────────────────┘
+
+================================================================================
+SEVERITY BREAKDOWN
+================================================================================
+
+🔴 CRITICAL Issues (1):
+┌─────────┬──────────────────────┬────────────────────────────────────────────┐
+│ Rule    │ Issue                │ Impact                                     │
+├─────────┼──────────────────────┼────────────────────────────────────────────┤
+│ RULE-008│ Wrong event type     │ Will trigger on EVERY order (entry, stop,  │
+│         │                      │ limit) instead of just position opens.     │
+│         │                      │ Completely broken semantics.               │
+└─────────┴──────────────────────┴────────────────────────────────────────────┘
+
+⚠️  MEDIUM Issues (2 rules, 4 total issues):
+┌─────────┬──────────────────────┬────────────────────────────────────────────┐
+│ Rule    │ Issue                │ Impact                                     │
+├─────────┼──────────────────────┼────────────────────────────────────────────┤
+│ RULE-004│ Inconsistent event   │ Documentation confusion - line 17 says 3   │
+│         │ subscription docs    │ events, line 124 says 1 event.             │
+│ RULE-004│ Wrong field name     │ Code will fail - SDK uses 'averagePrice'   │
+│         │                      │ not 'avgPrice'                             │
+│ RULE-005│ Inconsistent event   │ Documentation confusion - line 17 says 3   │
+│         │ subscription docs    │ events, line 125 says 1 event.             │
+│ RULE-005│ Wrong field name     │ Code will fail - SDK uses 'averagePrice'   │
+│         │                      │ not 'avgPrice'                             │
+└─────────┴──────────────────────┴────────────────────────────────────────────┘
+
+⚠️  LOW Issues (1):
+┌─────────┬──────────────────────┬────────────────────────────────────────────┐
+│ Rule    │ Issue                │ Impact                                     │
+├─────────┼──────────────────────┼────────────────────────────────────────────┤
+│ RULE-012│ Missing QUOTE_UPDATE │ Documentation unclear - mentions "market   │
+│         │ event reference      │ price updates" but doesn't name the event. │
+└─────────┴──────────────────────┴────────────────────────────────────────────┘
+
+================================================================================
+PATTERN CONSISTENCY ANALYSIS
+================================================================================
+
+✅ CORRECT PATTERNS (Used Consistently):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Pattern: Position Tracking (All 3 events)                                   │
+│   - POSITION_OPENED, POSITION_UPDATED, POSITION_CLOSED                      │
+│   - Used by: RULE-001, 002, 011 ✅                                          │
+│   - Partially used by: RULE-004, 005 (line 17 ✅, line 124/125 ❌)         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Pattern: Realized P&L (TRADE_EXECUTED + null check)                        │
+│   - TRADE_EXECUTED.profitAndLoss (skip if null)                            │
+│   - Used by: RULE-003, 013 ✅                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Pattern: Trade Counting (TRADE_EXECUTED)                                   │
+│   - Count TRADE_EXECUTED events                                            │
+│   - Used by: RULE-006, 007 ✅                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Pattern: Authorization Check (ACCOUNT_UPDATED)                             │
+│   - ACCOUNT_UPDATED.canTrade field                                         │
+│   - Used by: RULE-010 ✅                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+⚠️  INCONSISTENT PATTERNS:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Issue: RULE-004/005 event subscription documentation                        │
+│   - Line 17 (Trigger Condition): Lists all 3 position events ✅             │
+│   - Line 124/125 (SDK Integration): Only lists POSITION_UPDATED ❌          │
+│   - Fix: Update SDK Integration sections to match Trigger Condition        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Issue: RULE-004/005 field naming                                           │
+│   - Spec uses: position_event['avgPrice'] ❌                                │
+│   - SDK uses: position_event['averagePrice'] ✅                             │
+│   - Fix: Change field name to match SDK exactly                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+🔴 MISSING PATTERNS:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Issue: RULE-008 stop-loss detection pattern completely missing              │
+│   - Currently: Subscribes to ORDER_PLACED (WRONG!)                         │
+│   - Should use:                                                             │
+│     1. POSITION_OPENED → detect when position opens                        │
+│     2. ORDER_PLACED (order.type == 3) → detect stop-loss orders           │
+│     3. Match contractId to link stop-loss to position                      │
+│   - Fix: Complete rewrite of trigger condition logic                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+FILES REQUIRING UPDATES
+================================================================================
+
+🔴 CRITICAL:
+  - docs/specifications/unified/rules/RULE-008-no-stop-loss-grace.md
+    Lines: 14-17 (Trigger Condition), 35 (SDK Integration)
+
+⚠️  MEDIUM:
+  - docs/specifications/unified/rules/RULE-004-daily-unrealized-loss.md
+    Lines: 24 (field name), 124 (event list)
+  - docs/specifications/unified/rules/RULE-005-max-unrealized-profit.md
+    Lines: 24 (field name), 125 (event list)
+
+⚠️  LOW:
+  - docs/specifications/unified/rules/RULE-012-trade-management.md
+    Lines: 17 (Trigger Condition), 44-45 (SDK Integration)
+
+================================================================================
+NEXT ACTIONS
+================================================================================
+
+Priority 1 - CRITICAL (Do Immediately):
+  [ ] Fix RULE-008 event subscription logic
+  [ ] Add POSITION_OPENED to detect position opens
+  [ ] Add ORDER_PLACED logic to detect stop-loss orders
+  [ ] Document order.type == 3 check for stop detection
+
+Priority 2 - MEDIUM (Do Soon):
+  [ ] Fix RULE-004 line 124 (add all 3 position events)
+  [ ] Fix RULE-004 line 24 (avgPrice → averagePrice)
+  [ ] Fix RULE-005 line 125 (add all 3 position events)
+  [ ] Fix RULE-005 line 24 (avgPrice → averagePrice)
+
+Priority 3 - LOW (Do Before Implementation):
+  [ ] Fix RULE-012 line 17 (add explicit QUOTE_UPDATE)
+  [ ] Fix RULE-012 lines 44-45 (add data field references)
+
+================================================================================
+VALIDATION CHECKLIST
+================================================================================
+
+Before marking any rule as "aligned", verify:
+  [ ] Event types listed match SDK event types exactly
+  [ ] Data fields referenced exist in those events
+  [ ] Event subscriptions are consistent across all sections
+  [ ] Field names match SDK naming (e.g., 'averagePrice' not 'avgPrice')
+  [ ] Event semantics are correct (ORDER_PLACED ≠ position opens!)
+  [ ] All 3 position events used when tracking positions
+  [ ] Null checks present for profitAndLoss field
+
+================================================================================
+REFERENCE DOCUMENTS
+================================================================================
+
+  - SDK Event Patterns: SDK_EVENTS_QUICK_REFERENCE.txt
+  - Full Audit Report: RULES_ALIGNMENT_AUDIT_REPORT.md
+  - Quick Summary: AUDIT_SUMMARY.md
+  - Rule Specifications: docs/specifications/unified/rules/RULE-*.md
+
+================================================================================
+END OF ALIGNMENT MATRIX
+================================================================================

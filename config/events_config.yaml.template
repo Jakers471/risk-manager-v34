@@ -1,0 +1,195 @@
+# ================================================================================
+# Risk Manager V34 - Events Configuration Template
+# ================================================================================
+#
+# Copy this file to events_config.yaml and customize for your environment
+#
+# Command: cp events_config.yaml.template events_config.yaml
+#
+# ================================================================================
+
+# ================================================================================
+# QUOTE EVENTS (Market Data)
+# ================================================================================
+
+quotes:
+  enabled: true                          # Enable/disable quote subscription
+  symbols: []                            # [] = auto-track positions, or ['MNQ', 'ES']
+  update_interval_ms: 1000              # Throttle rate (100-5000ms)
+  fields:                                # Price fields to track
+    - last
+    - bid
+    - ask
+  auto_subscribe_on_position: true      # Auto-subscribe when position opens
+  auto_unsubscribe_on_close: true       # Auto-unsubscribe when position closes
+  buffer_size: 10                        # Buffer size for batching
+  buffer_flush_interval_ms: 500         # Buffer flush interval
+
+# ================================================================================
+# POSITION EVENTS
+# ================================================================================
+
+positions:
+  enabled: true
+  events:
+    - OPENED
+    - UPDATED
+    - CLOSED
+  priority: critical
+  fields:
+    - size
+    - averagePrice
+    - contractId
+    - type
+    - accountId
+
+# ================================================================================
+# ORDER EVENTS
+# ================================================================================
+
+orders:
+  enabled: true
+  events:
+    - PLACED
+    - FILLED
+    - PARTIAL_FILL
+    - CANCELLED
+    - MODIFIED
+    - REJECTED
+  priority_map:
+    PLACED: critical
+    FILLED: critical
+    REJECTED: critical
+    CANCELLED: normal
+    MODIFIED: normal
+    PARTIAL_FILL: high
+  fields:
+    - type
+    - side
+    - stopPrice
+    - limitPrice
+    - size
+    - filledPrice
+    - status
+    - accountId
+    - contractId
+
+# ================================================================================
+# TRADE EVENTS
+# ================================================================================
+
+trades:
+  enabled: true
+  events:
+    - EXECUTED
+  priority: critical
+  track_pnl: true
+  fields:
+    - profitAndLoss
+    - quantity
+    - price
+    - accountId
+    - contractId
+
+# ================================================================================
+# ACCOUNT EVENTS
+# ================================================================================
+
+account:
+  enabled: true
+  events:
+    - UPDATED
+  priority: critical
+  fields:
+    - canTrade
+    - balance
+    - equity
+    - marginUsed
+    - accountId
+
+# ================================================================================
+# BAR EVENTS (Optional)
+# ================================================================================
+
+bars:
+  enabled: false                         # Enable only if needed for RULE-012
+  events:
+    - NEW_BAR
+  priority: normal
+  timeframes:
+    - 5m
+    - 15m
+
+# ================================================================================
+# EVENT PROCESSING SETTINGS
+# ================================================================================
+
+processing:
+  max_queue_size: 1000                   # Max events in queue
+  backpressure_strategy: drop_oldest    # drop_oldest | drop_newest | block
+  processing_timeout_ms: 100            # Warn if event takes longer
+  batch_processing:
+    enabled: true
+    batch_size: 10
+    batch_timeout_ms: 50
+
+# ================================================================================
+# EVENT FILTERING
+# ================================================================================
+
+filters:
+  deduplicate:
+    enabled: true
+    window_ms: 100
+  ignore_events: []                      # Event types to ignore
+  account_ids: []                        # [] = all accounts, or specific IDs
+
+# ================================================================================
+# LOGGING & MONITORING
+# ================================================================================
+
+logging:
+  log_all_events: false                  # Very verbose, use for debugging only
+  log_statistics: true
+  statistics_interval_seconds: 60
+  log_dropped_events: true
+  log_slow_events: true
+  slow_event_threshold_ms: 50
+
+# ================================================================================
+# INTEGRATION WITH RISK RULES
+# ================================================================================
+
+rule_event_mapping:
+  RULE-001: [POSITION_OPENED, POSITION_UPDATED, POSITION_CLOSED]
+  RULE-003: [TRADE_EXECUTED]
+  RULE-004: [POSITION_OPENED, POSITION_UPDATED, POSITION_CLOSED, QUOTE_UPDATE]
+  RULE-005: [POSITION_OPENED, POSITION_UPDATED, POSITION_CLOSED, QUOTE_UPDATE]
+  RULE-008: [POSITION_OPENED, ORDER_PLACED]
+  RULE-010: [ACCOUNT_UPDATED]
+  RULE-011: [ACCOUNT_UPDATED]
+  RULE-012: [ORDER_PLACED, ORDER_FILLED, POSITION_UPDATED, QUOTE_UPDATE]
+
+# ================================================================================
+# TICK VALUES & SIZES
+# ================================================================================
+
+tick_values:
+  MNQ: 5.0    # Micro E-mini NASDAQ-100
+  MES: 5.0    # Micro E-mini S&P 500
+  M2K: 5.0    # Micro E-mini Russell 2000
+  MYM: 0.5    # Micro E-mini Dow
+  NQ: 20.0    # E-mini NASDAQ-100
+  ES: 50.0    # E-mini S&P 500
+  RTY: 5.0    # E-mini Russell 2000
+  YM: 5.0     # E-mini Dow
+
+tick_sizes:
+  MNQ: 0.25
+  MES: 0.25
+  M2K: 0.10
+  MYM: 1.0
+  NQ: 0.25
+  ES: 0.25
+  RTY: 0.10
+  YM: 1.0

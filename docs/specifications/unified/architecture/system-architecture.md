@@ -242,8 +242,8 @@ class RiskManager:
         # 2. Load state from database
         await self.load_state()
 
-        # 3. Connect to Project-X SDK
-        self.sdk = await TradingSuite.create(api_key=self.config.api_key)
+        # 3. Connect to Project-X SDK via TradingIntegration
+        await self.trading_integration.connect()
 
         # 4. Load risk rules
         self.rules = self.load_rules()
@@ -255,7 +255,7 @@ class RiskManager:
 **Responsibilities:**
 - Component initialization
 - State loading/restoration
-- SDK connection management
+- SDK connection management (via TradingIntegration)
 - Rule orchestration
 - Event loop coordination
 - Background tasks (lockout expiry, daily reset)
@@ -264,58 +264,162 @@ class RiskManager:
 
 ---
 
-### Layer 3: Event Processing Pipeline
+### Layer 3: TradingIntegration (SDK Wrapper)
+
+```python
+# src/risk_manager/integrations/trading.py (~421 lines)
+
+class TradingIntegration:
+    """
+    Integration with Project-X-Py trading SDK.
+
+    Bridges between the trading platform and risk management system.
+
+    Uses two-step connection:
+    1. HTTP API authentication (get JWT token)
+    2. SignalR WebSocket connection (real-time events)
+    """
+
+    async def connect(self):
+        """Connect to trading platform using two-step process."""
+        # STEP 1: HTTP API Authentication
+        self.client = await ProjectX.from_env().__aenter__()
+        await self.client.authenticate()
+
+        # STEP 2: SignalR WebSocket Connection
+        self.realtime = ProjectXRealtimeClient(
+            jwt_token=self.client.session_token,
+            account_id=str(self.client.account_info.id),
+            config=self.client.config
+        )
+        await self.realtime.connect()
+
+        # STEP 3: Create TradingSuite
+        self.suite = await TradingSuite.create(
+            instruments=self.instruments,
+            timeframes=["1min", "5min"],
+            features=["orderbook", "statistics"]
+        )
+
+    async def start(self):
+        """Start monitoring trading events via realtime callbacks."""
+        # Subscribe to realtime callbacks (NOT suite.on)
+        await self.realtime.add_callback("position_update", self._on_position_update)
+        await self.realtime.add_callback("order_update", self._on_order_update)
+        await self.realtime.add_callback("trade_update", self._on_trade_update)
+        await self.realtime.add_callback("account_update", self._on_account_update)
+
+    async def flatten_all(self):
+        """Flatten all positions across all instruments."""
+        for symbol in self.instruments:
+            await self.flatten_position(symbol)
+
+    async def flatten_position(self, symbol: str):
+        """Flatten a specific position."""
+        context = self.suite[symbol]
+        await context.positions.close_all_positions()
+```
+
+**Responsibilities:**
+- SDK connection lifecycle (HTTP + WebSocket + TradingSuite)
+- Subscribe to SignalR real-time events via direct callbacks
+- Convert SignalR data to RiskEvents
+- Publish events to Risk EventBus
+- Execute enforcement actions via SDK (flatten, cancel orders)
+
+**Key Implementation Detail:**
+- Uses `realtime.add_callback()` NOT `suite.on()`
+- SDK EventBus doesn't emit position/order/trade events from SignalR
+- Must subscribe directly to realtime client callbacks
+
+**Status:** ✅ IMPLEMENTED (working connection + event bridging)
+
+**File:** `src/risk_manager/integrations/trading.py`
+
+---
+
+### Layer 4: Event Processing Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Project-X SDK Events                                        │
-│   ├─ GatewayUserPosition (position updates)                │
-│   ├─ GatewayUserTrade (trade executions)                   │
-│   └─ GatewayUserOrder (order status)                       │
+│ TopstepX Platform (SignalR WebSocket)                      │
+│   ├─ position_update events                                │
+│   ├─ order_update events                                   │
+│   ├─ trade_update events                                   │
+│   └─ account_update events                                 │
 └──────────────────┬──────────────────────────────────────────┘
+                   │ SignalR messages
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ Event Router (src/core/event_router.py)                    │
-│   1. Check if account is locked out                        │
-│   2. If locked → close any new positions immediately       │
-│   3. If not locked → route to appropriate rules            │
+│ TradingIntegration (src/integrations/trading.py)           │
+│   ├─ Realtime callbacks parse SignalR data                 │
+│   ├─ Convert to RiskEvent objects                          │
+│   └─ Publish to Risk EventBus                              │
 └──────────────────┬──────────────────────────────────────────┘
+                   │ RiskEvent published
+                   ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Risk EventBus (src/core/events.py)                         │
+│   └─ Pub/sub system for risk events                        │
+└──────────────────┬──────────────────────────────────────────┘
+                   │ Event distributed
+                   ↓
+┌─────────────────────────────────────────────────────────────┐
+│ RiskEngine (src/core/engine.py)                            │
+│   ├─ Checkpoint 6: "📨 Event received"                     │
+│   ├─ Route to all registered rules                         │
+│   └─ For each rule: rule.evaluate(event, engine)           │
+└──────────────────┬──────────────────────────────────────────┘
+                   │ For each rule
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ Risk Rules (src/rules/*.py)                                │
-│   ├─ MaxContracts                                          │
-│   ├─ DailyRealizedLoss                                     │
-│   ├─ TradeFrequencyLimit                                   │
+│   ├─ MaxContracts (RULE-001)                               │
+│   ├─ DailyRealizedLoss (RULE-003)                          │
+│   ├─ TradeFrequencyLimit (RULE-006)                        │
 │   └─ ... (12 rules total)                                  │
 │                                                              │
 │ Each rule:                                                  │
-│   1. Checks breach condition                               │
-│   2. If breach → calls enforcement                         │
+│   ├─ Checkpoint 7: "🔍 Rule evaluated"                     │
+│   ├─ Checks breach condition                               │
+│   └─ If breach → returns violation dict                    │
 └──────────────────┬──────────────────────────────────────────┘
+                   │ Violation detected
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ Enforcement Module (MOD-001)                                │
-│   ├─ close_all_positions()                                 │
-│   ├─ cancel_all_orders()                                   │
-│   └─ reduce_position_to_limit()                            │
-│                                                              │
-│ Executes enforcement via Project-X SDK                      │
+│ RiskEngine._handle_violation()                             │
+│   ├─ Checkpoint 8: "⚠️ Enforcement triggered"              │
+│   ├─ Publish ENFORCEMENT_ACTION event                      │
+│   └─ Execute action (flatten/pause/alert)                  │
 └──────────────────┬──────────────────────────────────────────┘
+                   │ Execute enforcement
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ Lockout Manager (MOD-002)                                   │
-│   ├─ set_lockout() - Hard lockout until time               │
-│   ├─ set_cooldown() - Duration-based lockout               │
-│   └─ Persist to SQLite                                     │
+│ TradingIntegration.flatten_all()                           │
+│   ├─ For each instrument: flatten_position(symbol)         │
+│   └─ Call SDK: suite[symbol].positions.close_all_positions()│
 └──────────────────┬──────────────────────────────────────────┘
+                   │ SDK API call
                    ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ Trader CLI Updates                                          │
-│   └─ Display: "🔴 LOCKED OUT - Daily loss limit - 3h 27m"  │
+│ TopstepX Platform REST API                                 │
+│   └─ POST /api/Position/closeAllPositions                  │
+│   └─ ✅ Positions actually closed!                         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Event Router Status:** NOT IMPLEMENTED (critical for lockout enforcement)
+**Component Interaction Table:**
+
+| Component | Responsibilities | Dependencies | Status |
+|-----------|-----------------|--------------|---------|
+| **TradingIntegration** | SDK connection, SignalR events, enforcement execution | ProjectX SDK, EventBus | ✅ Implemented |
+| **EventBus** | Pub/sub event distribution | None | ✅ Implemented |
+| **RiskEngine** | Event routing, rule coordination, violation handling | EventBus, TradingIntegration | ✅ Implemented |
+| **Risk Rules** | Rule logic, violation detection | RiskEngine state | ✅ Partially (2/12 rules) |
+| **Lockout Manager** | Lockout state, cooldowns, auto-expiry | Database | ❌ Not implemented |
+| **Event Router** | Lockout check, event filtering | Lockout Manager | ❌ Not implemented |
+
+**See:** `docs/specifications/unified/architecture/event-flow.md` for detailed event flow diagrams
 
 ---
 

@@ -272,6 +272,24 @@ Convert SDK events to Risk events with appropriate data extraction and transform
 
 **File:** `src/risk_manager/sdk/event_bridge.py`
 
+**⚠️ CRITICAL: Two Different SDK Event Sources**
+
+Before implementing event subscriptions, understand that the SDK provides events through **two different mechanisms**:
+
+**Quick Reference Table:**
+
+| Event Category | Subscription Method | Data Format | Example Events |
+|----------------|---------------------|-------------|----------------|
+| **Position/Order/Trade** | `realtime.add_callback("event_name", handler)` | `dict` (camelCase keys) | position_update, order_update, trade_update |
+| **Quote/Market Data** | `await suite.on(EventType.XXX, handler)` | Object (snake_case attrs) | QUOTE_UPDATE, NEW_BAR, TRADE_TICK |
+
+**Why This Matters:**
+
+- Using the wrong pattern will result in **NO EVENTS RECEIVED**
+- Position/Order/Trade events **bypass SDK EventBus** (SignalR direct)
+- Quote/Market Data events **use SDK EventBus** (SDK layer)
+- See Section 2.3 for detailed implementation patterns
+
 ### 2.2 Event Mappings
 
 | SDK Event | Risk Event | Handler Method | Data Extracted |
@@ -286,67 +304,135 @@ Convert SDK events to Risk events with appropriate data extraction and transform
 | `ORDER_REJECTED` | `ORDER_REJECTED` | `_on_order_rejected` | order_id, reason |
 | `QUOTE_UPDATE` ⭐ | `QUOTE_UPDATED` ⭐ | `_on_quote_update` ⭐ | symbol, last_price, bid, ask |
 
-### 2.3 Implementation Pattern
+### 2.3 Implementation Patterns
 
-**Subscription:**
+**⚠️ CRITICAL: Two Different Subscription Patterns**
+
+The SDK uses **two different mechanisms** for event subscriptions:
+
+1. **SignalR Direct Callbacks** (Position/Order/Trade events)
+   - Use: `suite.client.realtime.add_callback(event_name, handler)`
+   - Why: These events come directly from SignalR and are NOT emitted to SDK EventBus
+   - Events: `position_update`, `order_update`, `trade_update`, `account_update`
+
+2. **SDK EventBus Subscriptions** (Quote/Market Data events)
+   - Use: `await suite.on(EventType.QUOTE_UPDATE, handler)`
+   - Why: These events ARE emitted to the SDK EventBus
+   - Events: `QUOTE_UPDATE`, `NEW_BAR`, `TRADE_TICK`, `ORDERBOOK_UPDATE`
+
+**Pattern Decision Tree:**
+
+```
+Is this a Position/Order/Trade event?
+├─ YES → Use realtime.add_callback()
+│        └─ Events: position_update, order_update, trade_update
+│
+└─ NO → Is this a Quote/Market Data event?
+         └─ YES → Use suite.on()
+                  └─ Events: QUOTE_UPDATE, NEW_BAR, TRADE_TICK
+```
+
+**Pattern 1: SignalR Direct (Position/Order/Trade):**
 ```python
-async def _subscribe_to_suite(self, symbol: str, suite: TradingSuite) -> None:
-    """Subscribe to events from a specific TradingSuite."""    # Subscribe to trade events
-    await suite.on(
-        EventType.TRADE_EXECUTED,
-        lambda event: self._on_trade_executed(symbol, event)
+async def _subscribe_to_realtime_events(self) -> None:
+    """
+    Subscribe to position/order/trade events via SignalR direct callbacks.
+
+    NOTE: These events do NOT flow through SDK EventBus!
+    Must use realtime.add_callback() instead of suite.on()
+    """
+    realtime = self.suite.client.realtime
+
+    # Subscribe to position updates (SignalR direct)
+    await realtime.add_callback(
+        "position_update",
+        lambda data: asyncio.create_task(self._on_position_update(data))
     )
 
-    # Subscribe to position events
-    await suite.on(
-        EventType.POSITION_OPENED,
-        lambda event: self._on_position_opened(symbol, event)
+    # Subscribe to order updates (SignalR direct)
+    await realtime.add_callback(
+        "order_update",
+        lambda data: asyncio.create_task(self._on_order_update(data))
     )
 
-    # Subscribe to quote events ⭐ NEW
+    # Subscribe to trade updates (SignalR direct)
+    await realtime.add_callback(
+        "trade_update",
+        lambda data: asyncio.create_task(self._on_trade_update(data))
+    )
+```
+
+**Pattern 2: SDK EventBus (Quote/Market Data):**
+```python
+async def _subscribe_to_market_events(self, symbol: str, suite: TradingSuite) -> None:
+    """
+    Subscribe to quote/market data events via SDK EventBus.
+
+    NOTE: These events DO flow through SDK EventBus!
+    Use suite.on() for these.
+    """
+    # Subscribe to quote events (SDK EventBus)
     await suite.on(
         EventType.QUOTE_UPDATE,
         lambda event: self._on_quote_update(symbol, event)
     )
 
-    # ... other subscriptions
+    # Subscribe to bar events (SDK EventBus)
+    await suite.on(
+        EventType.NEW_BAR,
+        lambda event: self._on_new_bar(symbol, event)
+    )
 ```
 
-**Handler Pattern:**
+**Handler Pattern 1: SignalR Direct Event Handler:**
 ```python
-async def _on_trade_executed(self, symbol: str, sdk_event: Any) -> None:
-    """Handle trade executed event from SDK."""
+async def _on_trade_update(self, data: dict) -> None:
+    """
+    Handle trade update from SignalR realtime callback.
+
+    Args:
+        data: Raw SignalR event data (dict)
+    """
     try:
-        # Extract data from SDK event
+        # Extract data from SignalR event (dict-based access)
+        symbol = data.get("symbol", "UNKNOWN")
+
         risk_event = RiskEvent(
-            type=EventType.TRADE_EXECUTED,
+            event_type=EventType.TRADE_EXECUTED,
             data={
                 "symbol": symbol,
-                "trade_id": getattr(sdk_event, "trade_id", None),
-                "side": getattr(sdk_event, "side", None),
-                "size": getattr(sdk_event, "size", None),
-                "price": getattr(sdk_event, "price", None),
-                "pnl": getattr(sdk_event, "profit_and_loss", None),  # ⭐ KEY
-                "timestamp": getattr(sdk_event, "timestamp", None),
-                "sdk_event": sdk_event,  # Keep reference for debugging
+                "trade_id": data.get("tradeId"),
+                "side": data.get("side"),
+                "size": data.get("quantity"),
+                "price": data.get("price"),
+                "pnl": data.get("profitAndLoss"),  # ⭐ May be null for half-turns
+                "timestamp": data.get("timestamp"),
+                "raw_event": data,  # Keep reference for debugging
             }
         )
 
         # Publish to Risk EventBus
         await self.risk_event_bus.publish(risk_event)
-        logger.debug(f"Bridged TRADE_EXECUTED event for {symbol}")
+        logger.debug(f"Bridged TRADE_EXECUTED event from SignalR: {symbol}")
 
     except Exception as e:
-        logger.error(f"Error bridging trade executed event: {e}")
+        logger.error(f"Error bridging trade update event: {e}")
 ```
 
-**Quote Update Handler ⭐ NEW:**
+**Handler Pattern 2: SDK EventBus Event Handler:**
 ```python
 async def _on_quote_update(self, symbol: str, sdk_event: Any) -> None:
-    """Handle quote update event from SDK."""
+    """
+    Handle quote update from SDK EventBus.
+
+    Args:
+        symbol: Symbol being quoted
+        sdk_event: SDK event object (attribute-based access)
+    """
     try:
+        # Extract data from SDK event object (attribute-based access)
         risk_event = RiskEvent(
-            type=EventType.QUOTE_UPDATED,
+            event_type=EventType.QUOTE_UPDATED,
             data={
                 "symbol": symbol,
                 "last_price": getattr(sdk_event, "last_price", None),
@@ -355,15 +441,48 @@ async def _on_quote_update(self, symbol: str, sdk_event: Any) -> None:
                 "bid_size": getattr(sdk_event, "bid_size", None),
                 "ask_size": getattr(sdk_event, "ask_size", None),
                 "timestamp": getattr(sdk_event, "timestamp", None),
+                "sdk_event": sdk_event,  # Keep reference for debugging
             }
         )
 
+        # Publish to Risk EventBus
         await self.risk_event_bus.publish(risk_event)
-        logger.debug(f"Bridged QUOTE_UPDATED event for {symbol}")
+        logger.debug(f"Bridged QUOTE_UPDATED event from SDK EventBus: {symbol}")
 
     except Exception as e:
         logger.error(f"Error bridging quote update event: {e}")
 ```
+
+**Key Differences:**
+
+| Aspect | SignalR Direct | SDK EventBus |
+|--------|----------------|--------------|
+| Data Type | `dict` | Object with attributes |
+| Access Pattern | `data.get("key")` | `getattr(event, "attr", None)` |
+| Field Names | camelCase (e.g., `profitAndLoss`) | snake_case (e.g., `last_price`) |
+| Events | position_update, order_update, trade_update | QUOTE_UPDATE, NEW_BAR |
+| Source | Raw SignalR WebSocket | SDK EventBus |
+
+**Why Two Different Patterns?**
+
+The SDK architecture separates concerns:
+
+1. **SignalR Direct**: Trading events (positions, orders, trades) are critical and low-latency
+   - Come directly from TopstepX platform via WebSocket
+   - Bypass SDK EventBus for performance
+   - Access via `suite.client.realtime.add_callback()`
+
+2. **SDK EventBus**: Market data events (quotes, bars) are high-frequency
+   - May be throttled or batched by SDK
+   - Emitted to SDK EventBus for broader consumption
+   - Access via `suite.on(EventType.XXX)`
+
+**Practical Impact:**
+
+- ✅ **DO**: Use `realtime.add_callback()` for Position/Order/Trade events
+- ❌ **DON'T**: Use `suite.on()` for Position/Order/Trade events (won't work!)
+- ✅ **DO**: Use `suite.on()` for Quote/Market Data events
+- ⚠️ **REMEMBER**: Check `trading.py` for working SignalR subscription examples
 
 ---
 
@@ -404,22 +523,39 @@ class EventBus:
 
 ### 3.3 Usage Pattern
 
-**Subscribe to Events:**
-```python
-event_bus = EventBus()
+**⚠️ IMPORTANT: This is the RISK EventBus (internal), not SDK EventBus**
 
-# Subscribe to trade events
+The Risk Manager's EventBus is used for distributing RiskEvents **after** they've been converted from SDK events.
+
+**Subscribe to Risk Events:**
+```python
+# This is our internal Risk EventBus
+risk_event_bus = EventBus()
+
+# Subscribe to risk events (AFTER conversion from SDK)
 async def on_trade(event: RiskEvent):
     logger.info(f"Trade executed: {event.data}")
+    # event.data contains our normalized RiskEvent data
 
-await suite.on(EventType.TRADE_EXECUTED, on_trade)
+risk_event_bus.subscribe(EventType.TRADE_EXECUTED, on_trade)
 
-# Subscribe to position events
-await suite.on(EventType.POSITION_OPENED, on_position_opened)
-await suite.on(EventType.POSITION_CLOSED, on_position_closed)
+# Subscribe to position events (internal risk events)
+risk_event_bus.subscribe(EventType.POSITION_OPENED, on_position_opened)
+risk_event_bus.subscribe(EventType.POSITION_CLOSED, on_position_closed)
 
-# Subscribe to quote events ⭐
-await suite.on(EventType.QUOTE_UPDATED, on_quote_update)
+# Subscribe to quote events (internal risk events)
+risk_event_bus.subscribe(EventType.QUOTE_UPDATED, on_quote_update)
+```
+
+**Flow Reminder:**
+```
+SDK Event (from SignalR or SDK EventBus)
+  ↓
+EventBridge converts to RiskEvent
+  ↓
+Risk EventBus.publish(risk_event)  ← EventBridge publishes here
+  ↓
+Risk EventBus subscribers receive event  ← RiskEngine, rules subscribe here
 ```
 
 **Publish Events:**
@@ -669,27 +805,32 @@ Risk EventBus
 
 ### 6.3 Implementation
 
-**EventBridge Subscription:**
+**EventBridge Subscription (SDK EventBus Pattern):**
 ```python
-# Subscribe to quote updates
+# Quote events use SDK EventBus (not SignalR direct)
 await suite.on(
-    EventType.QUOTE_UPDATE,
+    EventType.QUOTE_UPDATE,  # SDK EventType
     lambda event: self._on_quote_update(symbol, event)
 )
 ```
 
-**Handler:**
+**Handler (SDK EventBus Pattern):**
 ```python
 async def _on_quote_update(self, symbol: str, sdk_event: Any) -> None:
-    """Handle quote update from SDK."""
+    """
+    Handle quote update from SDK EventBus.
+
+    NOTE: Quote events use suite.on() pattern (SDK EventBus),
+    NOT realtime.add_callback() like position/order/trade events!
+    """
     risk_event = RiskEvent(
-        type=EventType.QUOTE_UPDATED,
+        event_type=EventType.QUOTE_UPDATED,  # Risk EventType
         data={
             "symbol": symbol,
-            "last_price": sdk_event.last_price,
-            "bid": sdk_event.best_bid,
-            "ask": sdk_event.best_ask,
-            "timestamp": sdk_event.timestamp,
+            "last_price": getattr(sdk_event, "last_price", None),
+            "bid": getattr(sdk_event, "best_bid", None),
+            "ask": getattr(sdk_event, "best_ask", None),
+            "timestamp": getattr(sdk_event, "timestamp", None),
         }
     )
 
@@ -966,19 +1107,20 @@ async def test_trade_event_bridging():
 
 ### 10.2 Event Bus Tests
 
-**Test pub/sub:**
+**Test pub/sub (Risk EventBus, not SDK):**
 ```python
 async def test_event_bus_pubsub():
-    event_bus = EventBus()
+    # This tests our internal Risk EventBus, NOT SDK subscriptions!
+    event_bus = EventBus()  # Risk EventBus
     received_events = []
 
-    # Subscribe
+    # Subscribe to Risk EventBus
     async def handler(event: RiskEvent):
         received_events.append(event)
 
-    await suite.on(EventType.TRADE_EXECUTED, handler)
+    event_bus.subscribe(EventType.TRADE_EXECUTED, handler)  # Risk EventBus
 
-    # Publish
+    # Publish RiskEvent
     event = RiskEvent(
         event_type=EventType.TRADE_EXECUTED,
         data={"symbol": "MNQ"}
@@ -1105,13 +1247,154 @@ async def process_quote_batch():
 
 ---
 
-## 13. References
+## 13. Troubleshooting Event Subscriptions
+
+### 13.1 "No Events Received" Checklist
+
+**Problem:** Events aren't firing in your handlers
+
+**Diagnosis:**
+
+1. **Check which subscription pattern you used:**
+   ```python
+   # ❌ WRONG: Using suite.on() for position events
+   await suite.on(EventType.POSITION_OPENED, handler)  # Won't work!
+
+   # ✅ CORRECT: Using realtime.add_callback() for position events
+   await suite.client.realtime.add_callback("position_update", handler)
+   ```
+
+2. **Check your event name (SignalR direct):**
+   ```python
+   # ❌ WRONG: Using camelCase or EventType enum
+   await realtime.add_callback("positionUpdate", handler)  # Won't work!
+   await realtime.add_callback(EventType.POSITION_OPENED, handler)  # Won't work!
+
+   # ✅ CORRECT: Using snake_case string
+   await realtime.add_callback("position_update", handler)
+   ```
+
+3. **Check your data access pattern:**
+   ```python
+   # SignalR direct events (dict)
+   async def handler(data: dict):
+       price = data.get("price")  # ✅ Correct
+       price = data.price  # ❌ Wrong - dict doesn't have attributes
+
+   # SDK EventBus events (object)
+   async def handler(event):
+       price = getattr(event, "price", None)  # ✅ Correct
+       price = event.get("price")  # ❌ Wrong - object doesn't have .get()
+   ```
+
+4. **Check SignalR connection:**
+   ```python
+   if not suite.client.realtime.is_connected:
+       logger.error("SignalR not connected!")
+   ```
+
+5. **Check callback registration:**
+   ```python
+   # Add logging after registration
+   await realtime.add_callback("position_update", handler)
+   logger.info("✅ Registered callback: position_update")
+   ```
+
+### 13.2 Event Pattern Reference Card
+
+**Copy this to your code comments:**
+
+```python
+# ============================================================
+# EVENT SUBSCRIPTION PATTERNS - QUICK REFERENCE
+# ============================================================
+
+# PATTERN 1: Position/Order/Trade Events (SignalR Direct)
+# --------------------------------------------------------
+# Use: suite.client.realtime.add_callback("event_name", handler)
+# Data: dict with camelCase keys
+# Events: position_update, order_update, trade_update
+
+realtime = suite.client.realtime
+await realtime.add_callback(
+    "position_update",  # snake_case string
+    lambda data: asyncio.create_task(on_position(data))
+)
+
+async def on_position(data: dict):
+    size = data.get("size")  # camelCase keys
+    price = data.get("averagePrice")
+
+
+# PATTERN 2: Quote/Market Data Events (SDK EventBus)
+# ---------------------------------------------------
+# Use: await suite.on(EventType.XXX, handler)
+# Data: object with snake_case attributes
+# Events: QUOTE_UPDATE, NEW_BAR, TRADE_TICK
+
+await suite.on(
+    EventType.QUOTE_UPDATE,  # SDK EventType enum
+    lambda event: on_quote(symbol, event)
+)
+
+async def on_quote(symbol: str, event):
+    price = getattr(event, "last_price", None)  # snake_case attrs
+    bid = getattr(event, "best_bid", None)
+
+
+# REMEMBER:
+# - Position/Order/Trade → realtime.add_callback() + dict.get()
+# - Quote/Market Data → suite.on() + getattr()
+# - Wrong pattern = NO EVENTS RECEIVED!
+# ============================================================
+```
+
+### 13.3 Common Errors
+
+**Error 1: TypeError: 'dict' object has no attribute 'last_price'**
+```python
+# Problem: Using attribute access on SignalR dict
+async def handler(data: dict):
+    price = data.last_price  # ❌ Error!
+
+# Fix: Use dict.get()
+async def handler(data: dict):
+    price = data.get("lastPrice")  # ✅ Correct
+```
+
+**Error 2: AttributeError: 'QuoteEvent' object has no attribute 'get'**
+```python
+# Problem: Using dict access on SDK object
+async def handler(event):
+    price = event.get("last_price")  # ❌ Error!
+
+# Fix: Use getattr()
+async def handler(event):
+    price = getattr(event, "last_price", None)  # ✅ Correct
+```
+
+**Error 3: Events not firing at all**
+```python
+# Problem: Wrong subscription pattern
+await suite.on(EventType.POSITION_OPENED, handler)  # ❌ Silent fail!
+
+# Fix: Use correct pattern
+await realtime.add_callback("position_update", handler)  # ✅ Works!
+```
+
+---
+
+## 14. References
 
 **Implementation Files:**
 - `src/risk_manager/core/events.py` - EventBus, RiskEvent
 - `src/risk_manager/sdk/event_bridge.py` - SDK → Risk conversion
 - `src/risk_manager/core/engine.py` - Event routing to rules
-- `src/risk_manager/integrations/trading.py` - Position polling
+- `src/risk_manager/integrations/trading.py` - **⭐ WORKING EXAMPLE of SignalR subscriptions**
+
+**Architecture Documentation:**
+- `docs/specifications/unified/architecture/system-architecture.md` - Complete component architecture with TradingIntegration layer
+- `docs/specifications/unified/architecture/event-flow.md` - **⭐ Detailed event flow diagrams and sequence flows**
 
 **Related Specs:**
 - SDK Integration (UNIFIED-SDK-001)
@@ -1120,8 +1403,21 @@ async def process_quote_batch():
 **Wave 1 Analysis:**
 - `docs/analysis/wave1-feature-inventory/02-SDK-INTEGRATION-INVENTORY.md`
 
+**Quick References:**
+- `SDK_EVENTS_QUICK_REFERENCE.txt` - Event types and data fields
+
+**Key Architectural Insights:**
+- **TradingIntegration Pattern**: Uses `realtime.add_callback()` NOT `suite.on()` for SignalR events
+- **Event Flow**: TopstepX → SignalR → TradingIntegration → EventBus → RiskEngine → Rules → Enforcement
+- **Async Coordination**: All components use async/await with asyncio event loop coordination
+- **8-Checkpoint Logging**: Strategic log points from service start through enforcement execution
+
 ---
 
-**Document Status:** Complete
-**Last Updated:** 2025-10-25
+**Document Status:** Complete - Subscription patterns clarified
+**Last Updated:** 2025-10-27
 **Next Review:** When adding new event types or optimizing performance
+**Key Changes:**
+- Added two-pattern clarification (SignalR direct vs SDK EventBus)
+- Added architecture documentation references
+- Linked to detailed event-flow.md for sequence diagrams

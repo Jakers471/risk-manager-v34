@@ -1,0 +1,544 @@
+================================================================================
+RISK MANAGER V34 - IMPLEMENTATION DEPENDENCY GRAPH
+================================================================================
+
+Version: 1.0
+Date: 2025-10-27
+Status: Complete
+
+================================================================================
+LEGEND
+================================================================================
+
+[X] = Already Implemented (ready to use)
+[ ] = Not Implemented (must build)
+→   = Depends on (must complete before)
+||  = Can run in parallel
+*   = Critical path item
+#   = Blocks multiple components
+
+PRIORITY LEVELS:
+  P0 = Critical (blocks 50%+ of rules)
+  P1 = High (blocks 30-49% of rules)
+  P2 = Medium (blocks 10-29% of rules)
+  P3 = Low (blocks <10% of rules)
+
+================================================================================
+FOUNDATION LAYER (Already Implemented)
+================================================================================
+
+[X] EventBus (src/risk_manager/core/events.py)
+    - Pub/sub event system
+    - Status: Working
+    - Used by: All rules
+
+[X] EventBridge (src/risk_manager/sdk/event_bridge.py)
+    - SDK → Risk EventBus bridge
+    - Status: Working
+    - Subscribes: position_update, order_update, trade_update
+
+[X] RiskEngine (src/risk_manager/core/engine.py)
+    - Rule evaluation loop
+    - Status: Working
+    - Needs: Event Router integration
+
+[X] BaseRule (src/risk_manager/rules/base.py)
+    - Abstract rule interface
+    - Status: Working
+    - Needs: Event subscription methods
+
+[X] TradingIntegration (src/risk_manager/integrations/trading.py)
+    - SDK connection & enforcement
+    - Status: Working
+    - Methods: flatten_all(), close_position()
+
+[X] Database (src/risk_manager/state/database.py)
+    - SQLite persistence
+    - Status: Working
+    - Used by: All state managers
+
+[X] PnLTracker (src/risk_manager/state/pnl_tracker.py)
+    - Daily realized P&L tracking
+    - Status: Working
+    - Used by: RULE-003, RULE-013
+
+[X] RULE-001 (src/risk_manager/rules/max_position.py)
+    - Max contracts (account-wide)
+    - Status: Fully implemented
+
+[X] RULE-002 (src/risk_manager/rules/max_contracts_per_instrument.py)
+    - Max contracts per symbol
+    - Status: Fully implemented
+
+[X] RULE-003 (src/risk_manager/rules/daily_loss.py)
+    - Daily realized loss (70% complete)
+    - Status: Needs MOD-002, MOD-004 integration
+
+================================================================================
+PHASE 1: CORE EVENT INFRASTRUCTURE (5-7 days)
+================================================================================
+Priority: P0 (Critical - unblocks all rules)
+
+                    [X] EventBus
+                         |
+                         v
+*               [ ] Event Router (#) ────────┐
+                    (2 days)                 │
+                    P0 Priority               │
+                    Blocks: All lockout      │
+                    enforcement              │
+                         |                    │
+                         ├──→ Needs: [ ] MOD-002 (LockoutManager)
+                         |
+                         v
+                [ ] Event Subscriptions
+                    (1 day)
+                    P2 Priority
+                    Adds: subscribed_events() to BaseRule
+                         |
+                         v
+                [ ] Event Validation
+                    (1 day)
+                    P3 Priority
+                    Adds: SDK data validation
+                         |
+                         v
+*               [ ] Action Queue (#) ─────────┤
+                    (1-2 days)               │
+                    P1 Priority               │
+                    Prevents: Race conditions │
+                    between rules            │
+                         |                    │
+                         v                    │
+                [ ] Phase 1 Integration      │
+                    (1 day)                  │
+                    Tests: E2E event flow    │
+                                             │
+================================================================================
+PHASE 2: STATE MANAGEMENT MODULES (4-6 days)
+================================================================================
+Priority: P0 (Critical - blocks 54% of rules)
+
+                    [X] Database
+                         |
+                         ├────────────────────┐
+                         |                    |
+                         v                    v
+*               [ ] MOD-002 (#)          [ ] MOD-003 (#)
+                LockoutManager           TimerManager
+                (2 days)                 (1-2 days)
+                P0 Priority              P1 Priority
+                Blocks 5 rules (38%)     Blocks 4 rules (31%)
+                         |                    |
+                         |                    ├──→ Needs: [ ] MOD-002
+                         |                    |
+                         v                    v
+                RULE-003 (complete)      RULE-006
+                RULE-009                 RULE-007
+                RULE-010                 RULE-008
+                RULE-011
+                RULE-013
+                         |
+                         |    [X] PnLTracker
+                         |         |
+                         |         v
+                         └───→ [ ] MOD-004
+                               ResetScheduler
+                               (1-2 days)
+                               P1 Priority
+                               Blocks 3 rules (23%)
+                                    |
+                                    v
+                               RULE-003 (complete)
+                               RULE-009
+                               RULE-013
+                                    |
+                                    v
+                               [ ] Phase 2 Integration
+                                   (1 day)
+                                   Tests: Lockout → Timer → Reset
+
+================================================================================
+PHASE 3: HIGH-PRIORITY RULES (6-8 days)
+================================================================================
+Priority: P1 (High - prevent account violations)
+
+    [ ] MOD-002          [ ] MOD-004
+         |                    |
+         └──────┬─────────────┘
+                v
+*       [X] RULE-003 (complete) ────────────────────────┐
+        Daily Realized Loss                              |
+        (1 day - integrate MOD-002/004)                  |
+        P0 Priority                                      |
+        Status: 70% → 100%                               |
+                                                         |
+    [ ] MOD-002          [ ] MOD-004                     |
+         |                    |                          |
+         └──────┬─────────────┘                         |
+                v                                        |
+*       [ ] RULE-009 (#) ──────────────────────────────┤
+        Session Block Outside                           |
+        (3 days - most complex)                         |
+        P1 Priority                                     |
+        Features: Multi-session, holidays, timezone     |
+                                                        |
+    [ ] MOD-003                                         |
+         |                                              |
+         v                                              |
+*   [ ] RULE-006 ───────────────────────────────────────┤
+    Trade Frequency Limit                               |
+    (2 days)                                            |
+    P1 Priority                                         |
+    Features: Rolling window, tiered cooldowns          |
+                                                        |
+                                                        v
+                                            [ ] Phase 3 Integration
+                                                (included in rule time)
+                                                Tests: Account protection
+
+================================================================================
+PHASE 4: MEDIUM-PRIORITY RULES (4-5 days)
+================================================================================
+Priority: P2 (Medium - discipline & protection)
+
+    [ ] MOD-003
+         |
+         ├──────────────┬──────────────┐
+         v              v              v
+    [ ] RULE-007   [ ] RULE-008   [ ] RULE-010
+    Cooldown       No Stop-Loss   Auth Loss
+    After Loss     Grace          Guard
+    (1 day)        (2 days)       (1 day)
+    P2             P2             P2
+         |              |              |
+         v              v              v
+    Timer-based    Timer-based    API-driven
+    cooldown       grace period   lockout
+         |              |              |
+         └──────┬───────┴──────────────┘
+                v
+         [ ] MOD-002
+              |
+              ├──────────────┐
+              v              v
+        [ ] RULE-011   [ ] RULE-013
+        Symbol Blocks  Daily Realized
+        (1 day)        Profit
+        P3             P2
+              |              |
+              v              v
+        Symbol-level   Timer-based
+        lockout        lockout
+              |              |
+              |              ├──→ Needs: [X] PnLTracker, [ ] MOD-004
+              |
+              └──────┬───────┘
+                     v
+              [ ] Phase 4 Integration
+                  (included in rule time)
+                  Tests: Cooldowns & lockouts
+
+================================================================================
+PHASE 5: MARKET DATA + UNREALIZED PNL (5-7 days)
+================================================================================
+Priority: P2 (Medium - blocks unrealized P&L rules)
+
+    [X] TradingIntegration
+         |
+         v
+*   [ ] Market Data Feed (#) ──────────────────────────┐
+    (3 days)                                            |
+    P2 Priority                                         |
+    Blocks 3 rules (23%)                                |
+    Features: Real-time quotes, high-frequency          |
+         |                                              |
+         v                                              |
+    [ ] Unrealized Calculator                          |
+    (included in feed)                                 |
+    Features: Tick values, Long/Short calculations     |
+         |                                              |
+         ├──────────────┬──────────────┐              |
+         v              v              v               |
+    [ ] RULE-004   [ ] RULE-005   [ ] RULE-012        |
+    Daily          Max            Trade               |
+    Unrealized     Unrealized     Management          |
+    Loss           Profit         (automation)        |
+    (2-3 days)     (shared)       (1-2 days)          |
+    P2             P2             P3                  |
+         |              |              |               |
+         v              v              v               |
+    Trade-by-     Trade-by-     Modify SL             |
+    trade close   trade close   (not enforcement)     |
+         |              |              |               |
+         └──────┬───────┴──────────────┘              |
+                v                                      v
+         [ ] Phase 5 Integration              [ ] Market Data Tests
+             (included in rule time)              Performance: 100+ quotes/sec
+             Tests: Unrealized P&L accuracy
+
+================================================================================
+PHASE 6: PRODUCTION POLISH (3-4 days)
+================================================================================
+Priority: P1 (High - production readiness)
+
+    All Phases
+         |
+         v
+    [ ] Comprehensive Testing
+        (2 days)
+        - Unit: 95%+ coverage
+        - Integration: 80%+ coverage
+        - E2E: Critical paths
+        - Runtime: Smoke, soak, trace
+        - Performance: 100 events/sec
+         |
+         v
+    [ ] Documentation
+        (1 day)
+        - Update PROJECT_STATUS.md (100%)
+        - Create OPERATOR_RUNBOOK.md
+        - Update README.md
+         |
+         v
+    [ ] Production Monitoring
+        (1 day)
+        - Prometheus metrics
+        - Grafana dashboards
+        - Alerting rules
+         |
+         v
+    [ ] PRODUCTION READY ✅
+
+================================================================================
+CRITICAL PATH (Longest Dependency Chain)
+================================================================================
+
+Duration: 20-28 days (4-5.5 weeks)
+
+START
+  |
+  v
+Phase 1: Event Router (2d) + Subscriptions (1d) + Validation (1d) + Action Queue (2d) = 5-7d
+  |
+  v
+Phase 2: MOD-002 (2d) || MOD-003 (1-2d)
+  |      Then MOD-004 (1-2d) = 4-6d
+  v
+Phase 3: RULE-003 (1d) + RULE-009 (3d) + RULE-006 (2d) = 6d
+  |
+  v
+Phase 5: Market Data Feed (3d) + RULE-004/005 (2-3d) + RULE-012 (1-2d) = 5-7d
+  |
+  v
+Phase 6: Testing (2d) + Docs (1d) + Monitoring (1d) = 4d
+  |
+  v
+DONE
+
+CRITICAL PATH TOTAL: 5 + 4 + 6 + 5 + 4 = 24 days
+
+Phase 4 can run in parallel with Phase 5 (not on critical path).
+
+================================================================================
+PARALLELIZATION OPPORTUNITIES
+================================================================================
+
+Week 1:
+  * Event Router (critical)
+  || Event Subscriptions (parallel)
+  || Event Validation (parallel)
+
+Week 2:
+  * MOD-002 (critical)
+  || MOD-003 (parallel after MOD-002)
+  * MOD-004 (after MOD-002)
+
+Week 3:
+  * RULE-003 (critical path)
+  * RULE-009 (critical path)
+  || RULE-006 (can start after MOD-003)
+
+Week 4:
+  * Market Data Feed (critical path)
+  || RULE-007 (parallel - uses MOD-003)
+  || RULE-008 (parallel - uses MOD-003)
+  || RULE-010 (parallel - uses MOD-002)
+  || RULE-011 (parallel - uses MOD-002)
+  || RULE-013 (parallel - uses MOD-002/MOD-004)
+
+Week 5:
+  * RULE-004, RULE-005 (critical path - need Market Data)
+  * RULE-012 (critical path - need Market Data)
+
+Week 6:
+  * Testing, Docs, Monitoring (critical path)
+
+================================================================================
+BOTTLENECK ANALYSIS
+================================================================================
+
+TOP BOTTLENECKS (Must address early):
+
+1. Event Router (2 days)
+   - Blocks: All lockout enforcement
+   - Impact: Cannot test RULE-003, RULE-009, RULE-010, RULE-011, RULE-013
+   - Mitigation: Start Day 1, highest priority
+
+2. MOD-002 LockoutManager (2 days)
+   - Blocks: 5 rules (38%)
+   - Impact: RULE-003, RULE-009, RULE-010, RULE-011, RULE-013
+   - Mitigation: Start Week 2 Day 1, critical path
+
+3. Market Data Feed (3 days)
+   - Blocks: 3 rules (23%)
+   - Impact: RULE-004, RULE-005, RULE-012
+   - Mitigation: Start Week 4, parallelize with Phase 4 rules
+
+4. MOD-003 TimerManager (1-2 days)
+   - Blocks: 4 rules (31%)
+   - Impact: RULE-006, RULE-007, RULE-008
+   - Mitigation: Parallelize with MOD-002 (after DB schema done)
+
+5. MOD-004 ResetScheduler (1-2 days)
+   - Blocks: 3 rules (23%)
+   - Impact: RULE-003, RULE-009, RULE-013
+   - Mitigation: Can start after MOD-002, before RULE-009
+
+================================================================================
+RISK MITIGATION STRATEGY
+================================================================================
+
+If Phase 1 takes longer than expected (Event Router complex):
+  - Fallback: Implement simple lockout check in RiskEngine temporarily
+  - Trade-off: Less robust, but unblocks Phase 2
+  - Recovery: Refactor to Event Router in Phase 6
+
+If MOD-002 takes longer than expected:
+  - Fallback: Simple in-memory lockout dict (no persistence)
+  - Trade-off: Lockouts lost on restart
+  - Recovery: Add persistence in Phase 6
+
+If Market Data Feed takes longer than expected:
+  - Fallback: Skip RULE-004, RULE-005, RULE-012 for v1.0
+  - Trade-off: No unrealized P&L rules
+  - Recovery: Add in v1.1
+
+================================================================================
+WEEKLY MILESTONES
+================================================================================
+
+Week 1: Foundation
+  ✅ Event Router implemented
+  ✅ Event subscriptions added to BaseRule
+  ✅ Action Queue preventing race conditions
+  ✅ Phase 1 tests passing (E2E event flow)
+
+Week 2: State Management
+  ✅ MOD-002 (LockoutManager) working
+  ✅ MOD-003 (TimerManager) working
+  ✅ MOD-004 (ResetScheduler) working
+  ✅ Phase 2 tests passing (Lockout → Timer → Reset)
+
+Week 3: High-Priority Rules
+  ✅ RULE-003 100% complete (was 70%)
+  ✅ RULE-009 implemented (session blocks)
+  ✅ RULE-006 implemented (trade frequency)
+  ✅ Phase 3 tests passing (account protection)
+
+Week 4: Medium-Priority Rules + Market Data
+  ✅ RULE-007, RULE-008, RULE-010, RULE-011, RULE-013 implemented
+  ✅ Market Data Feed integrated
+  ✅ Phase 4 tests passing (cooldowns & lockouts)
+
+Week 5: Unrealized PnL Rules
+  ✅ RULE-004, RULE-005 implemented (unrealized P&L)
+  ✅ RULE-012 implemented (trade management)
+  ✅ Phase 5 tests passing (unrealized calculations accurate)
+
+Week 6: Production Polish
+  ✅ Comprehensive testing (95%+ unit, 80%+ integration)
+  ✅ Documentation updated (PROJECT_STATUS.md, OPERATOR_RUNBOOK.md)
+  ✅ Production monitoring (Prometheus, Grafana, alerts)
+  ✅ Runtime smoke test passing (exit code 0)
+  ✅ PRODUCTION DEPLOYMENT ✅
+
+================================================================================
+RULE IMPLEMENTATION ORDER (By Priority)
+================================================================================
+
+IMMEDIATE (Week 2-3):
+  1. RULE-003 (complete) - P0 (Daily realized loss)
+  2. RULE-009            - P1 (Session blocks)
+  3. RULE-006            - P1 (Trade frequency)
+
+WEEK 4:
+  4. RULE-007            - P2 (Cooldown after loss)
+  5. RULE-008            - P2 (No stop-loss grace)
+  6. RULE-010            - P2 (Auth loss guard)
+  7. RULE-013            - P2 (Daily realized profit)
+  8. RULE-011            - P3 (Symbol blocks)
+
+WEEK 5:
+  9. RULE-004            - P2 (Daily unrealized loss)
+ 10. RULE-005            - P2 (Max unrealized profit)
+ 11. RULE-012            - P3 (Trade management)
+
+ALREADY DONE:
+  ✅ RULE-001 (Max contracts)
+  ✅ RULE-002 (Max contracts per instrument)
+
+================================================================================
+INTEGRATION CHECKPOINTS (Validate Between Phases)
+================================================================================
+
+Checkpoint 1 (End of Phase 1):
+  [ ] Event Router routes events to correct rules
+  [ ] Lockout check prevents event processing when locked
+  [ ] Action Queue prevents race conditions
+  [ ] EventBus → EventRouter → Rules → ActionQueue → Enforcement (E2E)
+
+Checkpoint 2 (End of Phase 2):
+  [ ] LockoutManager sets/clears lockouts (persisted)
+  [ ] TimerManager countdown timers auto-unlock
+  [ ] ResetScheduler daily resets execute at configured time
+  [ ] Crash recovery: lockouts/timers restored from database
+
+Checkpoint 3 (End of Phase 3):
+  [ ] RULE-003 enforces daily loss limit (close all + lockout)
+  [ ] RULE-009 blocks trading outside session (holiday aware)
+  [ ] RULE-006 enforces trade frequency (tiered cooldowns)
+  [ ] All 8 checkpoints logging correctly (🚀 ✅ ✅ ✅ ✅ 📨 🔍 ⚠️)
+
+Checkpoint 4 (End of Phase 4):
+  [ ] RULE-007 cooldown after loss (tiered)
+  [ ] RULE-008 stop-loss grace period (10s timer)
+  [ ] RULE-010 canTrade monitoring (API-driven lockout)
+  [ ] RULE-011 symbol blocks (symbol-specific lockout)
+  [ ] RULE-013 daily profit target (close all + lockout)
+
+Checkpoint 5 (End of Phase 5):
+  [ ] Market Data Feed subscriptions active (quote updates)
+  [ ] Unrealized P&L calculations accurate (compare with broker)
+  [ ] RULE-004 closes losing positions (trade-by-trade)
+  [ ] RULE-005 takes profit on winners (trade-by-trade)
+  [ ] RULE-012 modifies stop losses (automation)
+
+Checkpoint 6 (End of Phase 6):
+  [ ] All 13 rules implemented (100%)
+  [ ] Unit tests: 95%+ coverage
+  [ ] Integration tests: 80%+ coverage
+  [ ] E2E tests: Critical paths covered
+  [ ] Runtime smoke test: Exit code 0
+  [ ] Performance: 100 events/sec sustained
+  [ ] Production monitoring: Metrics, dashboards, alerts
+  [ ] Documentation: PROJECT_STATUS.md (100%), OPERATOR_RUNBOOK.md
+
+================================================================================
+END OF DEPENDENCY GRAPH
+================================================================================
+
+Generated: 2025-10-27
+Status: Ready for Phase 1 execution
+
+Next Step: Create src/risk_manager/core/event_router.py

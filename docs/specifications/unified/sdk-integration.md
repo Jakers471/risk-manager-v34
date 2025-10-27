@@ -2,8 +2,16 @@
 
 **Document ID:** UNIFIED-SDK-001
 **Created:** 2025-10-25
+**Last Updated:** 2025-10-27 (Parameter naming corrections)
 **Status:** Complete - SDK-First Architecture
 **Dependencies:** Project-X-Py SDK v3.5.9+
+
+**Recent Changes:**
+- ✅ Fixed parameter naming inconsistencies
+- ✅ Updated `features=[]` → `enable_market_data`, `enable_indicators`
+- ✅ Updated `fetch_last_x_days` → `initial_days`
+- ✅ Clarified `instrument` (singular) vs `instruments` (plural)
+- ✅ Added comprehensive parameter reference table (Section 0)
 
 ---
 
@@ -50,6 +58,61 @@ Risk Manager V34 uses **SDK-first architecture**, leveraging the Project-X-Py SD
 
 ---
 
+## 0. TradingSuite.create() Parameter Reference
+
+### Correct Parameters (SDK v3.5.9+)
+
+| Parameter | Type | Default | Description | Required |
+|-----------|------|---------|-------------|----------|
+| `instrument` | `str` | - | Single trading instrument symbol (e.g., "MNQ", "ES") | Yes (single) |
+| `instruments` | `list[str]` | - | Multiple trading instrument symbols (e.g., ["MNQ", "ES"]) | Yes (multi) |
+| `timeframes` | `list[str]` | `["1min"]` | OHLCV timeframes for bar data (e.g., ["1min", "5min", "15min", "1hr"]) | No |
+| `initial_days` | `int` | `1` | Number of days of historical data to load on startup | No |
+| `enable_market_data` | `bool` | `True` | Enable real-time market data features (quotes, ticks) | No |
+| `enable_indicators` | `bool` | `False` | Enable technical indicators (RSI, MACD, etc.) | No |
+
+### ⚠️ Deprecated/Incorrect Parameters (DO NOT USE)
+
+| Incorrect Parameter | Correct Alternative | Notes |
+|---------------------|---------------------|-------|
+| ❌ `features=[]` | ✅ `enable_market_data=True, enable_indicators=False` | `features` parameter doesn't exist in SDK v3.5.9+ |
+| ❌ `fetch_last_x_days=N` | ✅ `initial_days=N` | Renamed in SDK v3.0+ |
+| ❌ `enable_orderbook=True` | ✅ Part of `enable_market_data` | Orderbook included in market data |
+| ❌ `enable_statistics=True` | ✅ Always enabled | Statistics always available, no flag needed |
+| ❌ `enable_risk_management=True` | ✅ Separate config | SDK risk is configured separately, not in create() |
+
+### Example: Correct Usage
+
+```python
+from project_x_py import TradingSuite
+
+# ✅ CORRECT: Single instrument with all parameters
+suite = await TradingSuite.create(
+    instrument="MNQ",               # str, not list
+    timeframes=["1min", "5min"],    # optional
+    initial_days=1,                 # not fetch_last_x_days
+    enable_market_data=True,        # not features=[]
+    enable_indicators=False         # not features=[]
+)
+
+# ✅ CORRECT: Multiple instruments (if SDK supports)
+suite = await TradingSuite.create(
+    instruments=["MNQ", "ES"],      # list[str]
+    timeframes=["1min"],
+    initial_days=1
+)
+
+# ❌ INCORRECT: Old parameter names
+suite = await TradingSuite.create(
+    instruments=["MNQ"],            # Wrong: should be instrument (singular)
+    fetch_last_x_days=1,            # Wrong: should be initial_days
+    features=["orderbook"],         # Wrong: should be enable_market_data=True
+    enable_statistics=True          # Wrong: statistics always enabled
+)
+```
+
+---
+
 ## 1. SDK Components
 
 ### 1.1 TradingSuite
@@ -60,12 +123,20 @@ Risk Manager V34 uses **SDK-first architecture**, leveraging the Project-X-Py SD
 ```python
 from project_x_py import TradingSuite
 
+# Single instrument (most common)
 suite = await TradingSuite.create(
-    instruments=["MNQ", "ES"],        # List of symbols
-    timeframes=["1min", "5min"],      # OHLCV timeframes
-    enable_orderbook=True,             # Level 2 market depth
-    enable_risk_management=True,       # SDK's built-in risk
-    enable_statistics=True             # Stats tracking
+    instrument="MNQ",                  # Single symbol (str)
+    timeframes=["1min", "5min"],       # OHLCV timeframes
+    initial_days=1,                    # Load last N days of data
+    enable_market_data=True,           # Enable market data features
+    enable_indicators=False            # Enable technical indicators
+)
+
+# Multiple instruments (if supported by SDK version)
+suite = await TradingSuite.create(
+    instruments=["MNQ", "ES"],         # List of symbols
+    timeframes=["1min", "5min"],
+    initial_days=1
 )
 ```
 
@@ -320,8 +391,9 @@ class SuiteManager:
     async def add_instrument(
         symbol: str,
         timeframes: list[str] = ["1min", "5min"],
-        enable_orderbook: bool = False,
-        enable_statistics: bool = True
+        initial_days: int = 1,
+        enable_market_data: bool = True,
+        enable_indicators: bool = False
     ) -> TradingSuite
 
     async def remove_instrument(symbol: str) -> None
@@ -729,7 +801,11 @@ current_price = response.json()["lastPrice"]
 **SDK-First Implementation:**
 ```python
 # 1. All authentication handled automatically
-suite = await TradingSuite.create(instruments=["MNQ"])
+suite = await TradingSuite.create(
+    instrument="MNQ",      # Single symbol (str)
+    timeframes=["1min"],
+    initial_days=1
+)
 
 # 2. All WebSocket handling automatic
 # SDK subscribes to events internally
@@ -829,7 +905,8 @@ async def mock_suite():
     return suite
 
 async def test_flatten_position(mock_suite):
-    integration = TradingIntegration(["MNQ"], config, event_bus)
+    # Note: TradingIntegration uses single instrument, not list
+    integration = TradingIntegration("MNQ", config, event_bus)
     integration.suite = mock_suite
 
     await integration.flatten_position("MNQ")
@@ -848,7 +925,11 @@ async def test_flatten_position(mock_suite):
 ```python
 @pytest.mark.integration
 async def test_sdk_connection():
-    suite = await TradingSuite.create(instruments=["MNQ"])
+    suite = await TradingSuite.create(
+        instrument="MNQ",
+        timeframes=["1min"],
+        initial_days=1
+    )
     assert suite.is_connected
 
     # Test position query
@@ -918,6 +999,7 @@ async def test_sdk_connection():
 
 ---
 
-**Document Status:** Complete
-**Last Updated:** 2025-10-25
+**Document Status:** Complete - Parameter Names Corrected
+**Last Updated:** 2025-10-27
 **Next Review:** When SDK version updates or new quote features added
+**Changes:** Fixed all parameter naming inconsistencies (features→enable_*, fetch_last_x_days→initial_days, instrument vs instruments)

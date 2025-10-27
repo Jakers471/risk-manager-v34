@@ -87,14 +87,28 @@ Risk Manager runs as a background daemon/service:
 **Purpose:** Complete system architecture (v1→v2 evolution)
 **Contents:**
 - Architecture evolution (v1 vs v2)
-- Component relationships
+- Component relationships (with TradingIntegration layer)
 - Data flow diagrams
 - Technology stack (SDK-first)
 - Daemon lifecycle
 - Directory structure
 - Key design decisions
+- Component interaction table
 
-### 2. Database Manager (MOD-001)
+### 2. Event Flow Architecture
+**File:** `event-flow.md` ⭐ NEW
+**Purpose:** Detailed event flow diagrams and sequence flows
+**Contents:**
+- Complete event flow (TopstepX → SDK → Risk Engine → Enforcement)
+- Two event subscription patterns (SignalR direct vs SDK EventBus)
+- Async pattern throughout (asyncio coordination)
+- Rule category event flows (immediate, hard lockout, cooldown)
+- Error handling flows (disconnect, exceptions, enforcement failures)
+- Component responsibility matrix
+- 8-checkpoint logging in event flow
+- Sequence diagrams for each rule category
+
+### 3. Database Manager (MOD-001)
 **File:** `MOD-001-database-manager.md`
 **Purpose:** State persistence layer
 **Contents:**
@@ -105,7 +119,7 @@ Risk Manager runs as a background daemon/service:
 - Connection pooling
 - Crash recovery
 
-### 3. Lockout Manager (MOD-002)
+### 4. Lockout Manager (MOD-002)
 **File:** `MOD-002-lockout-manager.md`
 **Purpose:** Account lockout system
 **Contents:**
@@ -116,7 +130,7 @@ Risk Manager runs as a background daemon/service:
 - CLI integration
 - Event router integration
 
-### 4. Timer Manager (MOD-003)
+### 5. Timer Manager (MOD-003)
 **File:** `MOD-003-timer-manager.md`
 **Purpose:** Time windows and reset schedules
 **Contents:**
@@ -126,7 +140,7 @@ Risk Manager runs as a background daemon/service:
 - Trader CLI countdown display
 - Precision handling
 
-### 5. Reset Scheduler (MOD-004)
+### 6. Reset Scheduler (MOD-004)
 **File:** `MOD-004-reset-scheduler.md`
 **Purpose:** Daily reset automation
 **Contents:**
@@ -136,9 +150,9 @@ Risk Manager runs as a background daemon/service:
 - P&L counter resets
 - Lockout clearing
 
-### 6. Daemon Lifecycle
+### 7. Daemon Lifecycle
 **File:** `daemon-lifecycle.md`
-**Purpose:** How daemon works (NEW)
+**Purpose:** How daemon works
 **Contents:**
 - Windows Service integration
 - Auto-start configuration

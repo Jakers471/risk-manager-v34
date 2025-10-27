@@ -1,0 +1,461 @@
+# ================================================================================
+# Risk Manager V34 - Events Configuration
+# ================================================================================
+#
+# This file configures how the Risk Manager subscribes to, filters, and processes
+# events from the Project-X SDK. It controls event routing, quote updates,
+# buffering, and priority handling.
+#
+# Last Updated: 2025-10-27
+# Dependencies: Project-X-Py SDK v3.5.9+
+#
+# CRITICAL: Quote events are required for RULE-004/005 (unrealized P&L tracking)
+#
+# ================================================================================
+
+# ================================================================================
+# QUOTE EVENTS (Market Data)
+# ================================================================================
+# Controls real-time price updates for unrealized P&L calculation
+# Required for: RULE-004 (Daily Unrealized Loss), RULE-005 (Max Unrealized Profit)
+
+quotes:
+  # Enable quote subscription (REQUIRED for unrealized P&L rules)
+  enabled: true
+
+  # Symbol filter:
+  # - Empty list [] = Auto-subscribe to all symbols with active positions
+  # - Specific symbols = Only subscribe to these (e.g., ['MNQ', 'ES', 'NQ'])
+  #
+  # RECOMMENDED: Leave empty to auto-track positions
+  symbols: []
+
+  # Update throttling:
+  # - Quote events fire at very high frequency (potentially 100s per second)
+  # - Throttle to reasonable update rate to prevent overwhelming the system
+  # - 1000ms (1 second) is sufficient for unrealized P&L tracking
+  # - Min: 100ms, Max: 5000ms
+  update_interval_ms: 1000
+
+  # Price fields to track:
+  # - last: Last traded price (most important for P&L calculation)
+  # - bid: Best bid price
+  # - ask: Best ask price
+  # - volume: Trading volume (informational)
+  #
+  # RECOMMENDED: ['last'] is sufficient for P&L tracking
+  fields:
+    - last
+    - bid
+    - ask
+
+  # Auto-subscribe behavior:
+  # - When true: Automatically subscribe to quotes when position opens
+  # - When false: Manual subscription required via symbols list
+  auto_subscribe_on_position: true
+
+  # Auto-unsubscribe behavior:
+  # - When true: Automatically unsubscribe when position closes (saves bandwidth)
+  # - When false: Keep subscriptions active even after position close
+  auto_unsubscribe_on_close: true
+
+  # Buffering:
+  # - Buffer quote updates to reduce processing load
+  # - When buffer fills or interval expires, process all buffered quotes
+  buffer_size: 10
+  buffer_flush_interval_ms: 500
+
+
+# ================================================================================
+# POSITION EVENTS
+# ================================================================================
+# Controls position lifecycle event processing
+# Required for: RULE-001, RULE-004, RULE-005, RULE-008
+
+positions:
+  # Enable position event processing (REQUIRED for all position-based rules)
+  enabled: true
+
+  # Event types to process:
+  # - OPENED: New position created (0 → 1+ contracts)
+  # - UPDATED: Position size changed (1 → 2 contracts, or avg price updated)
+  # - CLOSED: Position flattened (1+ → 0 contracts)
+  #
+  # NOTE: SDK sends POSITION_UPDATED for all changes (opens, changes, closes)
+  # We need to distinguish based on old_size vs new_size
+  events:
+    - OPENED
+    - UPDATED
+    - CLOSED
+
+  # Priority level:
+  # - critical: Process immediately, no buffering
+  # - high: Process quickly, minimal buffering
+  # - normal: Standard processing
+  priority: critical
+
+  # Fields to extract from position events:
+  # - size: Current position size (contracts)
+  # - averagePrice: Average entry price
+  # - contractId: Symbol/contract identifier
+  # - type: Position type (1=LONG, 2=SHORT)
+  # - accountId: Account identifier
+  fields:
+    - size
+    - averagePrice
+    - contractId
+    - type
+    - accountId
+
+
+# ================================================================================
+# ORDER EVENTS
+# ================================================================================
+# Controls order lifecycle event processing
+# Required for: RULE-008 (Stop Loss Check), RULE-012 (Trade Management)
+
+orders:
+  # Enable order event processing
+  enabled: true
+
+  # Event types to process:
+  # - PLACED: New order submitted (includes stop price!)
+  # - FILLED: Order fully executed
+  # - PARTIAL_FILL: Order partially executed
+  # - CANCELLED: Order cancelled by trader or system
+  # - MODIFIED: Order parameters changed
+  # - REJECTED: Order rejected by broker
+  events:
+    - PLACED
+    - FILLED
+    - PARTIAL_FILL
+    - CANCELLED
+    - MODIFIED
+    - REJECTED
+
+  # Priority level:
+  # - critical: PLACED, FILLED, REJECTED (immediate action required)
+  # - normal: CANCELLED, MODIFIED (informational)
+  priority_map:
+    PLACED: critical
+    FILLED: critical
+    REJECTED: critical
+    CANCELLED: normal
+    MODIFIED: normal
+    PARTIAL_FILL: high
+
+  # Fields to extract from order events:
+  # - type: Order type (1=MARKET, 2=LIMIT, 3=STOP)
+  # - side: Order side (1=BUY, 2=SELL)
+  # - stopPrice: Stop loss price (CRITICAL for RULE-008)
+  # - limitPrice: Limit price
+  # - size: Order size
+  # - filledPrice: Execution price (for FILLED events)
+  # - status: Order status
+  fields:
+    - type
+    - side
+    - stopPrice
+    - limitPrice
+    - size
+    - filledPrice
+    - status
+    - accountId
+    - contractId
+
+
+# ================================================================================
+# TRADE EVENTS
+# ================================================================================
+# Controls trade execution event processing
+# Required for: RULE-003 (Daily Realized Loss), RULE-013 (Daily Realized Profit)
+
+trades:
+  # Enable trade event processing (REQUIRED for realized P&L tracking)
+  enabled: true
+
+  # Event types to process:
+  # - EXECUTED: Trade completed (has profitAndLoss field!)
+  events:
+    - EXECUTED
+
+  # Priority level:
+  # - critical: Process immediately to update realized P&L
+  priority: critical
+
+  # Track P&L from trades:
+  # - When true: Extract profitAndLoss field and update daily P&L tracker
+  # - When false: Process trade events but ignore P&L
+  #
+  # NOTE: profitAndLoss is NULL for opening trades (only set for closing trades)
+  track_pnl: true
+
+  # Fields to extract from trade events:
+  # - profitAndLoss: Realized P&L in $ (NULL for opening trades!)
+  # - quantity: Trade size
+  # - price: Execution price
+  # - accountId: Account identifier
+  # - contractId: Symbol/contract identifier
+  fields:
+    - profitAndLoss
+    - quantity
+    - price
+    - accountId
+    - contractId
+
+
+# ================================================================================
+# ACCOUNT EVENTS
+# ================================================================================
+# Controls account status event processing
+# Required for: RULE-010 (Authorization Guard), RULE-011 (Account Balance Guard)
+
+account:
+  # Enable account event processing
+  enabled: true
+
+  # Event types to process:
+  # - UPDATED: Account status changed (has canTrade field!)
+  events:
+    - UPDATED
+
+  # Priority level:
+  # - critical: Process immediately (account lockout detection)
+  priority: critical
+
+  # Fields to extract from account events:
+  # - canTrade: Whether trader can still trade (TopstepX lockout detection)
+  # - balance: Account balance
+  # - equity: Account equity
+  # - marginUsed: Margin currently in use
+  fields:
+    - canTrade
+    - balance
+    - equity
+    - marginUsed
+    - accountId
+
+
+# ================================================================================
+# BAR EVENTS (Optional)
+# ================================================================================
+# Controls candlestick bar event processing
+# Required for: RULE-012 (Trade Management - time-based analysis)
+
+bars:
+  # Enable bar event processing (OPTIONAL - not critical for core rules)
+  enabled: false
+
+  # Event types to process:
+  # - NEW_BAR: New candlestick completed
+  events:
+    - NEW_BAR
+
+  # Priority level:
+  # - normal: Bar data is not time-critical
+  priority: normal
+
+  # Timeframes to subscribe to:
+  # - Valid: 1m, 5m, 15m, 30m, 1h, 4h, 1d
+  timeframes:
+    - 5m
+    - 15m
+
+
+# ================================================================================
+# EVENT PROCESSING SETTINGS
+# ================================================================================
+# Global settings for event handling
+
+processing:
+  # Event queue settings:
+  # - Max queue size before backpressure (drop or block)
+  # - 1000 events is ~1 second of high-frequency quote data
+  max_queue_size: 1000
+
+  # Backpressure strategy:
+  # - drop_oldest: Drop oldest events when queue full (RECOMMENDED)
+  # - drop_newest: Drop newest events when queue full
+  # - block: Block event producer until queue has space (may cause SDK issues)
+  backpressure_strategy: drop_oldest
+
+  # Event processing timeout:
+  # - Max time to process a single event before warning
+  # - If processing takes longer, log warning and continue
+  processing_timeout_ms: 100
+
+  # Batch processing:
+  # - Process multiple events in a batch (reduces overhead)
+  # - Batch size: Max events per batch
+  # - Batch timeout: Max wait time for batch to fill
+  batch_processing:
+    enabled: true
+    batch_size: 10
+    batch_timeout_ms: 50
+
+
+# ================================================================================
+# EVENT FILTERING
+# ================================================================================
+# Advanced filtering to reduce noise
+
+filters:
+  # Duplicate event filtering:
+  # - Some events may fire multiple times (SDK behavior)
+  # - Filter duplicates within time window
+  deduplicate:
+    enabled: true
+    window_ms: 100
+
+  # Ignore list:
+  # - Event types to completely ignore (never process)
+  # - Useful for debugging or disabling noisy events
+  ignore_events: []
+
+  # Account ID filtering:
+  # - Empty list [] = Process events from all accounts
+  # - Specific IDs = Only process events from these accounts
+  account_ids: []
+
+
+# ================================================================================
+# LOGGING & MONITORING
+# ================================================================================
+# Event processing observability
+
+logging:
+  # Log all events (very verbose, use for debugging only):
+  log_all_events: false
+
+  # Log event statistics (counts, latency):
+  log_statistics: true
+  statistics_interval_seconds: 60
+
+  # Log dropped events (when backpressure triggered):
+  log_dropped_events: true
+
+  # Log slow event processing:
+  log_slow_events: true
+  slow_event_threshold_ms: 50
+
+
+# ================================================================================
+# INTEGRATION WITH RISK RULES
+# ================================================================================
+# Maps events to risk rules for routing
+
+rule_event_mapping:
+  # RULE-001: Max Contracts
+  RULE-001:
+    - POSITION_OPENED
+    - POSITION_UPDATED
+    - POSITION_CLOSED
+
+  # RULE-003: Daily Realized Loss
+  RULE-003:
+    - TRADE_EXECUTED
+
+  # RULE-004: Daily Unrealized Loss
+  RULE-004:
+    - POSITION_OPENED
+    - POSITION_UPDATED
+    - POSITION_CLOSED
+    - QUOTE_UPDATE
+
+  # RULE-005: Max Unrealized Profit
+  RULE-005:
+    - POSITION_OPENED
+    - POSITION_UPDATED
+    - POSITION_CLOSED
+    - QUOTE_UPDATE
+
+  # RULE-008: Stop Loss Check
+  RULE-008:
+    - POSITION_OPENED
+    - ORDER_PLACED
+
+  # RULE-010: Authorization Guard
+  RULE-010:
+    - ACCOUNT_UPDATED
+
+  # RULE-011: Account Balance Guard
+  RULE-011:
+    - ACCOUNT_UPDATED
+
+  # RULE-012: Trade Management
+  RULE-012:
+    - ORDER_PLACED
+    - ORDER_FILLED
+    - POSITION_UPDATED
+    - QUOTE_UPDATE
+
+
+# ================================================================================
+# TICK VALUES & SIZES (For P&L Calculation)
+# ================================================================================
+# Required for RULE-004/005 unrealized P&L calculation
+#
+# Formula: unrealized_pnl = (current_price - entry_price) / tick_size * contracts * tick_value
+
+tick_values:
+  # Micro E-mini contracts:
+  MNQ: 5.0    # $5 per tick (Micro E-mini NASDAQ-100)
+  MES: 5.0    # $5 per tick (Micro E-mini S&P 500)
+  M2K: 5.0    # $5 per tick (Micro E-mini Russell 2000)
+  MYM: 0.5    # $0.50 per tick (Micro E-mini Dow)
+
+  # E-mini contracts:
+  NQ: 20.0    # $20 per tick (E-mini NASDAQ-100)
+  ES: 50.0    # $50 per tick (E-mini S&P 500)
+  RTY: 5.0    # $5 per tick (E-mini Russell 2000)
+  YM: 5.0     # $5 per tick (E-mini Dow)
+
+tick_sizes:
+  # Micro E-mini contracts:
+  MNQ: 0.25   # 0.25 point tick
+  MES: 0.25   # 0.25 point tick
+  M2K: 0.10   # 0.10 point tick
+  MYM: 1.0    # 1 point tick
+
+  # E-mini contracts:
+  NQ: 0.25    # 0.25 point tick
+  ES: 0.25    # 0.25 point tick
+  RTY: 0.10   # 0.10 point tick
+  YM: 1.0     # 1 point tick
+
+
+# ================================================================================
+# NOTES
+# ================================================================================
+#
+# 1. QUOTE THROTTLING:
+#    - Quote events can fire 100+ times per second
+#    - Always throttle to reasonable rate (1000ms recommended)
+#    - Use auto-subscribe to only get quotes for active positions
+#
+# 2. EVENT PRIORITIES:
+#    - critical: Process immediately (positions, trades, account)
+#    - high: Process quickly (partial fills)
+#    - normal: Standard processing (cancellations, bars)
+#
+# 3. BACKPRESSURE:
+#    - Use "drop_oldest" strategy (prefer fresh data)
+#    - Monitor dropped event logs
+#    - Increase queue size if drops are frequent
+#
+# 4. P&L CALCULATION:
+#    - Requires: entry_price (from POSITION_UPDATED)
+#    - Requires: current_price (from QUOTE_UPDATE)
+#    - Requires: tick_value and tick_size (from this config)
+#    - Formula: (current - entry) / tick_size * contracts * tick_value
+#
+# 5. EVENT TYPE MAPPING:
+#    - SDK event names may differ from internal event types
+#    - See SDK_EVENTS_QUICK_REFERENCE.txt for complete mapping
+#
+# 6. TESTING:
+#    - Use log_all_events: true to see all incoming events
+#    - Check log_statistics for event processing metrics
+#    - Monitor log_slow_events for performance issues
+#
+# ================================================================================
