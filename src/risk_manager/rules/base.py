@@ -22,6 +22,11 @@ class RiskRule(ABC):
         self.action = action
         self.enabled = True
 
+    @property
+    def name(self) -> str:
+        """Return the rule name."""
+        return self.__class__.__name__
+
     @abstractmethod
     async def evaluate(self, event: RiskEvent, engine: "RiskEngine") -> dict[str, Any] | None:
         """

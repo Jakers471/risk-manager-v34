@@ -1,15 +1,20 @@
 """
 Event Bridge - SDK to Risk Engine
 
-Bridges events from the Project-X SDK EventBus to the Risk Engine EventBus.
-Maps SDK event types to RiskEvent types for rule processing.
+Bridges events from the Project-X SDK REALTIME CLIENT to the Risk Engine EventBus.
+Maps SignalR callback events to RiskEvent types for rule processing.
+
+IMPORTANT: This uses DIRECT realtime callbacks, NOT the SDK EventBus.
+The SDK's EventBus does not emit position/order/trade events, so we
+subscribe directly to the realtime_client callbacks where those events
+actually arrive from SignalR.
 """
 
 import asyncio
+from datetime import datetime
 from typing import Any
 
 from loguru import logger
-from project_x_py import EventType as SDKEventType
 from project_x_py import TradingSuite
 
 from risk_manager.core.events import EventBus, EventType, RiskEvent
@@ -18,12 +23,17 @@ from risk_manager.sdk.suite_manager import SuiteManager
 
 class EventBridge:
     """
-    Bridges events between SDK and Risk Engine.
+    Bridges events between SDK Realtime Client and Risk Engine.
 
-    Maps SDK events to RiskEvents:
-    - SDK Trade events → TRADE_EXECUTED, ORDER_FILLED
-    - SDK Position events → POSITION_OPENED, POSITION_CLOSED, POSITION_UPDATED
-    - SDK Order events → ORDER_PLACED, ORDER_CANCELLED, ORDER_REJECTED
+    ARCHITECTURE CHANGE:
+    - OLD: Subscribe to suite.event_bus (broken - position events never emitted)
+    - NEW: Subscribe directly to suite.realtime.add_callback() (working!)
+
+    Maps SignalR callbacks to RiskEvents:
+    - "position_update" → POSITION_OPENED, POSITION_CLOSED, POSITION_UPDATED
+    - "order_update" → ORDER_PLACED, ORDER_FILLED, ORDER_CANCELLED, ORDER_REJECTED
+    - "trade_update" → TRADE_EXECUTED
+    - "account_update" → (logged but not forwarded)
     """
 
     def __init__(self, suite_manager: SuiteManager, risk_event_bus: EventBus):
@@ -39,7 +49,7 @@ class EventBridge:
         self.running = False
         self._subscription_tasks: list[asyncio.Task[Any]] = []
 
-        logger.info("EventBridge initialized")
+        logger.info("EventBridge initialized (using direct realtime callbacks)")
 
     async def start(self) -> None:
         """Start bridging events from all active suites."""
@@ -70,225 +80,291 @@ class EventBridge:
         """
         Subscribe to events from a specific TradingSuite.
 
+        Uses DIRECT realtime callbacks, bypassing the SDK EventBus.
+
         Args:
             symbol: Instrument symbol
             suite: TradingSuite instance
         """
-        logger.info(f"Subscribing to events for {symbol}")
+        logger.info(f"Subscribing to realtime events for {symbol}")
 
-        # Get SDK's EventBus
-        if not hasattr(suite, "event_bus"):
-            logger.warning(f"Suite for {symbol} has no event_bus")
+        # Get the realtime client (where events actually arrive!)
+        if not hasattr(suite, "realtime") or not suite.realtime:
+            logger.warning(f"Suite for {symbol} has no realtime client")
             return
 
-        sdk_event_bus = suite.event_bus
+        realtime_client = suite.realtime
 
-        # Subscribe to trade events
-        sdk_event_bus.subscribe(
-            SDKEventType.TRADE_EXECUTED,
-            lambda event: self._on_trade_executed(symbol, event)
-        )
-
-        # Subscribe to position events
-        sdk_event_bus.subscribe(
-            SDKEventType.POSITION_OPENED,
-            lambda event: self._on_position_opened(symbol, event)
-        )
-        sdk_event_bus.subscribe(
-            SDKEventType.POSITION_CLOSED,
-            lambda event: self._on_position_closed(symbol, event)
-        )
-        sdk_event_bus.subscribe(
-            SDKEventType.POSITION_UPDATED,
-            lambda event: self._on_position_updated(symbol, event)
-        )
-
-        # Subscribe to order events
-        sdk_event_bus.subscribe(
-            SDKEventType.ORDER_PLACED,
-            lambda event: self._on_order_placed(symbol, event)
-        )
-        sdk_event_bus.subscribe(
-            SDKEventType.ORDER_FILLED,
-            lambda event: self._on_order_filled(symbol, event)
-        )
-        sdk_event_bus.subscribe(
-            SDKEventType.ORDER_CANCELLED,
-            lambda event: self._on_order_cancelled(symbol, event)
-        )
-        sdk_event_bus.subscribe(
-            SDKEventType.ORDER_REJECTED,
-            lambda event: self._on_order_rejected(symbol, event)
-        )
-
-        logger.success(f"Subscribed to events for {symbol}")
-
-    # Trade event handlers
-
-    async def _on_trade_executed(self, symbol: str, sdk_event: Any) -> None:
-        """Handle trade executed event from SDK."""
         try:
-            risk_event = RiskEvent(
-                type=EventType.TRADE_EXECUTED,
-                data={
-                    "symbol": symbol,
-                    "trade_id": getattr(sdk_event, "trade_id", None),
-                    "side": getattr(sdk_event, "side", None),
-                    "size": getattr(sdk_event, "size", None),
-                    "price": getattr(sdk_event, "price", None),
-                    "timestamp": getattr(sdk_event, "timestamp", None),
-                    "sdk_event": sdk_event,
-                }
+            # Subscribe to position updates via DIRECT callback
+            # This is where TopstepX SignalR sends position data
+            await realtime_client.add_callback(
+                "position_update",
+                lambda data: asyncio.create_task(
+                    self._on_position_update(symbol, data)
+                )
             )
+            logger.debug(f"✅ Registered callback: position_update for {symbol}")
 
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged TRADE_EXECUTED event for {symbol}")
+            # Subscribe to order updates via DIRECT callback
+            await realtime_client.add_callback(
+                "order_update",
+                lambda data: asyncio.create_task(
+                    self._on_order_update(symbol, data)
+                )
+            )
+            logger.debug(f"✅ Registered callback: order_update for {symbol}")
+
+            # Subscribe to trade updates via DIRECT callback
+            await realtime_client.add_callback(
+                "trade_update",
+                lambda data: asyncio.create_task(
+                    self._on_trade_update(symbol, data)
+                )
+            )
+            logger.debug(f"✅ Registered callback: trade_update for {symbol}")
+
+            # Subscribe to account updates for logging (optional)
+            await realtime_client.add_callback(
+                "account_update",
+                lambda data: asyncio.create_task(
+                    self._on_account_update(symbol, data)
+                )
+            )
+            logger.debug(f"✅ Registered callback: account_update for {symbol}")
+
+            logger.success(f"Subscribed to 4 realtime callbacks for {symbol}")
 
         except Exception as e:
-            logger.error(f"Error bridging trade executed event: {e}")
+            logger.error(f"Failed to subscribe to realtime events for {symbol}: {e}")
+            raise
 
-    # Position event handlers
+    # ============================================================================
+    # POSITION EVENT HANDLERS - Parse SignalR data format
+    # ============================================================================
 
-    async def _on_position_opened(self, symbol: str, sdk_event: Any) -> None:
-        """Handle position opened event from SDK."""
+    async def _on_position_update(self, symbol: str, data: Any) -> None:
+        """
+        Handle position update from SignalR.
+
+        SignalR sends data in format:
+        [{'action': 1, 'data': {'contractId': 123, 'size': 2, ...}}]
+
+        Actions:
+        - 1 = Add/Update
+        - 2 = Remove/Close
+        """
         try:
-            risk_event = RiskEvent(
-                type=EventType.POSITION_OPENED,
-                data={
-                    "symbol": symbol,
-                    "contract_id": getattr(sdk_event, "contract_id", None),
-                    "side": getattr(sdk_event, "side", None),
-                    "size": getattr(sdk_event, "size", None),
-                    "entry_price": getattr(sdk_event, "entry_price", None),
-                    "sdk_event": sdk_event,
-                }
-            )
+            if not isinstance(data, list):
+                logger.warning(f"Position update for {symbol} not a list: {type(data)}")
+                return
 
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged POSITION_OPENED event for {symbol}")
+            for update in data:
+                action = update.get('action', 0)
+                position_data = update.get('data', {})
+
+                # Extract position details
+                contract_id = position_data.get('contractId')
+                size = position_data.get('size', 0)
+                avg_price = position_data.get('averagePrice', 0.0)
+                unrealized_pnl = position_data.get('unrealizedPnl', 0.0)
+
+                logger.info(
+                    f"📨 Position update for {symbol}: "
+                    f"action={action}, size={size}, price={avg_price:.2f}, "
+                    f"pnl={unrealized_pnl:.2f}"
+                )
+
+                # Determine event type based on action and size
+                if action == 1 and size != 0:
+                    # Position opened or updated
+                    # Check if this is a new position (could track previous state)
+                    event_type = EventType.POSITION_UPDATED
+
+                    risk_event = RiskEvent(
+                        event_type=event_type,
+                        data={
+                            "symbol": symbol,
+                            "contract_id": contract_id,
+                            "size": size,
+                            "side": "long" if size > 0 else "short",
+                            "average_price": avg_price,
+                            "unrealized_pnl": unrealized_pnl,
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "raw_data": position_data,
+                        }
+                    )
+
+                    await self.risk_event_bus.publish(risk_event)
+                    logger.debug(f"Bridged {event_type} event for {symbol}")
+
+                elif action == 2 or (action == 1 and size == 0):
+                    # Position closed
+                    risk_event = RiskEvent(
+                        event_type=EventType.POSITION_CLOSED,
+                        data={
+                            "symbol": symbol,
+                            "contract_id": contract_id,
+                            "realized_pnl": position_data.get('realizedPnl', 0.0),
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "raw_data": position_data,
+                        }
+                    )
+
+                    await self.risk_event_bus.publish(risk_event)
+                    logger.debug(f"Bridged POSITION_CLOSED event for {symbol}")
 
         except Exception as e:
-            logger.error(f"Error bridging position opened event: {e}")
+            logger.error(f"Error handling position update for {symbol}: {e}")
+            logger.exception(e)
 
-    async def _on_position_closed(self, symbol: str, sdk_event: Any) -> None:
-        """Handle position closed event from SDK."""
+    # ============================================================================
+    # ORDER EVENT HANDLERS - Parse SignalR data format
+    # ============================================================================
+
+    async def _on_order_update(self, symbol: str, data: Any) -> None:
+        """
+        Handle order update from SignalR.
+
+        SignalR sends data in format:
+        [{'action': 1, 'data': {'id': 123, 'status': 'Filled', ...}}]
+        """
         try:
-            risk_event = RiskEvent(
-                type=EventType.POSITION_CLOSED,
-                data={
-                    "symbol": symbol,
-                    "contract_id": getattr(sdk_event, "contract_id", None),
-                    "realized_pnl": getattr(sdk_event, "realized_pnl", None),
-                    "sdk_event": sdk_event,
-                }
-            )
+            if not isinstance(data, list):
+                logger.warning(f"Order update for {symbol} not a list: {type(data)}")
+                return
 
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged POSITION_CLOSED event for {symbol}")
+            for update in data:
+                action = update.get('action', 0)
+                order_data = update.get('data', {})
+
+                # Extract order details
+                order_id = order_data.get('id')
+                status = order_data.get('status', 'Unknown')
+                side = order_data.get('side', 'Unknown')
+                quantity = order_data.get('quantity', 0)
+                price = order_data.get('price', 0.0)
+                filled_quantity = order_data.get('filledQuantity', 0)
+
+                logger.info(
+                    f"📨 Order update for {symbol}: "
+                    f"id={order_id}, status={status}, side={side}, "
+                    f"qty={quantity}, filled={filled_quantity}"
+                )
+
+                # Map status to event type
+                event_type = None
+                if status in ['Working', 'Accepted', 'Pending']:
+                    event_type = EventType.ORDER_PLACED
+                elif status == 'Filled':
+                    event_type = EventType.ORDER_FILLED
+                elif status == 'Cancelled':
+                    event_type = EventType.ORDER_CANCELLED
+                elif status == 'Rejected':
+                    event_type = EventType.ORDER_REJECTED
+
+                if event_type:
+                    risk_event = RiskEvent(
+                        event_type=event_type,
+                        data={
+                            "symbol": symbol,
+                            "order_id": order_id,
+                            "status": status,
+                            "side": side,
+                            "quantity": quantity,
+                            "price": price,
+                            "filled_quantity": filled_quantity,
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "raw_data": order_data,
+                        }
+                    )
+
+                    await self.risk_event_bus.publish(risk_event)
+                    logger.debug(f"Bridged {event_type} event for {symbol}")
 
         except Exception as e:
-            logger.error(f"Error bridging position closed event: {e}")
+            logger.error(f"Error handling order update for {symbol}: {e}")
+            logger.exception(e)
 
-    async def _on_position_updated(self, symbol: str, sdk_event: Any) -> None:
-        """Handle position updated event from SDK."""
+    # ============================================================================
+    # TRADE EVENT HANDLERS - Parse SignalR data format
+    # ============================================================================
+
+    async def _on_trade_update(self, symbol: str, data: Any) -> None:
+        """
+        Handle trade update from SignalR.
+
+        SignalR sends data in format:
+        [{'action': 1, 'data': {'id': 123, 'price': 21500.0, ...}}]
+        """
         try:
-            risk_event = RiskEvent(
-                type=EventType.POSITION_UPDATED,
-                data={
-                    "symbol": symbol,
-                    "contract_id": getattr(sdk_event, "contract_id", None),
-                    "size": getattr(sdk_event, "size", None),
-                    "unrealized_pnl": getattr(sdk_event, "unrealized_pnl", None),
-                    "sdk_event": sdk_event,
-                }
-            )
+            if not isinstance(data, list):
+                logger.warning(f"Trade update for {symbol} not a list: {type(data)}")
+                return
 
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged POSITION_UPDATED event for {symbol}")
+            for update in data:
+                action = update.get('action', 0)
+                trade_data = update.get('data', {})
+
+                # Extract trade details
+                trade_id = trade_data.get('id')
+                price = trade_data.get('price', 0.0)
+                quantity = trade_data.get('quantity', 0)
+                side = trade_data.get('side', 'Unknown')
+
+                logger.info(
+                    f"📨 Trade update for {symbol}: "
+                    f"id={trade_id}, side={side}, qty={quantity}, price={price:.2f}"
+                )
+
+                risk_event = RiskEvent(
+                    event_type=EventType.TRADE_EXECUTED,
+                    data={
+                        "symbol": symbol,
+                        "trade_id": trade_id,
+                        "side": side,
+                        "quantity": quantity,
+                        "price": price,
+                        "timestamp": datetime.utcnow().isoformat(),
+                        "raw_data": trade_data,
+                    }
+                )
+
+                await self.risk_event_bus.publish(risk_event)
+                logger.debug(f"Bridged TRADE_EXECUTED event for {symbol}")
 
         except Exception as e:
-            logger.error(f"Error bridging position updated event: {e}")
+            logger.error(f"Error handling trade update for {symbol}: {e}")
+            logger.exception(e)
 
-    # Order event handlers
+    # ============================================================================
+    # ACCOUNT EVENT HANDLERS - For logging only
+    # ============================================================================
 
-    async def _on_order_placed(self, symbol: str, sdk_event: Any) -> None:
-        """Handle order placed event from SDK."""
+    async def _on_account_update(self, symbol: str, data: Any) -> None:
+        """
+        Handle account update from SignalR.
+
+        Account updates are frequent (every few seconds) and mostly contain
+        balance changes. We log them but don't forward to risk engine.
+        """
         try:
-            risk_event = RiskEvent(
-                type=EventType.ORDER_PLACED,
-                data={
-                    "symbol": symbol,
-                    "order_id": getattr(sdk_event, "order_id", None),
-                    "side": getattr(sdk_event, "side", None),
-                    "size": getattr(sdk_event, "size", None),
-                    "order_type": getattr(sdk_event, "order_type", None),
-                    "sdk_event": sdk_event,
-                }
-            )
+            if not isinstance(data, list):
+                return
 
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged ORDER_PLACED event for {symbol}")
+            for update in data:
+                account_data = update.get('data', {})
+                balance = account_data.get('balance', 0.0)
+
+                # Only log significant balance changes
+                logger.trace(f"Account update for {symbol}: balance=${balance:,.2f}")
 
         except Exception as e:
-            logger.error(f"Error bridging order placed event: {e}")
+            logger.error(f"Error handling account update for {symbol}: {e}")
 
-    async def _on_order_filled(self, symbol: str, sdk_event: Any) -> None:
-        """Handle order filled event from SDK."""
-        try:
-            risk_event = RiskEvent(
-                type=EventType.ORDER_FILLED,
-                data={
-                    "symbol": symbol,
-                    "order_id": getattr(sdk_event, "order_id", None),
-                    "fill_price": getattr(sdk_event, "fill_price", None),
-                    "fill_size": getattr(sdk_event, "fill_size", None),
-                    "sdk_event": sdk_event,
-                }
-            )
-
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged ORDER_FILLED event for {symbol}")
-
-        except Exception as e:
-            logger.error(f"Error bridging order filled event: {e}")
-
-    async def _on_order_cancelled(self, symbol: str, sdk_event: Any) -> None:
-        """Handle order cancelled event from SDK."""
-        try:
-            risk_event = RiskEvent(
-                type=EventType.ORDER_CANCELLED,
-                data={
-                    "symbol": symbol,
-                    "order_id": getattr(sdk_event, "order_id", None),
-                    "reason": getattr(sdk_event, "reason", None),
-                    "sdk_event": sdk_event,
-                }
-            )
-
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged ORDER_CANCELLED event for {symbol}")
-
-        except Exception as e:
-            logger.error(f"Error bridging order cancelled event: {e}")
-
-    async def _on_order_rejected(self, symbol: str, sdk_event: Any) -> None:
-        """Handle order rejected event from SDK."""
-        try:
-            risk_event = RiskEvent(
-                type=EventType.ORDER_REJECTED,
-                data={
-                    "symbol": symbol,
-                    "order_id": getattr(sdk_event, "order_id", None),
-                    "reason": getattr(sdk_event, "reason", None),
-                    "sdk_event": sdk_event,
-                }
-            )
-
-            await self.risk_event_bus.publish(risk_event)
-            logger.debug(f"Bridged ORDER_REJECTED event for {symbol}")
-
-        except Exception as e:
-            logger.error(f"Error bridging order rejected event: {e}")
+    # ============================================================================
+    # INSTRUMENT MANAGEMENT
+    # ============================================================================
 
     async def add_instrument(self, symbol: str, suite: TradingSuite) -> None:
         """
@@ -300,3 +376,4 @@ class EventBridge:
         """
         if self.running:
             await self._subscribe_to_suite(symbol, suite)
+            logger.info(f"EventBridge now monitoring {symbol}")

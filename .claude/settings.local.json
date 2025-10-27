@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ruv-swarm",
+      "mcp__claude-flow@alpha",
+      "mcp__flow-nexus",
+      "Read(//home/jakers/**)",
+      "Read(//mnt/c/Users/jakers/Desktop/**)",
+      "Bash(npx ruv-swarm:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(cat:*)",
+      "Bash(claude --debug mcp list:*)",
+      "mcp__claude-flow_alpha__swarm_init",
+      "Bash(npx claude-flow@alpha hooks pre-task:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx claude-flow@alpha hooks:*)",
+      "Bash(npx claude-flow@alpha sparc modes:*)",
+      "Bash(npx claude-flow@alpha mcp:*)",
+      "Bash(find:*)",
+      "Bash(cd /home/jakers/projects/simple-risk-manager/simple\\ risk\\ manager && python3 -m py_compile:*)",
+      "Bash(python3:*)",
+      "Bash(chmod:*)",
+      "Bash(source:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(tree:*)",
+      "Bash(pip3 install:*)",
+      "Bash(./venv/bin/python -m pytest:*)"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "claude-flow@alpha",
+    "ruv-swarm",
+    "flow-nexus",
+    "agentic-payments"
+  ],
+  "outputStyle": "Explanatory"
+}

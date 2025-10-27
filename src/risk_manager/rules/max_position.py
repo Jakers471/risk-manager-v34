@@ -12,21 +12,21 @@ if TYPE_CHECKING:
 class MaxPositionRule(RiskRule):
     """Enforce maximum position size limit."""
 
-    def __init__(self, max_contracts: int, action: str = "reject", per_instrument: bool = True):
+    def __init__(self, max_contracts: int, action: str = "reject", per_instrument: bool = False):
         """
         Initialize max position rule.
 
         Args:
             max_contracts: Maximum number of contracts allowed
-            action: Action to take on violation ("alert", "reject")
-            per_instrument: Apply limit per instrument vs. total across all
+            action: Action to take on violation ("alert", "reject", "flatten")
+            per_instrument: Apply limit per instrument vs. total across all (default: False)
         """
         super().__init__(action=action)
         self.max_contracts = max_contracts
         self.per_instrument = per_instrument
 
-        if max_contracts <= 0:
-            raise ValueError("Max contracts must be positive")
+        if max_contracts < 0:
+            raise ValueError("Max contracts must be non-negative")
 
     async def evaluate(self, event: RiskEvent, engine: "RiskEngine") -> dict[str, Any] | None:
         """Evaluate if position size limit is violated."""
@@ -49,10 +49,10 @@ class MaxPositionRule(RiskRule):
                 if size > self.max_contracts:
                     return {
                         "rule": "MaxPositionRule",
-                        "message": f"Position size exceeded for {instrument}: {size} (max: {self.max_contracts})",
+                        "message": f"Position size for {instrument} exceeds limit: {size} (max: {self.max_contracts})",
                         "instrument": instrument,
                         "current_size": size,
-                        "max_contracts": self.max_contracts,
+                        "max_size": self.max_contracts,
                         "action": self.action,
                     }
         else:
@@ -63,9 +63,9 @@ class MaxPositionRule(RiskRule):
             if total_size > self.max_contracts:
                 return {
                     "rule": "MaxPositionRule",
-                    "message": f"Total position size exceeded: {total_size} (max: {self.max_contracts})",
-                    "total_size": total_size,
-                    "max_contracts": self.max_contracts,
+                    "message": f"Total position size exceeds limit: {total_size} (max: {self.max_contracts})",
+                    "current_size": total_size,
+                    "max_size": self.max_contracts,
                     "action": self.action,
                 }
 

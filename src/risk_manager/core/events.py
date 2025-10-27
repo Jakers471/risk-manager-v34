@@ -99,10 +99,20 @@ class EventBus:
         """Publish event to all subscribers."""
         if event.event_type in self._handlers:
             for handler in self._handlers[event.event_type]:
-                if asyncio.iscoroutinefunction(handler):
-                    await handler(event)
-                else:
-                    handler(event)
+                try:
+                    if asyncio.iscoroutinefunction(handler):
+                        await handler(event)
+                    else:
+                        handler(event)
+                except Exception as e:
+                    # Log error but continue processing other handlers
+                    # This prevents one faulty handler from crashing the event bus
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(
+                        f"Error in event handler {handler.__name__}: {e}",
+                        exc_info=True
+                    )
 
 
 import asyncio
