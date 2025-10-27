@@ -12,7 +12,7 @@
 Monitor TopstepX `canTrade` status and lockout when API signals account restriction.
 
 ### Trigger Condition
-**Event**: `GatewayUserAccount` (when `canTrade` changes)
+**Event**: `EventType.ACCOUNT_UPDATED` (when `canTrade` changes)
 
 **Logic**:
 ```python

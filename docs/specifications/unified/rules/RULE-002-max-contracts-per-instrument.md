@@ -12,7 +12,7 @@
 Enforce per-symbol contract limits to prevent concentration risk in specific instruments.
 
 ### Trigger Condition
-**Event Type**: `GatewayUserPosition` (per-symbol position updates)
+**Event Types**: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED` (per-symbol position updates)
 
 **Trigger Logic**:
 ```python
@@ -60,7 +60,7 @@ max_contracts_per_instrument:
 - Reset Scheduler: No
 
 ### SDK Integration
-- Events: `GatewayUserPosition`
+- Events: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED`
 - Methods: `close_position()`, `partial_close_position()`
 - Quote data: No
 

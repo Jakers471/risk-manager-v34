@@ -12,7 +12,7 @@
 Blacklist specific symbols - close any position immediately and permanently lock that symbol.
 
 ### Trigger Condition
-**Event**: `GatewayUserPosition` (position opens in blocked symbol)
+**Events**: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED` (position opens in blocked symbol)
 
 ### Enforcement Action
 **Type**: TRADE-BY-TRADE (with symbol-specific lockout)

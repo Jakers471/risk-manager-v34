@@ -14,7 +14,7 @@ Enforce daily realized profit target to prevent giving back profits through over
 **Philosophy**: Profit protection + discipline - prevents psychological overtrading after hitting daily goal.
 
 ### Trigger Condition
-**Event Type**: `GatewayUserTrade` (every trade execution)
+**Event Type**: `EventType.TRADE_EXECUTED` (every trade execution)
 
 **Trigger Logic**:
 ```python
@@ -116,7 +116,7 @@ daily_realized_profit:
 
 ### SDK Integration
 **Events needed**:
-- `GatewayUserTrade` - Trigger when trades execute
+- `EventType.TRADE_EXECUTED` - Trigger when trades execute
 
 **Methods needed**:
 - `close_all_positions(account_id)` - Close all positions

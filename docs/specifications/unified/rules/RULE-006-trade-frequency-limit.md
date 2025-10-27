@@ -12,7 +12,7 @@
 Prevent overtrading by limiting trades per time window (minute/hour/session).
 
 ### Trigger Condition
-**Event Type**: `GatewayUserTrade` (every trade execution)
+**Event Type**: `EventType.TRADE_EXECUTED` (every trade execution)
 
 **Trigger Logic**:
 ```python
@@ -75,7 +75,7 @@ trade_frequency_limit:
 - Trade Counter: Yes (SQLite - track trades in rolling windows)
 
 ### SDK Integration
-- Events: `GatewayUserTrade`
+- Events: `EventType.TRADE_EXECUTED`
 - Methods: None (no enforcement action, just set timer)
 - Quote data: No
 

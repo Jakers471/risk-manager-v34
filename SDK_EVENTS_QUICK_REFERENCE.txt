@@ -1,0 +1,111 @@
+================================================================================
+SDK EVENTS - QUICK REFERENCE
+================================================================================
+
+ALL EVENT TYPES (By Category):
+
+POSITION EVENTS:
+  - POSITION_OPENED      (new position: 0 → 1)
+  - POSITION_UPDATED     (size changes: 1 → 2)
+  - POSITION_CLOSED      (flatten: 2 → 0)
+
+ORDER EVENTS:
+  - ORDER_PLACED         ← HAS STOP PRICE!
+  - ORDER_FILLED
+  - ORDER_PARTIAL_FILL
+  - ORDER_CANCELLED
+  - ORDER_MODIFIED
+  - ORDER_REJECTED
+
+TRADE EVENTS:
+  - TRADE_EXECUTED       ← HAS PROFIT/LOSS!
+
+QUOTE EVENTS:
+  - QUOTE_UPDATE         ← HAS CURRENT PRICE! (high frequency!)
+  - NEW_BAR
+  - DATA_UPDATE
+
+ACCOUNT EVENTS:
+  - ACCOUNT_UPDATED      ← HAS canTrade field!
+
+================================================================================
+WHAT EACH EVENT SENDS US:
+================================================================================
+
+POSITION_UPDATED:
+  size: 2                    ← Position size
+  averagePrice: 25947.0      ← Entry price
+  contractId: CON.F.US.MNQ.Z25
+  type: 1                    ← 1=LONG, 2=SHORT
+
+ORDER_PLACED:
+  order.type: 3              ← 1=MARKET, 2=LIMIT, 3=STOP
+  order.side: 2              ← 1=BUY, 2=SELL
+  order.stopPrice: 25940.0   ← STOP LOSS PRICE!
+  order.limitPrice: 25950.0
+  order.size: 1
+
+ORDER_FILLED:
+  order.filledPrice: 25947.0 ← Execution price
+  old_status: 6              ← 6=PENDING_TRIGGER (was stop order!)
+  new_status: 2              ← 2=FILLED
+
+TRADE_EXECUTED:
+  profitAndLoss: -20.00      ← P&L in $ (null for opening trades!)
+  quantity: 1
+  price: 25940.0
+
+QUOTE_UPDATE:
+  last: 25935.75             ← CURRENT MARKET PRICE!
+  bid: 25935.50
+  ask: 25936.00
+
+ACCOUNT_UPDATED:
+  canTrade: True             ← Can trader still trade?
+  balance: 148458.28
+
+================================================================================
+CRITICAL INSIGHTS:
+================================================================================
+
+1. STOP LOSS PRICE → Get from ORDER_PLACED.stopPrice (NOT ORDER_FILLED!)
+
+2. ENTRY PRICE → Get from POSITION_UPDATED.averagePrice
+
+3. CURRENT PRICE → Get from QUOTE_UPDATE.last
+
+4. P&L → Get from TRADE_EXECUTED.profitAndLoss (skip if null!)
+
+5. BUY vs SELL → Get from ORDER_PLACED.side (1=BUY, 2=SELL)
+
+6. MARKET vs LIMIT vs STOP → Get from ORDER_PLACED.type (1/2/3)
+
+7. POSITION_UPDATED fires for EVERYTHING (new, changes, closes)
+
+8. Stop orders: ORDER_PLACED (type=3) → wait → ORDER_FILLED (type=1)
+
+================================================================================
+WHICH RULES NEED WHICH EVENTS:
+================================================================================
+
+RULE-001 (Max Contracts):
+  → POSITION_OPENED, POSITION_UPDATED, POSITION_CLOSED
+  → Need: size, contractId
+
+RULE-003 (Realized Loss):
+  → TRADE_EXECUTED
+  → Need: profitAndLoss (skip if null!)
+
+RULE-004/005 (Unrealized P&L):
+  → POSITION_UPDATED + QUOTE_UPDATE
+  → Need: size, averagePrice, current price
+
+RULE-008 (Stop Loss Check):
+  → POSITION_OPENED + ORDER_PLACED
+  → Need: Check if stopPrice exists when position opens
+
+RULE-010 (Auth Guard):
+  → ACCOUNT_UPDATED
+  → Need: canTrade field
+
+================================================================================

@@ -14,7 +14,7 @@ Enforce profit target on individual positions by closing winning positions when 
 **Key Insight** (per user guidance): When unrealized positions close (hitting their profit target), they become realized P&L. We need quote data for unrealized tracking (Project-X-Py provides this).
 
 ### Trigger Condition
-**Event Type**: `GatewayUserPosition` + real-time market price updates
+**Event Types**: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED` + real-time market price updates
 
 **Trigger Logic**:
 ```python
@@ -122,7 +122,7 @@ max_unrealized_profit:
 
 ### SDK Integration
 **Events needed**:
-- `GatewayUserPosition` - Position updates
+- `EventType.POSITION_UPDATED` - Position updates
 - **Market Data Updates** - Real-time price feed (critical dependency)
 
 **Methods needed**:

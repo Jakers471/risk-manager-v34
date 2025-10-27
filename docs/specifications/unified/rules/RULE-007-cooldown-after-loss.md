@@ -12,7 +12,7 @@
 Force break after losing trades to prevent revenge trading.
 
 ### Trigger Condition
-**Event**: `GatewayUserTrade` (when `profitAndLoss < 0`)
+**Event**: `EventType.TRADE_EXECUTED` (when `profitAndLoss < 0`)
 
 ### Enforcement Action
 **Type**: TIMER/COOLDOWN

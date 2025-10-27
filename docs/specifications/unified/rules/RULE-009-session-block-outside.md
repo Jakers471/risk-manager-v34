@@ -13,7 +13,7 @@ Block trading outside configured session hours and on holidays.
 
 ### Trigger Condition
 **Events**: 
-1. `GatewayUserPosition` (position opens outside session)
+1. `EventType.POSITION_UPDATED` (position opens outside session)
 2. Background timer (session end time reached)
 3. Holiday detection
 

@@ -14,7 +14,7 @@ Automated trade management - auto breakeven stop, trailing stops.
 **NOTE**: NOT enforcement, just automation.
 
 ### Trigger Condition
-**Event**: `GatewayUserPosition` + market price updates
+**Events**: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED` + market price updates
 
 ### Enforcement Action
 **Type**: AUTOMATION (NOT enforcement)

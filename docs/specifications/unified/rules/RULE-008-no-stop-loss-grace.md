@@ -12,7 +12,7 @@
 Enforce stop-loss placement - close position if no SL placed within grace period.
 
 ### Trigger Condition
-**Event**: `GatewayUserOrder` (when position opens)
+**Event**: `EventType.ORDER_PLACED` (when position opens)
 
 **Logic**: Start timer, check for stop-loss order at expiry
 

@@ -12,7 +12,7 @@
 Cap net contract exposure across all instruments to prevent over-leveraging and excessive account risk.
 
 ### Trigger Condition
-**Event Type**: `GatewayUserPosition` (every position update)
+**Event Types**: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED` (every position update)
 
 **Trigger Logic**:
 ```python
@@ -61,7 +61,7 @@ max_contracts:
 - Reset Scheduler: No
 
 ### SDK Integration
-- Events: `GatewayUserPosition`
+- Events: `EventType.POSITION_OPENED`, `EventType.POSITION_UPDATED`, `EventType.POSITION_CLOSED`
 - Methods: `close_position()`, `close_all_positions()`
 - Quote data: No
 

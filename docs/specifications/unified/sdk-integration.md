@@ -254,44 +254,41 @@ unrealized_pnl = (current_price - entry_price) * contracts * multiplier
 from project_x_py import EventType as SDKEventType
 
 # Connection Events
-SDKEventType.CONNECTED
-SDKEventType.DISCONNECTED
-SDKEventType.AUTHENTICATED
-SDKEventType.RECONNECTING
+EventType.CONNECTED
+EventType.DISCONNECTED
+EventType.AUTHENTICATED
+EventType.RECONNECTING
 
 # Order Events
-SDKEventType.ORDER_PLACED
-SDKEventType.ORDER_FILLED
-SDKEventType.ORDER_PARTIAL_FILL
-SDKEventType.ORDER_CANCELLED
-SDKEventType.ORDER_MODIFIED
-SDKEventType.ORDER_REJECTED
+EventType.ORDER_PLACED
+EventType.ORDER_FILLED
+EventType.ORDER_PARTIAL_FILL
+EventType.ORDER_CANCELLED
+EventType.ORDER_MODIFIED
+EventType.ORDER_REJECTED
 
 # Position Events
-SDKEventType.POSITION_OPENED
-SDKEventType.POSITION_CLOSED
-SDKEventType.POSITION_UPDATED
-SDKEventType.POSITION_PNL_UPDATE
+EventType.POSITION_OPENED
+EventType.POSITION_CLOSED
+EventType.POSITION_UPDATED
+EventType.POSITION_PNL_UPDATE
 
 # Market Data Events
-SDKEventType.NEW_BAR
-SDKEventType.QUOTE_UPDATE  ⭐ NEW (for unrealized P&L)
-SDKEventType.TRADE_TICK
-SDKEventType.ORDERBOOK_UPDATE
+EventType.NEW_BAR
+EventType.QUOTE_UPDATE  ⭐ NEW (for unrealized P&L)
+EventType.TRADE_TICK
+EventType.ORDERBOOK_UPDATE
 
 # System Events
-SDKEventType.ERROR
-SDKEventType.WARNING
-SDKEventType.LATENCY_WARNING
+EventType.ERROR
+EventType.WARNING
+EventType.LATENCY_WARNING
 ```
 
 **Subscription Pattern:**
 ```python
 # Subscribe to SDK events
-suite.event_bus.subscribe(
-    SDKEventType.ORDER_FILLED,
-    callback_function
-)
+await suite.on(EventType.ORDER_FILLED, callback_function)
 
 # Callback signature
 async def callback_function(event: SDKEvent):
@@ -516,10 +513,7 @@ await suite["MNQ"].realtime.subscribe_quotes(on_quote_update)
 **From SignalR (via SDK EventBus):**
 ```python
 # SDK automatically subscribes to quote updates
-suite.event_bus.subscribe(
-    SDKEventType.QUOTE_UPDATE,
-    handle_quote_update
-)
+await suite.on(EventType.QUOTE_UPDATE, handle_quote_update)
 ```
 
 ### 3.3 Unrealized P&L Calculation

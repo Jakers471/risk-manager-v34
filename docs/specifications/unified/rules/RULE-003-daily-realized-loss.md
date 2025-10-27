@@ -12,7 +12,7 @@
 Enforce hard daily realized P&L limit to prevent catastrophic daily losses and account termination. This rule tracks cumulative realized profits and losses from closed trades throughout the trading day.
 
 ### Trigger Condition
-**Event Type**: `GatewayUserTrade` (every trade execution)
+**Event Type**: `EventType.TRADE_EXECUTED` (every trade execution)
 
 **Trigger Logic**:
 ```python
@@ -103,7 +103,7 @@ daily_realized_loss:
 
 ### SDK Integration
 **Events needed**:
-- `GatewayUserTrade` - Trigger when trades execute
+- `EventType.TRADE_EXECUTED` - Trigger when trades execute
 
 **Methods needed**:
 - `close_all_positions(account_id)` - Close all positions

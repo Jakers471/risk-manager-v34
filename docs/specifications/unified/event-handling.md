@@ -84,36 +84,36 @@ Risk Manager V34 uses **event-driven architecture** where all risk rule evaluati
 from project_x_py import EventType as SDKEventType
 
 # Connection Events
-SDKEventType.CONNECTED                # Connected to platform
-SDKEventType.DISCONNECTED             # Disconnected from platform
-SDKEventType.AUTHENTICATED            # Successfully authenticated
-SDKEventType.RECONNECTING             # Attempting reconnect
+EventType.CONNECTED                # Connected to platform
+EventType.DISCONNECTED             # Disconnected from platform
+EventType.AUTHENTICATED            # Successfully authenticated
+EventType.RECONNECTING             # Attempting reconnect
 
 # Order Events
-SDKEventType.ORDER_PLACED             # Order submitted to platform
-SDKEventType.ORDER_FILLED             # Order completely filled
-SDKEventType.ORDER_PARTIAL_FILL       # Order partially filled
-SDKEventType.ORDER_CANCELLED          # Order cancelled
-SDKEventType.ORDER_MODIFIED           # Order modified
-SDKEventType.ORDER_REJECTED           # Order rejected by platform
-SDKEventType.ORDER_EXPIRED            # Order expired
+EventType.ORDER_PLACED             # Order submitted to platform
+EventType.ORDER_FILLED             # Order completely filled
+EventType.ORDER_PARTIAL_FILL       # Order partially filled
+EventType.ORDER_CANCELLED          # Order cancelled
+EventType.ORDER_MODIFIED           # Order modified
+EventType.ORDER_REJECTED           # Order rejected by platform
+EventType.ORDER_EXPIRED            # Order expired
 
 # Position Events
-SDKEventType.POSITION_OPENED          # New position opened
-SDKEventType.POSITION_CLOSED          # Position closed
-SDKEventType.POSITION_UPDATED         # Position size/price changed
-SDKEventType.POSITION_PNL_UPDATE      # P&L updated
+EventType.POSITION_OPENED          # New position opened
+EventType.POSITION_CLOSED          # Position closed
+EventType.POSITION_UPDATED         # Position size/price changed
+EventType.POSITION_PNL_UPDATE      # P&L updated
 
 # Market Data Events
-SDKEventType.NEW_BAR                  # New OHLCV bar
-SDKEventType.QUOTE_UPDATE             # Bid/Ask update ⭐ NEW
-SDKEventType.TRADE_TICK               # Market trade
-SDKEventType.ORDERBOOK_UPDATE         # Level 2 depth update
+EventType.NEW_BAR                  # New OHLCV bar
+EventType.QUOTE_UPDATE             # Bid/Ask update ⭐ NEW
+EventType.TRADE_TICK               # Market trade
+EventType.ORDERBOOK_UPDATE         # Level 2 depth update
 
 # System Events
-SDKEventType.ERROR                    # Error occurred
-SDKEventType.WARNING                  # Warning condition
-SDKEventType.LATENCY_WARNING          # High latency detected
+EventType.ERROR                    # Error occurred
+EventType.WARNING                  # Warning condition
+EventType.LATENCY_WARNING          # High latency detected
 ```
 
 ---
@@ -291,25 +291,21 @@ Convert SDK events to Risk events with appropriate data extraction and transform
 **Subscription:**
 ```python
 async def _subscribe_to_suite(self, symbol: str, suite: TradingSuite) -> None:
-    """Subscribe to events from a specific TradingSuite."""
-
-    sdk_event_bus = suite.event_bus
-
-    # Subscribe to trade events
-    sdk_event_bus.subscribe(
-        SDKEventType.TRADE_EXECUTED,
+    """Subscribe to events from a specific TradingSuite."""    # Subscribe to trade events
+    await suite.on(
+        EventType.TRADE_EXECUTED,
         lambda event: self._on_trade_executed(symbol, event)
     )
 
     # Subscribe to position events
-    sdk_event_bus.subscribe(
-        SDKEventType.POSITION_OPENED,
+    await suite.on(
+        EventType.POSITION_OPENED,
         lambda event: self._on_position_opened(symbol, event)
     )
 
     # Subscribe to quote events ⭐ NEW
-    sdk_event_bus.subscribe(
-        SDKEventType.QUOTE_UPDATE,
+    await suite.on(
+        EventType.QUOTE_UPDATE,
         lambda event: self._on_quote_update(symbol, event)
     )
 
@@ -416,14 +412,14 @@ event_bus = EventBus()
 async def on_trade(event: RiskEvent):
     logger.info(f"Trade executed: {event.data}")
 
-event_bus.subscribe(EventType.TRADE_EXECUTED, on_trade)
+await suite.on(EventType.TRADE_EXECUTED, on_trade)
 
 # Subscribe to position events
-event_bus.subscribe(EventType.POSITION_OPENED, on_position_opened)
-event_bus.subscribe(EventType.POSITION_CLOSED, on_position_closed)
+await suite.on(EventType.POSITION_OPENED, on_position_opened)
+await suite.on(EventType.POSITION_CLOSED, on_position_closed)
 
 # Subscribe to quote events ⭐
-event_bus.subscribe(EventType.QUOTE_UPDATED, on_quote_update)
+await suite.on(EventType.QUOTE_UPDATED, on_quote_update)
 ```
 
 **Publish Events:**
@@ -676,8 +672,8 @@ Risk EventBus
 **EventBridge Subscription:**
 ```python
 # Subscribe to quote updates
-sdk_event_bus.subscribe(
-    SDKEventType.QUOTE_UPDATE,
+await suite.on(
+    EventType.QUOTE_UPDATE,
     lambda event: self._on_quote_update(symbol, event)
 )
 ```
@@ -980,7 +976,7 @@ async def test_event_bus_pubsub():
     async def handler(event: RiskEvent):
         received_events.append(event)
 
-    event_bus.subscribe(EventType.TRADE_EXECUTED, handler)
+    await suite.on(EventType.TRADE_EXECUTED, handler)
 
     # Publish
     event = RiskEvent(

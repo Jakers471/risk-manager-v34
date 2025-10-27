@@ -66,10 +66,7 @@ await quote_manager.subscribe_quotes(on_quote_update)
 from project_x_py import EventType as SDKEventType
 
 # Subscribe to quote updates via SDK EventBus
-suite.event_bus.subscribe(
-    SDKEventType.QUOTE_UPDATE,
-    handle_quote_update
-)
+await suite.on(EventType.QUOTE_UPDATE, handle_quote_update)
 
 async def handle_quote_update(event):
     symbol = event.symbol
@@ -352,8 +349,8 @@ class QuoteDataManager:
     async def _subscribe_to_quotes(self):
         """Subscribe to real-time quote updates."""
         for symbol, suite in self.suite_manager.get_all_suites().items():
-            suite.event_bus.subscribe(
-                SDKEventType.QUOTE_UPDATE,
+            await suite.on(
+                EventType.QUOTE_UPDATE,
                 lambda event: self._on_quote_update(symbol, event)
             )
 
@@ -414,15 +411,11 @@ class QuoteDataManager:
 # src/risk_manager/sdk/event_bridge.py
 
 async def _subscribe_to_suite(self, symbol: str, suite: TradingSuite) -> None:
-    """Subscribe to events from a specific TradingSuite."""
-
-    sdk_event_bus = suite.event_bus
-
-    # ... existing subscriptions ...
+    """Subscribe to events from a specific TradingSuite."""    # ... existing subscriptions ...
 
     # ⭐ NEW: Subscribe to quote updates
-    sdk_event_bus.subscribe(
-        SDKEventType.QUOTE_UPDATE,
+    await suite.on(
+        EventType.QUOTE_UPDATE,
         lambda event: self._on_quote_update(symbol, event)
     )
 
@@ -1080,7 +1073,7 @@ async def test_quote_subscription():
         received_quotes.append(event)
 
     # Subscribe
-    suite.event_bus.subscribe(SDKEventType.QUOTE_UPDATE, on_quote)
+    await suite.on(EventType.QUOTE_UPDATE, on_quote)
 
     # Wait for quotes
     await asyncio.sleep(5)
