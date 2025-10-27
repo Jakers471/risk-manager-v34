@@ -128,7 +128,23 @@ def run_pytest(args: list[str], description: str) -> int:
 
     # Build command with forced colors
     # Use venv's pytest directly instead of "uv run" to avoid slow dependency resolution
-    venv_python = Path(__file__).parent / ".venv" / "bin" / "python"
+
+    # Detect platform and use correct venv path
+    import sys
+    import platform
+
+    project_root = Path(__file__).parent
+
+    # On Windows, prefer .venv-windows if it exists
+    if platform.system() == "Windows":
+        venv_dir = project_root / ".venv-windows"
+        if not venv_dir.exists():
+            venv_dir = project_root / ".venv"
+        venv_python = venv_dir / "Scripts" / "python.exe"
+    else:
+        venv_dir = project_root / ".venv"
+        venv_python = venv_dir / "bin" / "python"
+
     if venv_python.exists():
         cmd = [str(venv_python), "-m", "pytest", "--color=yes"] + args
     else:
