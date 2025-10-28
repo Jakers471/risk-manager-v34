@@ -1,0 +1,168 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                   RISK MANAGER V34 - ADMIN CLI QUICK REFERENCE              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+ENTRY POINT: python admin_cli.py <command>
+
+─────────────────────────────────────────────────────────────────────────────────
+📋 GENERAL COMMANDS
+─────────────────────────────────────────────────────────────────────────────────
+  admin_cli.py --help              Show all commands
+  admin_cli.py status              Show system status (accounts, rules, P&L)
+  admin_cli.py logs                View recent logs (last 50 lines)
+  admin_cli.py logs --tail 100     View last 100 lines
+  admin_cli.py logs --follow       Follow logs in real-time (Ctrl+C to stop)
+
+─────────────────────────────────────────────────────────────────────────────────
+🔧 SERVICE CONTROL (Requires Admin)
+─────────────────────────────────────────────────────────────────────────────────
+  admin_cli.py service status      Check service status
+  admin_cli.py service start       Start the service
+  admin_cli.py service stop        Stop the service
+  admin_cli.py service restart     Restart the service
+  admin_cli.py service install     Install Windows service
+  admin_cli.py service uninstall   Uninstall Windows service
+
+─────────────────────────────────────────────────────────────────────────────────
+⚙️  CONFIGURATION MANAGEMENT
+─────────────────────────────────────────────────────────────────────────────────
+  admin_cli.py config show         Display current configuration
+  admin_cli.py config edit         Open config in editor (Admin)
+  admin_cli.py config validate     Validate configuration syntax
+  admin_cli.py config reload       Reload config by restarting service (Admin)
+
+─────────────────────────────────────────────────────────────────────────────────
+📊 RULE MANAGEMENT
+─────────────────────────────────────────────────────────────────────────────────
+  admin_cli.py rules list                    List all rules and status
+  admin_cli.py rules enable <rule_id>        Enable specific rule (Admin)
+  admin_cli.py rules disable <rule_id>       Disable specific rule (Admin)
+  admin_cli.py rules configure <rule_id>     Configure rule parameters (Admin)
+
+  Available Rule IDs:
+    - max_contracts
+    - max_contracts_per_instrument
+    - daily_realized_loss
+    - daily_unrealized_loss
+    - max_unrealized_profit
+    - trade_frequency_limit
+    - cooldown_after_loss
+    - no_stop_loss_grace
+    - session_block_outside
+    - auth_loss_guard
+    - symbol_blocks
+    - trade_management
+    - daily_realized_profit
+
+─────────────────────────────────────────────────────────────────────────────────
+🔒 LOCKOUT MANAGEMENT
+─────────────────────────────────────────────────────────────────────────────────
+  admin_cli.py lockouts list                       List active lockouts
+  admin_cli.py lockouts remove <account_id>        Remove lockout (Admin)
+  admin_cli.py lockouts history                    Show lockout history
+  admin_cli.py lockouts history --account <id>     Filter by account
+  admin_cli.py lockouts history --limit 100        Show last 100 records
+
+─────────────────────────────────────────────────────────────────────────────────
+🚀 QUICK START
+─────────────────────────────────────────────────────────────────────────────────
+  1. Validate config:    admin_cli.py config validate
+  2. Check rules:        admin_cli.py rules list
+  3. Start service:      admin_cli.py service start  (as admin)
+  4. Verify status:      admin_cli.py service status
+  5. Monitor logs:       admin_cli.py logs --follow
+
+─────────────────────────────────────────────────────────────────────────────────
+⚠️  COMMON TASKS
+─────────────────────────────────────────────────────────────────────────────────
+  Change loss limit:
+    1. admin_cli.py config edit
+    2. admin_cli.py config validate
+    3. admin_cli.py config reload
+
+  Emergency unlock:
+    1. admin_cli.py lockouts list
+    2. admin_cli.py lockouts remove <account_id>
+
+  Enable/disable rule:
+    1. admin_cli.py rules enable <rule_id>
+    2. admin_cli.py config reload
+
+  Debug service:
+    1. admin_cli.py service status
+    2. admin_cli.py logs --tail 100
+    3. admin_cli.py config validate
+
+─────────────────────────────────────────────────────────────────────────────────
+🔑 ADMIN PRIVILEGES
+─────────────────────────────────────────────────────────────────────────────────
+  Commands marked (Admin) require Windows administrator privileges.
+
+  To run as administrator:
+    1. Right-click Command Prompt
+    2. Select "Run as administrator"
+    3. Run command
+
+  Commands requiring admin:
+    ✓ service start, stop, restart, install, uninstall
+    ✓ config edit, reload
+    ✓ rules enable, disable, configure
+    ✓ lockouts remove
+
+  Commands NOT requiring admin (read-only):
+    ✓ service status
+    ✓ config show, validate
+    ✓ rules list
+    ✓ lockouts list, history
+    ✓ status, logs
+
+─────────────────────────────────────────────────────────────────────────────────
+📁 FILE LOCATIONS
+─────────────────────────────────────────────────────────────────────────────────
+  Development:
+    Config:  ./config/risk_config.yaml
+    Data:    ./data/risk_state.db
+    Logs:    ./data/logs/risk_manager.log
+
+  Production (Windows Service):
+    Config:  C:\ProgramData\SimpleRiskManager\config\risk_config.yaml
+    Data:    C:\ProgramData\SimpleRiskManager\data\risk_state.db
+    Logs:    C:\ProgramData\SimpleRiskManager\logs\risk_manager.log
+
+─────────────────────────────────────────────────────────────────────────────────
+❌ TROUBLESHOOTING
+─────────────────────────────────────────────────────────────────────────────────
+  "Configuration file not found"
+    → Copy template: copy config\risk_config.yaml.template config\risk_config.yaml
+
+  "Administrator privileges required"
+    → Right-click terminal → "Run as administrator"
+
+  "Service not responding"
+    → admin_cli.py service restart (as admin)
+    → admin_cli.py logs --tail 100 (check errors)
+
+  "Configuration validation failed"
+    → admin_cli.py config edit (fix errors)
+    → admin_cli.py config validate (check again)
+
+─────────────────────────────────────────────────────────────────────────────────
+📚 DOCUMENTATION
+─────────────────────────────────────────────────────────────────────────────────
+  Complete Guide:  docs/current/ADMIN_CLI_GUIDE.md
+  Examples:        docs/current/ADMIN_CLI_EXAMPLES.md
+  Implementation:  ADMIN_CLI_IMPLEMENTATION.md
+
+─────────────────────────────────────────────────────────────────────────────────
+💡 PRO TIPS
+─────────────────────────────────────────────────────────────────────────────────
+  - Always validate config after editing
+  - Backup configs before major changes
+  - Use --follow to monitor real-time logs
+  - Check service status before other commands
+  - Test config changes in practice mode first
+  - Document emergency unlocks for audit trail
+
+─────────────────────────────────────────────────────────────────────────────────
+
+Version: 1.0.0-alpha | Last Updated: 2025-10-28
