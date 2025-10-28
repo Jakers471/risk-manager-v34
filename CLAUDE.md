@@ -22,7 +22,7 @@
 
 This file tells Claude AI exactly what to read and in what order to get up to speed on this project.
 
-**Last Updated**: 2025-10-23
+**Last Updated**: 2025-10-28
 **Project**: Risk Manager V34
 **Location**: `C:\Users\jakers\Desktop\risk-manager-v34\`
 **Environment**: Windows WSL2
@@ -63,6 +63,86 @@ Priority 4 - API Reference (For Coding/Testing):
 - ✅ **Test runner behavior** (why tests were failing/fixed)
 - ✅ What we still need to build
 - ✅ Exactly where we left off
+
+---
+
+## 🚀 Entry Points (How to Run the System)
+
+### Development Runtime (Primary Entry Point)
+
+**Command**: `python run_dev.py`
+
+**Purpose**: Live microscope for validating the complete system end-to-end
+
+**Use When**:
+- First-time integration testing
+- Validating rule math and event flow
+- Debugging SDK integration
+- Watching real-time events
+- Before deploying as Windows Service
+
+**Features**:
+- ✅ Maximum logging (8 checkpoints visible)
+- ✅ Real-time event streaming
+- ✅ Rule evaluation display
+- ✅ P&L tracking
+- ✅ Enforcement action visibility
+- ✅ Graceful Ctrl+C shutdown
+
+**Options**:
+```bash
+python run_dev.py                    # Interactive account selection
+python run_dev.py --account ACC123   # Explicit account
+python run_dev.py --config path.yaml # Custom config
+python run_dev.py --log-level DEBUG  # More verbose
+```
+
+**Documentation**: See `RUN_DEV_IMPLEMENTATION.md`
+
+---
+
+### Admin CLI (Management Interface)
+
+**Command**: `python admin_cli.py`
+
+**Purpose**: Configure, manage, and control the Risk Manager system
+
+**Modes**:
+1. **Interactive Menu** (default - no args)
+   - Number-based navigation (1-6)
+   - Setup wizard, service control, rule configuration
+   - Dashboard, connection testing
+
+2. **Command Mode** (with args)
+   - Individual commands for scripting
+   - `admin_cli service status`
+   - `admin_cli rules list`
+   - `admin_cli config show`
+
+**Key Features**:
+- ✅ Setup wizard (4-step, SDK-free)
+- ✅ Service control (start/stop/restart)
+- ✅ Rule management (13 rules)
+- ✅ Configuration editing
+- ✅ UAC elevation checks
+
+**Documentation**: See `ADMIN_CLI_MVP_COMPLETE.md` and `ADMIN_MENU_IMPLEMENTATION.md`
+
+---
+
+### Test Runner
+
+**Command**: `python run_tests.py`
+
+**Purpose**: Interactive test menu for running pytest suites
+
+**Use When**:
+- Running unit/integration/E2E tests
+- Checking test coverage
+- Running runtime smoke tests
+- Debugging test failures
+
+**Documentation**: See `docs/testing/TESTING_GUIDE.md`
 
 ---
 
