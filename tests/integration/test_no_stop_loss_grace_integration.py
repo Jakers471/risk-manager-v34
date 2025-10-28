@@ -665,10 +665,16 @@ class TestNoStopLossGraceIntegration:
         3. Enforcement fails (returns success=False)
         4. Rule logs error but doesn't crash
         """
+        # Track enforcement calls
+        enforcement_calls = []
+
+        async def track_close_with_failure(symbol, contract_id):
+            """Track enforcement call and return failure."""
+            enforcement_calls.append({"symbol": symbol, "contract_id": contract_id})
+            return {"success": False, "error": "Test failure"}
+
         # Make enforcement fail
-        mock_engine.enforcement_executor.close_position = AsyncMock(
-            return_value={"success": False, "error": "Test failure"}
-        )
+        mock_engine.enforcement_executor.close_position = track_close_with_failure
 
         # Open position
         position_event = RiskEvent(
@@ -682,13 +688,15 @@ class TestNoStopLossGraceIntegration:
 
         await rule.evaluate(position_event, mock_engine)
 
-        # Wait for grace period
-        await asyncio.sleep(2.5)
+        # Wait for grace period to expire
+        # Timer checks every 1s, grace period is 2s, so at t=2s it should fire
+        # Add buffer to ensure timer loop has time to check
+        await asyncio.sleep(3.0)
 
         # Enforcement should have been attempted
-        mock_engine.enforcement_executor.close_position.assert_called_once_with(
-            "MNQ", "CON.F.US.MNQ.Z25"
-        )
+        assert len(enforcement_calls) == 1
+        assert enforcement_calls[0]["symbol"] == "MNQ"
+        assert enforcement_calls[0]["contract_id"] == "CON.F.US.MNQ.Z25"
 
         # Rule should not crash (timer removed cleanly)
         assert not rule.timer_manager.has_timer("no_stop_loss_grace_CON.F.US.MNQ.Z25")

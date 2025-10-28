@@ -90,7 +90,11 @@ class TestMaxContractsE2E:
     async def risk_manager(self, mock_sdk_suite):
         """Create simplified risk system for e2e testing."""
         # Create components directly (without full RiskManager)
-        config = RiskConfig(max_contracts=2)
+        config = RiskConfig(
+            project_x_api_key="test_api_key",
+            project_x_username="test_user",
+            max_contracts=2
+        )
         event_bus = EventBus()
 
         # Mock trading integration
@@ -203,21 +207,15 @@ class TestMaxContractsE2E:
         )
 
         # When: SDK fires position update (simulating SignalR message)
-        from project_x_py.event_bus import EventType as SDKEventType, Event
-
-        sdk_event = Event(
-            type=SDKEventType.POSITION_UPDATED,
+        # NOTE: In real E2E, SDK would fire event → EventBridge converts it
+        # Here we simulate the already-converted RiskEvent
+        position_event = RiskEvent(
+            event_type=EventType.POSITION_UPDATED,
             data={
                 "symbol": "MNQ",
                 "size": 4,
                 "unrealizedPnl": 200.00
             }
-        )
-
-        # Simulate SDK event → EventBridge → RiskEngine flow
-        position_event = RiskEvent(
-            event_type=EventType.POSITION_UPDATED,
-            data=sdk_event.data
         )
 
         await risk_manager.event_bus.publish(position_event)

@@ -161,9 +161,11 @@ MAX_CONTRACTS=25
 ENABLE_AI=true
 """)
 
-        # Change to directory with .env file
+        # Change to directory with .env file and clear all env vars
         monkeypatch.chdir(tmp_path)
-        # Unset environment variables so .env file values are used
+        # Unset ALL project-related environment variables to prevent contamination
+        monkeypatch.delenv("PROJECT_X_API_KEY", raising=False)
+        monkeypatch.delenv("PROJECT_X_USERNAME", raising=False)
         monkeypatch.delenv("MAX_CONTRACTS", raising=False)
         monkeypatch.delenv("ENABLE_AI", raising=False)
 
@@ -182,7 +184,9 @@ PROJECT_X_API_KEY=dotenv_key
 PROJECT_X_USERNAME=dotenv_user
 """)
 
+        # Clear existing env vars first, then set override
         monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("PROJECT_X_USERNAME", raising=False)
         monkeypatch.setenv("PROJECT_X_API_KEY", "env_override_key")
 
         config = RiskConfig.from_env()
@@ -310,8 +314,10 @@ PROJECT_X_USERNAME=dotenv_user  # Inline comment
 MAX_CONTRACTS=10
 """)
 
+        # Clear all project env vars to prevent contamination
         monkeypatch.chdir(tmp_path)
-        # Unset environment variable so .env file value is used
+        monkeypatch.delenv("PROJECT_X_API_KEY", raising=False)
+        monkeypatch.delenv("PROJECT_X_USERNAME", raising=False)
         monkeypatch.delenv("MAX_CONTRACTS", raising=False)
 
         config = RiskConfig.from_env()
@@ -327,7 +333,10 @@ PROJECT_X_API_KEY="quoted_key"
 PROJECT_X_USERNAME='single_quoted_user'
 """)
 
+        # Clear env vars to use only .env file values
         monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("PROJECT_X_API_KEY", raising=False)
+        monkeypatch.delenv("PROJECT_X_USERNAME", raising=False)
 
         config = RiskConfig.from_env()
 

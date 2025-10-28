@@ -393,8 +393,12 @@ PROJECT_X_API_KEY=key
 
         assert missing == []
 
-    def test_validate_missing_single_var(self, tmp_path):
+    def test_validate_missing_single_var(self, tmp_path, monkeypatch):
         """Test validation when single variable missing."""
+        # Isolate from real .env file
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("PROJECT_X_API_KEY", raising=False)
+
         env_file = tmp_path / ".env"
         env_file.write_text("PROJECT_X_USERNAME=user")
 
