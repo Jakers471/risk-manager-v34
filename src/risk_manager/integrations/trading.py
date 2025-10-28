@@ -73,7 +73,7 @@ class TradingIntegration:
             self.suite = await TradingSuite.create(
                 instruments=self.instruments,
                 timeframes=["1min", "5min"],
-                features=["orderbook", "statistics"],  # Enable orderbook and statistics
+                features=["orderbook", "performance_analytics", "auto_reconnect"],  # Enable orderbook, analytics, and auto-reconnect
             )
 
             # Wire the realtime client to the suite

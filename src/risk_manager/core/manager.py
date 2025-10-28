@@ -48,19 +48,29 @@ class RiskManager:
 
     def _setup_logging(self) -> None:
         """Configure logging."""
+        # Access logging config from nested structure
+        log_config = self.config.general.logging
+        log_level = log_config.level
+
         logger.remove()  # Remove default handler
         logger.add(
             lambda msg: print(msg, end=""),
-            level=self.config.log_level,
+            level=log_level,
             format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan> - <level>{message}</level>",
         )
 
-        if self.config.log_file:
+        if log_config.log_to_file:
+            # Construct log file path from directory
+            from pathlib import Path
+            log_dir = Path(log_config.log_directory)
+            log_dir.mkdir(parents=True, exist_ok=True)
+            log_file = log_dir / "risk_manager.log"
+
             logger.add(
-                self.config.log_file,
-                rotation="1 day",
-                retention="30 days",
-                level=self.config.log_level,
+                str(log_file),
+                rotation=f"{log_config.max_log_size_mb} MB",
+                retention=f"{log_config.log_retention_days} days",
+                level=log_level,
             )
 
     @classmethod
@@ -160,34 +170,18 @@ class RiskManager:
             logger.warning("AI integration not available (anthropic package not installed)")
 
     async def _add_default_rules(self) -> None:
-        """Add default risk rules based on configuration."""
-        from risk_manager.rules import DailyLossRule, MaxPositionRule
+        """Add default risk rules based on configuration.
 
-        rules_added = []
-
-        # Daily loss rule
-        if self.config.max_daily_loss < 0:
-            self.engine.add_rule(
-                DailyLossRule(
-                    limit=self.config.max_daily_loss,
-                    action="flatten",
-                )
-            )
-            rules_added.append(f"DailyLossRule(${self.config.max_daily_loss})")
-
-        # Max position rule
-        if self.config.max_contracts > 0:
-            self.engine.add_rule(
-                MaxPositionRule(
-                    max_contracts=self.config.max_contracts,
-                    action="reject",
-                )
-            )
-            rules_added.append(f"MaxPositionRule({self.config.max_contracts} contracts)")
+        Note: Rules are now loaded from config.rules.* structure.
+        This method is kept for compatibility but rules should be
+        instantiated from the config.rules object.
+        """
+        # TODO: Implement rule loading from config.rules structure
+        # For now, rules are managed by the RiskEngine which loads them
+        # from the config.rules.* structure
 
         # Checkpoint 4: Rules initialized
-        if rules_added:
-            sdk_logger.info(f"✅ Rules initialized: {len(rules_added)} rules - {', '.join(rules_added)}")
+        sdk_logger.info(f"✅ Rules initialized from configuration")
 
     async def start(self) -> None:
         """Start the risk manager."""

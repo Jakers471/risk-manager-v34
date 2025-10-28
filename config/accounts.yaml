@@ -1,4 +1,42 @@
+# ==============================================================================
+# ACCOUNTS CONFIGURATION
+# ==============================================================================
+# Purpose: API credentials + multi-account support with per-account overrides
+# Security: KEEP THIS FILE SECURE - Contains API credentials
+# ==============================================================================
+
+# ==============================================================================
+# API CREDENTIALS
+# ==============================================================================
+topstepx:
+  # API credentials (from .env file or hardcoded)
+  username: "${PROJECT_X_USERNAME}"     # Will be replaced from .env
+  api_key: "${PROJECT_X_API_KEY}"       # Will be replaced from .env
+
+  # API endpoints
+  api_url: "https://api.topstepx.com/api"
+  websocket_url: "wss://api.topstepx.com"
+
+# ==============================================================================
+# MONITORED ACCOUNTS
+# ==============================================================================
 accounts:
-- account_id: PRAC-V2-XXXXXX
-  enabled: true
-  name: Practice Account
+  # Account 1: Practice Account
+  - id: "PRAC-V2-XXXXXX"              # Replace with actual account ID
+    name: "Practice Account"
+    account_type: "practice"           # "practice" or "live"
+    description: "Default practice account"
+    enabled: true
+
+    # Configuration options (both null = use default risk_config.yaml)
+    risk_config_file: null             # Use default config
+    config_overrides: null             # No overrides
+
+# ==============================================================================
+# NOTES
+# ==============================================================================
+# 1. Environment variables: $VARIABLE syntax will be replaced from .env
+# 2. Multi-account: Add more accounts to the list above
+# 3. Per-account rules: Use risk_config_file or config_overrides
+# 4. Account selection: run_dev.py will prompt if multiple accounts present
+# ==============================================================================

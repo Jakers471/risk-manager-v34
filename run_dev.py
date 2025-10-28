@@ -34,6 +34,10 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
+# Load .env file into environment variables BEFORE SDK access
+from dotenv import load_dotenv
+load_dotenv()
+
 from rich.console import Console
 
 console = Console()
@@ -86,7 +90,7 @@ async def main():
             colorize=True,
         )
 
-        cp1(version="1.0.0-dev", mode="development")
+        cp1(details={"version": "1.0.0-dev", "mode": "development"})
 
     except ImportError as e:
         console.print(f"[red]Failed to setup logging: {e}[/red]")
@@ -160,6 +164,7 @@ async def main():
 
         trading_integration = TradingIntegration(
             instruments=runtime_config.risk_config.general.instruments,
+            config=runtime_config.risk_config,
             event_bus=risk_manager.event_bus,
         )
 

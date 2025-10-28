@@ -1,27 +1,144 @@
+# ==============================================================================
+# RISK MANAGER V34 - RISK CONFIGURATION
+# ==============================================================================
+# This file configures all 13 risk rules for the Risk Manager system.
+# Each rule can be individually enabled/disabled and configured.
+#
+# For detailed documentation, see:
+# docs/specifications/unified/configuration/risk-config-schema.md
+# ==============================================================================
+
 general:
+  # Instruments to monitor
   instruments:
-  - MNQ
-  - NQ
-  - ES
-  timezone: America/Chicago
+    - MNQ                          # E-mini NASDAQ
+    - NQ                           # NASDAQ
+    - ES                           # E-mini S&P 500
+
+  # Timezone (IANA timezone string)
+  timezone: "America/Chicago"      # Central Time
+
+  # Logging configuration
   logging:
-    level: INFO
-    file: data/logs/risk_manager.log
+    level: "INFO"                  # DEBUG, INFO, WARNING, ERROR
+    log_to_file: true              # Enable file logging
+    log_directory: "data/logs/"    # Log directory
+    max_log_size_mb: 100           # Max log file size in MB
+    log_retention_days: 30         # Keep logs for 30 days
+
+# ==============================================================================
+# RISK RULES (13 TOTAL)
+# ==============================================================================
+
 rules:
+  # ============================================================================
+  # TRADE-BY-TRADE RULES (6 rules)
+  # Characteristic: Close only that position, NO lockout, immediate retry allowed
+  # ============================================================================
+
+  # RULE-001: Max Contracts (Account-Wide)
   max_contracts:
     enabled: true
-    limit: 5
-    count_type: net
-  daily_realized_loss:
+    limit: 5                       # Max 5 net contracts across all instruments
+    count_type: "net"              # "net" or "gross"
+
+  # RULE-002: Max Contracts Per Instrument
+  max_contracts_per_instrument:
     enabled: true
-    limit: -500
-    reset_time: '17:00'
-    timezone: America/Chicago
+    default_limit: 3               # Default: 3 contracts per instrument
+    instrument_limits:
+      MNQ: 2                       # Max 2 MNQ contracts
+      ES: 1                        # Max 1 ES contract
+
+  # RULE-004: Daily Unrealized Loss (Per Position)
   daily_unrealized_loss:
     enabled: true
-    limit: -750
+    limit: -750                    # Max $750 floating loss per position
+    check_interval_seconds: 10     # Check every 10 seconds
+
+  # RULE-005: Max Unrealized Profit (Profit Target Per Position)
+  max_unrealized_profit:
+    enabled: true
+    target: 500.0                  # Take profit at $500 per position
+    check_interval_seconds: 5      # Check every 5 seconds
+
+  # RULE-008: Stop-Loss Enforcement
+  no_stop_loss_grace:
+    enabled: false                 # Disabled by default
+    require_within_seconds: 60     # Must place stop within 60s
+    grace_period_seconds: 300      # 5 min grace before enforcement
+
+  # RULE-011: Symbol Blocks (Blacklist)
+  symbol_blocks:
+    enabled: false                 # Disabled by default
+    blocked_symbols: []            # Add symbols to block (e.g., ["ES", "NQ"])
+
+  # ============================================================================
+  # TIMER/COOLDOWN RULES (2 rules)
+  # Characteristic: Close all positions, temporary lockout, auto-unlock
+  # ============================================================================
+
+  # RULE-006: Trade Frequency Limit
+  trade_frequency_limit:
+    enabled: true
+    limits:
+      per_minute: 3                # Max 3 trades per minute
+      per_hour: 10                 # Max 10 trades per hour
+      per_session: 50              # Max 50 trades per session
+
+  # RULE-007: Cooldown After Loss
+  cooldown_after_loss:
+    enabled: true
+    loss_threshold: -100.0         # Trigger on $100 loss in single trade
+
+  # ============================================================================
+  # HARD LOCKOUT RULES (4 rules)
+  # Characteristic: Close all positions, hard lockout until condition met
+  # ============================================================================
+
+  # RULE-003: Daily Realized Loss
+  daily_realized_loss:
+    enabled: true
+    limit: -500                    # Max daily loss: $500
+    reset_time: "17:00"            # Reset at 5 PM CT
+    timezone: "America/Chicago"
+
+  # RULE-013: Daily Realized Profit
+  daily_realized_profit:
+    enabled: true
+    target: 1000.0                 # Daily profit target: $1000
+    message: "Daily profit target reached! Good job! See you tomorrow."
+
+  # RULE-009: Session Block Outside Hours
   session_block_outside:
     enabled: true
-    start_time: 08:30
-    end_time: '15:00'
-    timezone: America/Chicago
+    start_time: "08:30"            # Session starts at 8:30 AM CT
+    end_time: "15:00"              # Session ends at 3:00 PM CT
+    timezone: "America/Chicago"
+    respect_holidays: true         # Check holidays
+
+  # RULE-010: Auth Loss Guard
+  auth_loss_guard:
+    enabled: true
+    check_interval_seconds: 30     # Check canTrade every 30s
+    reason: "API canTrade status is false - account disabled"
+
+  # ============================================================================
+  # AUTOMATION (1 rule)
+  # ============================================================================
+
+  # RULE-012: Trade Management (Auto Breakeven + Trailing Stop)
+  trade_management:
+    enabled: false                 # Disabled by default (advanced feature)
+    auto_breakeven:
+      enabled: true
+      profit_threshold_ticks: 4    # Move stop to breakeven after 4 ticks profit
+      offset_ticks: 1              # Offset from breakeven (safety margin)
+    trailing_stop:
+      enabled: true
+      trail_ticks: 4               # Trail by 4 ticks
+      activation_profit_ticks: 8   # Activate trail after 8 ticks profit
+
+# ==============================================================================
+# END OF CONFIGURATION
+# ==============================================================================
