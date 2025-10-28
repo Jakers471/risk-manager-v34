@@ -7,7 +7,7 @@ Thread-safe connection management.
 
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Generator
 
@@ -79,7 +79,7 @@ class Database:
             self._migrate_to_v1(cursor)
             cursor.execute(
                 "INSERT INTO schema_version (version, applied_at) VALUES (?, ?)",
-                (1, datetime.utcnow().isoformat()),
+                (1, datetime.now(timezone.utc).isoformat()),
             )
             conn.commit()
 
@@ -166,6 +166,22 @@ class Database:
         """)
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_trades_account_timestamp ON trades(account_id, timestamp)"
+        )
+
+        # Reset log (for MOD-004 Reset Scheduler)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS reset_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                account_id TEXT NOT NULL,
+                reset_type TEXT NOT NULL,
+                reset_time TEXT NOT NULL,
+                triggered_at TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(account_id, reset_type, reset_time)
+            )
+        """)
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_reset_log_account ON reset_log(account_id, reset_type)"
         )
 
         logger.success("Schema v1 applied successfully")

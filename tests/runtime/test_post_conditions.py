@@ -114,7 +114,7 @@ async def test_post_condition_event_bus_operational():
 
     # Process multiple events
     for i in range(5):
-        bus.publish(RiskEvent(event_type=EventType.TRADE_EXECUTED, data={}))
+        await bus.publish(RiskEvent(event_type=EventType.TRADE_EXECUTED, data={}))
 
     # Post-conditions
     all_events_processed = events_processed == 5

@@ -1,5 +1,6 @@
 """Event system for risk management."""
 
+import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -39,6 +40,12 @@ class EventType(str, Enum):
     SYSTEM_STOPPED = "system_stopped"
     CONNECTION_LOST = "connection_lost"
     CONNECTION_RESTORED = "connection_restored"
+
+    # SDK authentication events
+    SDK_CONNECTED = "sdk_connected"
+    SDK_DISCONNECTED = "sdk_disconnected"
+    AUTH_SUCCESS = "auth_success"
+    AUTH_FAILED = "auth_failed"
 
     # AI events
     PATTERN_DETECTED = "pattern_detected"
@@ -113,6 +120,3 @@ class EventBus:
                         f"Error in event handler {handler.__name__}: {e}",
                         exc_info=True
                     )
-
-
-import asyncio

@@ -1,0 +1,7 @@
+# Invalid YAML syntax
+project_x_api_key: test_key
+project_x_username: test_user
+invalid_list: [no closing bracket
+nested:
+  bad indentation
+unmatched: "quote

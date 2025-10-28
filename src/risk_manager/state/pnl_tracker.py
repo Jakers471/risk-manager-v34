@@ -5,7 +5,7 @@ Tracks daily realized P&L with SQLite persistence for crash recovery.
 Thread-safe, handles multiple accounts.
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Dict
 
 from loguru import logger
@@ -60,7 +60,7 @@ class PnLTracker:
             trade_date = date.today()
 
         date_str = trade_date.isoformat()
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
 
         # Check if record exists for this account/date
         row = self.db.execute_one(
@@ -191,7 +191,7 @@ class PnLTracker:
             trade_date = date.today()
 
         date_str = trade_date.isoformat()
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
 
         self.db.execute_write(
             """

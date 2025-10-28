@@ -75,7 +75,7 @@ class MaxContractsPerInstrumentRule(RiskRule):
             True if rule is violated, False otherwise
         """
         # Only process position events
-        if event.type not in [EventType.POSITION_OPENED, EventType.POSITION_UPDATED]:
+        if event.event_type not in [EventType.POSITION_OPENED, EventType.POSITION_UPDATED]:
             return False
 
         # Extract position data

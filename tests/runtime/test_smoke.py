@@ -82,7 +82,7 @@ async def test_smoke_event_bus_success():
         event_received = True
 
     bus.subscribe(EventType.POSITION_UPDATED, callback)
-    bus.publish(RiskEvent(event_type=EventType.POSITION_UPDATED, data={}))
+    await bus.publish(RiskEvent(event_type=EventType.POSITION_UPDATED, data={}))
 
     result = {
         'exit_code': 0,
@@ -122,14 +122,19 @@ async def test_smoke_rule_engine_success(mock_engine):
 async def test_smoke_state_tracking_success():
     """Test that state tracking components initialize."""
     from risk_manager.state.pnl_tracker import PnLTracker
-
     from risk_manager.state.database import Database
-    db = Database()
+    import tempfile
+
+    # Create temp database for test
+    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp:
+        db_path = tmp.name
+    db = Database(db_path=db_path)
     tracker = PnLTracker(db=db)
 
-    # Track a simple transaction
-    tracker.record_realized_pnl(100.0, "MNQ")
-    total = tracker.get_total_realized_pnl()
+    # Track a simple transaction (using correct API: add_trade_pnl(account_id, pnl))
+    account_id = "TEST-ACCOUNT"
+    tracker.add_trade_pnl(account_id, 100.0)
+    total = tracker.get_daily_pnl(account_id)
 
     result = {
         'exit_code': 0,

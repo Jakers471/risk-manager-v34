@@ -1,0 +1,8 @@
+# Configuration with null values for optional fields
+project_x_api_key: test_key
+project_x_username: test_user
+log_file: null
+anthropic_api_key: null
+discord_webhook_url: null
+telegram_bot_token: null
+telegram_chat_id: null

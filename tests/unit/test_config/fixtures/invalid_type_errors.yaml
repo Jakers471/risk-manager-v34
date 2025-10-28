@@ -1,0 +1,5 @@
+# Invalid: type errors
+project_x_api_key: test_key
+project_x_username: test_user
+max_contracts: not_a_number
+max_daily_loss: also_invalid

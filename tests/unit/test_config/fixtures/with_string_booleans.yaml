@@ -1,0 +1,8 @@
+# Configuration with booleans as strings (should coerce)
+project_x_api_key: test_key
+project_x_username: test_user
+require_stop_loss: "true"
+enable_ai: "false"
+debug: "yes"
+enable_pattern_recognition: "1"
+enable_anomaly_detection: "0"

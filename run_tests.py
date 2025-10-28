@@ -22,11 +22,56 @@ RESET = "\033[0m"
 
 # Test reports directory
 REPORTS_DIR = Path(__file__).parent / "test_reports"
+COVERAGE_HISTORY_FILE = REPORTS_DIR / "coverage_history.txt"
 
 
 def ensure_reports_dir():
     """Ensure test_reports directory exists."""
     REPORTS_DIR.mkdir(exist_ok=True)
+
+
+def save_coverage_stat(coverage_percent: float):
+    """
+    Save coverage percentage to history file (last 5 runs).
+
+    Args:
+        coverage_percent: Coverage percentage (e.g., 36.05)
+    """
+    ensure_reports_dir()
+
+    # Read existing history
+    history = []
+    if COVERAGE_HISTORY_FILE.exists():
+        lines = COVERAGE_HISTORY_FILE.read_text(encoding="utf-8").strip().split("\n")
+        history = [line for line in lines if line.strip()]
+
+    # Add new entry
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    new_entry = f"{timestamp}  {coverage_percent:.2f}%"
+    history.append(new_entry)
+
+    # Keep only last 5
+    history = history[-5:]
+
+    # Save back
+    COVERAGE_HISTORY_FILE.write_text("\n".join(history) + "\n", encoding="utf-8")
+
+
+def show_coverage_history():
+    """Display the last 5 coverage runs."""
+    if not COVERAGE_HISTORY_FILE.exists():
+        print(f"\n{YELLOW}No coverage history yet. Run tests with coverage first (option 6 or 7){RESET}")
+        return
+
+    print(f"\n{CYAN}{'─' * 70}{RESET}")
+    print(f"{BOLD}Coverage History (Last 5 Runs){RESET}")
+    print(f"{CYAN}{'─' * 70}{RESET}\n")
+
+    history = COVERAGE_HISTORY_FILE.read_text(encoding="utf-8").strip().split("\n")
+    for line in history:
+        print(f"  {line}")
+
+    print(f"\n{CYAN}{'─' * 70}{RESET}")
 
 
 def save_test_report(output: str, description: str, exit_code: int):
@@ -92,8 +137,8 @@ def print_menu():
     print(f"  {GREEN}[3]{RESET} Run INTEGRATION tests only")
     print(f"  {GREEN}[4]{RESET} Run E2E tests only")
     print(f"  {GREEN}[5]{RESET} Run SLOW tests only")
-    print(f"  {GREEN}[6]{RESET} Run tests with COVERAGE report")
-    print(f"  {GREEN}[7]{RESET} Run tests with COVERAGE + HTML report")
+    print(f"  {GREEN}[6]{RESET} Run tests with COVERAGE report (with branch)")
+    print(f"  {GREEN}[7]{RESET} Run tests with COVERAGE + HTML report (with branch)")
     print(f"  {GREEN}[8]{RESET} Run specific test file")
     print(f"  {GREEN}[9]{RESET} Run tests matching keyword")
     print(f"  {GREEN}[0]{RESET} Run last failed tests only")
@@ -517,21 +562,23 @@ def main():
         elif choice == "6":
             # Run with coverage
             args = base_args + [
-                "--cov=risk_manager",
+                "--cov=src",
+                "--cov-branch",
                 "--cov-report=term-missing",
                 "tests/",
             ]
-            exit_code = run_pytest(args, "All tests with coverage")
+            exit_code = run_pytest(args, "All tests with coverage (with branch)")
 
         elif choice == "7":
             # Run with coverage + HTML
             args = base_args + [
-                "--cov=risk_manager",
+                "--cov=src",
+                "--cov-branch",
                 "--cov-report=term-missing",
                 "--cov-report=html",
                 "tests/",
             ]
-            exit_code = run_pytest(args, "All tests with coverage + HTML report")
+            exit_code = run_pytest(args, "All tests with coverage + HTML report (with branch)")
             if exit_code == 0:
                 print(
                     f"\n{GREEN}✓ HTML coverage report: {BOLD}htmlcov/index.html{RESET}"
@@ -593,14 +640,34 @@ def main():
         elif choice == "c":
             # Check coverage status
             print(f"\n{CYAN}{'─' * 70}{RESET}")
-            print(f"{BOLD}Coverage Status{RESET}")
+            print(f"{BOLD}Coverage Status (with branch coverage){RESET}")
             print(f"{CYAN}{'─' * 70}{RESET}\n")
-            result = subprocess.run(
-                ["uv", "run", "coverage", "report"],
-                cwd=Path(__file__).parent,
-            )
-            if result.returncode != 0:
-                print(f"\n{YELLOW}No coverage data. Run tests with coverage first (option 5 or 6){RESET}")
+
+            # Check if .coverage file exists
+            coverage_file = Path(__file__).parent / ".coverage"
+            if not coverage_file.exists():
+                print(f"\n{YELLOW}No coverage data. Run tests with coverage first (option 6 or 7){RESET}")
+                input(f"\n{BOLD}Press Enter to continue...{RESET}")
+                continue
+
+            # Use venv's coverage command directly
+            import platform
+            project_root = Path(__file__).parent
+            if platform.system() == "Windows":
+                venv_dir = project_root / ".venv-windows"
+                if not venv_dir.exists():
+                    venv_dir = project_root / ".venv"
+                coverage_cmd = venv_dir / "Scripts" / "coverage.exe"
+            else:
+                venv_dir = project_root / ".venv"
+                coverage_cmd = venv_dir / "bin" / "coverage"
+
+            if coverage_cmd.exists():
+                cmd = [str(coverage_cmd), "report"]
+            else:
+                cmd = ["uv", "run", "coverage", "report"]
+
+            result = subprocess.run(cmd, cwd=project_root)
             input(f"\n{BOLD}Press Enter to continue...{RESET}")
             continue
 

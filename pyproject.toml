@@ -103,6 +103,7 @@ markers = [
 [tool.coverage.run]
 source = ["src"]
 omit = ["tests/*", "*/conftest.py"]
+branch = true
 
 [tool.coverage.report]
 precision = 2

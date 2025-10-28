@@ -1,0 +1,15 @@
+# Production environment configuration
+project_x_api_key: prod_api_key_secure
+project_x_username: prod_user
+project_x_api_url: https://api.topstepx.com/api
+project_x_websocket_url: wss://api.topstepx.com
+max_daily_loss: -1000.0
+max_contracts: 5
+require_stop_loss: true
+stop_loss_grace_seconds: 60
+log_level: WARNING
+log_file: /var/log/risk_manager/production.log
+enforcement_latency_target_ms: 500
+max_events_per_second: 1000
+environment: production
+debug: false

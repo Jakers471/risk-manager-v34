@@ -65,3 +65,7 @@ Thumbs.db
 risk_manager.pid
 data/
 backups/
+.venv-wsl/
+*.disabled
+test_output*.txt
+coverage_report.txt

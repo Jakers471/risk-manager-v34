@@ -1,0 +1,8 @@
+# Configuration with numbers as strings (should coerce)
+project_x_api_key: test_key
+project_x_username: test_user
+max_contracts: "15"
+max_daily_loss: "-2000.5"
+stop_loss_grace_seconds: "120"
+enforcement_latency_target_ms: "500"
+max_events_per_second: "1000"

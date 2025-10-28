@@ -1,0 +1,11 @@
+# Development environment configuration
+project_x_api_key: dev_api_key
+project_x_username: dev_user
+project_x_api_url: http://localhost:8000/api
+project_x_websocket_url: ws://localhost:8000
+max_daily_loss: -500.0
+max_contracts: 3
+require_stop_loss: false
+log_level: DEBUG
+environment: development
+debug: true

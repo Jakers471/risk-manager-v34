@@ -16,7 +16,7 @@ class TestEnforcementWiring:
 
     async def test_engine_accepts_trading_integration(self):
         """Test that RiskEngine can be initialized with trading_integration."""
-        config = RiskConfig()
+        config = RiskConfig(project_x_api_key="test", project_x_username="user")
         event_bus = EventBus()
         mock_trading = AsyncMock()
 
@@ -27,7 +27,7 @@ class TestEnforcementWiring:
 
     async def test_flatten_all_calls_trading_integration(self):
         """Test that flatten_all_positions() calls trading_integration.flatten_all()."""
-        config = RiskConfig()
+        config = RiskConfig(project_x_api_key="test", project_x_username="user")
         event_bus = EventBus()
         mock_trading = AsyncMock()
 
@@ -43,7 +43,7 @@ class TestEnforcementWiring:
 
     async def test_flatten_all_without_trading_integration(self):
         """Test that flatten_all_positions() doesn't crash without trading_integration."""
-        config = RiskConfig()
+        config = RiskConfig(project_x_api_key="test", project_x_username="user")
         event_bus = EventBus()
 
         # Create engine WITHOUT trading integration
@@ -57,7 +57,7 @@ class TestEnforcementWiring:
 
     async def test_enforcement_from_violation(self):
         """Test complete flow: violation → enforcement → SDK call."""
-        config = RiskConfig()
+        config = RiskConfig(project_x_api_key="test", project_x_username="user")
         event_bus = EventBus()
         mock_trading = AsyncMock()
 

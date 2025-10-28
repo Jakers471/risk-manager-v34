@@ -1,0 +1,11 @@
+# Configuration with comments
+# This is the API key
+project_x_api_key: test_key_with_comments  # Inline comment
+project_x_username: test_user  # Username here
+
+# Risk settings section
+max_daily_loss: -1000.0  # Daily loss limit
+max_contracts: 5  # Maximum contracts
+
+# Logging configuration
+log_level: INFO  # Default log level

@@ -27,7 +27,11 @@ class TestMaxPositionRuleUnit:
     @pytest.fixture
     def config(self):
         """Create test config."""
-        return RiskConfig(max_contracts=2)
+        return RiskConfig(
+            project_x_api_key="test_key",
+            project_x_username="test_user",
+            max_contracts=2
+        )
 
     @pytest.fixture
     def rule(self, config):

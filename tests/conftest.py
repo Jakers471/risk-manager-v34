@@ -50,6 +50,13 @@ def setup_loguru_caplog(caplog):
 # ============================================================================
 
 @pytest.fixture
+def event_bus():
+    """Real EventBus for integration tests."""
+    from risk_manager.core.events import EventBus
+    return EventBus()
+
+
+@pytest.fixture
 def mock_engine():
     """Mock RiskEngine for unit tests."""
     engine = AsyncMock()
@@ -102,7 +109,7 @@ def mock_suite_manager():
 def sample_trade_event():
     """Sample trade event for testing."""
     return RiskEvent(
-        type=EventType.TRADE_EXECUTED,
+        event_type=EventType.TRADE_EXECUTED,
         data={
             "symbol": "MNQ",
             "side": "Buy",
@@ -118,7 +125,7 @@ def sample_trade_event():
 def sample_position_event():
     """Sample position update event for testing."""
     return RiskEvent(
-        type=EventType.POSITION_UPDATED,
+        event_type=EventType.POSITION_UPDATED,
         data={
             "symbol": "MNQ",
             "quantity": 2,
@@ -134,7 +141,7 @@ def sample_position_event():
 def sample_order_event():
     """Sample order event for testing."""
     return RiskEvent(
-        type=EventType.ORDER_UPDATED,
+        event_type=EventType.ORDER_UPDATED,
         data={
             "symbol": "MNQ",
             "side": "Buy",
@@ -166,7 +173,7 @@ def sample_position():
 def losing_trade():
     """Sample losing trade."""
     return RiskEvent(
-        type=EventType.TRADE_EXECUTED,
+        event_type=EventType.TRADE_EXECUTED,
         data={
             "symbol": "MNQ",
             "realized_pnl": -150.0,  # Loss
@@ -179,7 +186,7 @@ def losing_trade():
 def winning_trade():
     """Sample winning trade."""
     return RiskEvent(
-        type=EventType.TRADE_EXECUTED,
+        event_type=EventType.TRADE_EXECUTED,
         data={
             "symbol": "MNQ",
             "realized_pnl": 100.0,  # Profit
@@ -237,7 +244,7 @@ def pytest_configure(config):
 def create_trade_event(symbol: str = "MNQ", pnl: float = -12.50) -> RiskEvent:
     """Create a trade event with custom P&L."""
     return RiskEvent(
-        type=EventType.TRADE_EXECUTED,
+        event_type=EventType.TRADE_EXECUTED,
         data={
             "symbol": symbol,
             "realized_pnl": pnl,
@@ -249,7 +256,7 @@ def create_trade_event(symbol: str = "MNQ", pnl: float = -12.50) -> RiskEvent:
 def create_position_event(symbol: str = "MNQ", quantity: int = 2) -> RiskEvent:
     """Create a position event with custom quantity."""
     return RiskEvent(
-        type=EventType.POSITION_UPDATED,
+        event_type=EventType.POSITION_UPDATED,
         data={
             "symbol": symbol,
             "quantity": quantity,

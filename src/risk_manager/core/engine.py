@@ -28,6 +28,7 @@ class RiskEngine:
         self.daily_pnl = 0.0
         self.peak_balance = 0.0
         self.current_positions: dict[str, Any] = {}
+        self.market_prices: dict[str, float] = {}  # Real-time market prices by symbol
 
         logger.info("Risk Engine initialized")
 
@@ -63,11 +64,16 @@ class RiskEngine:
         self.rules.append(rule)
         logger.info(f"Added rule: {rule.__class__.__name__}")
 
-    async def evaluate_rules(self, event: RiskEvent) -> None:
-        """Evaluate all rules against an event."""
+    async def evaluate_rules(self, event: RiskEvent) -> list[dict[str, Any]]:
+        """Evaluate all rules against an event.
+
+        Returns:
+            List of violations detected by rules. Empty list if no violations.
+        """
         # Checkpoint 6: Event received
         sdk_logger.info(f"📨 Event received: {event.event_type.value} - evaluating {len(self.rules)} rules")
 
+        violations = []
         for rule in self.rules:
             try:
                 violation = await rule.evaluate(event, self)
@@ -77,8 +83,11 @@ class RiskEngine:
 
                 if violation:
                     await self._handle_violation(rule, violation)
+                    violations.append(violation)
             except Exception as e:
                 logger.error(f"Error evaluating rule {rule.__class__.__name__}: {e}")
+
+        return violations
 
     async def _handle_violation(self, rule: Any, violation: dict[str, Any]) -> None:
         """Handle a rule violation."""
@@ -101,6 +110,12 @@ class RiskEngine:
             # Checkpoint 8: Enforcement triggered (flatten)
             sdk_logger.warning(f"⚠️ Enforcement triggered: FLATTEN ALL - Rule: {rule.__class__.__name__}")
             await self.flatten_all_positions()
+        elif action == "close_position":
+            # Checkpoint 8: Enforcement triggered (close position)
+            sdk_logger.warning(f"⚠️ Enforcement triggered: CLOSE POSITION - Rule: {rule.__class__.__name__}")
+            contract_id = violation.get("contractId")
+            symbol = violation.get("symbol")
+            await self.close_position(contract_id, symbol)
         elif action == "pause":
             # Checkpoint 8: Enforcement triggered (pause)
             sdk_logger.warning(f"⚠️ Enforcement triggered: PAUSE TRADING - Rule: {rule.__class__.__name__}")
@@ -109,6 +124,33 @@ class RiskEngine:
             # Checkpoint 8: Enforcement triggered (alert)
             sdk_logger.info(f"⚠️ Enforcement triggered: ALERT - Rule: {rule.__class__.__name__}")
             await self.send_alert(violation)
+
+    async def close_position(self, contract_id: str, symbol: str) -> None:
+        """Close a specific position."""
+        logger.warning(f"CLOSING POSITION: {symbol} ({contract_id})")
+
+        await self.event_bus.publish(
+            RiskEvent(
+                event_type=EventType.ENFORCEMENT_ACTION,
+                data={
+                    "action": "close_position",
+                    "symbol": symbol,
+                    "contractId": contract_id,
+                    "reason": "risk_rule_violation",
+                },
+                severity="warning",
+            )
+        )
+
+        # Execute enforcement via TradingIntegration
+        if self.trading_integration:
+            try:
+                await self.trading_integration.flatten_position(contract_id)
+                logger.success(f"✅ Position closed: {symbol} ({contract_id})")
+            except Exception as e:
+                logger.error(f"❌ Failed to close position {symbol}: {e}")
+        else:
+            logger.warning("⚠️ TradingIntegration not connected - enforcement not executed")
 
     async def flatten_all_positions(self) -> None:
         """Flatten all open positions."""

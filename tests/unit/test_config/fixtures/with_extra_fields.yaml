@@ -1,0 +1,11 @@
+# Configuration with extra fields (should be ignored)
+project_x_api_key: test_key
+project_x_username: test_user
+max_contracts: 10
+
+# Extra fields that don't exist in model
+unknown_field: some_value
+another_unknown: 12345
+nested_unknown:
+  field1: value1
+  field2: value2
