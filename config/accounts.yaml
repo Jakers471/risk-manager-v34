@@ -1,0 +1,4 @@
+accounts:
+- account_id: PRAC-V2-XXXXXX
+  enabled: true
+  name: Practice Account

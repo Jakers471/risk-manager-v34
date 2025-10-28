@@ -5,13 +5,13 @@ Admin CLI Entry Point for Risk Manager V34
 This is the main entry point for administrative commands.
 
 Usage:
+    admin_cli                           # Interactive menu (default)
     admin_cli --help                    # Show all commands
     admin_cli service status            # Check service status
     admin_cli config show               # Show configuration
     admin_cli rules list                # List all rules
     admin_cli lockouts list             # List active lockouts
     admin_cli status                    # Show system status
-    admin_cli logs                      # View recent logs
 
 Administrator Commands (require UAC elevation):
     admin_cli service start             # Start service
@@ -26,11 +26,10 @@ For detailed help on any command:
     admin_cli <command> --help
 
 Examples:
+    admin_cli                           # Launch interactive menu
     admin_cli service status
     admin_cli rules list
     admin_cli lockouts list
-    admin_cli logs --tail 100
-    admin_cli logs --follow
 """
 
 import sys
@@ -40,7 +39,12 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from risk_manager.cli.admin import main
-
 if __name__ == "__main__":
-    main()
+    # If no arguments provided, launch interactive menu
+    if len(sys.argv) == 1:
+        from admin_menu import main as menu_main
+        menu_main()
+    else:
+        # Otherwise use command-line interface
+        from risk_manager.cli.admin import main
+        main()

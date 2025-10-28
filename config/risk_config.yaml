@@ -1,0 +1,27 @@
+general:
+  instruments:
+  - MNQ
+  - NQ
+  - ES
+  timezone: America/Chicago
+  logging:
+    level: INFO
+    file: data/logs/risk_manager.log
+rules:
+  max_contracts:
+    enabled: true
+    limit: 5
+    count_type: net
+  daily_realized_loss:
+    enabled: true
+    limit: -500
+    reset_time: '17:00'
+    timezone: America/Chicago
+  daily_unrealized_loss:
+    enabled: true
+    limit: -750
+  session_block_outside:
+    enabled: true
+    start_time: 08:30
+    end_time: '15:00'
+    timezone: America/Chicago
