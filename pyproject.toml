@@ -47,6 +47,10 @@ ai = [
     "anthropic>=0.18.0",     # Claude API client (optional)
 ]
 
+windows = [
+    "pywin32>=306",          # Windows Service support (daemon)
+]
+
 [project.urls]
 Homepage = "https://github.com/yourusername/risk-manager-v34"
 Documentation = "https://github.com/yourusername/risk-manager-v34/docs"
