@@ -98,6 +98,9 @@ markers = [
     "integration: Integration tests",
     "slow: Slow tests",
     "ai: AI feature tests",
+    "smoke: Smoke tests - runtime wiring validation",
+    "e2e: End-to-end tests",
+    "runtime: Runtime reliability tests",
 ]
 
 [tool.coverage.run]

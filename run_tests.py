@@ -142,6 +142,14 @@ def print_menu():
     print(f"  {GREEN}[8]{RESET} Run specific test file")
     print(f"  {GREEN}[9]{RESET} Run tests matching keyword")
     print(f"  {GREEN}[0]{RESET} Run last failed tests only")
+    print(f"\n  {BOLD}Rule Smoke Tests:{RESET}")
+    print(f"  {CYAN}[m]{RESET} Run ALL rule smoke tests (27 tests, ~16s)")
+    print(f"  {CYAN}[a]{RESET} Position rules smoke (RULE-001,002,004,005)")
+    print(f"  {CYAN}[b]{RESET} P&L/Loss rules smoke (RULE-003,007,008,013)")
+    print(f"  {CYAN}[d]{RESET} Freq/Session/Misc smoke (RULE-006,009,010,011,012)")
+    print(f"\n  {BOLD}Sanity Checks:{RESET}")
+    print(f"  {CYAN}[k]{RESET} Quick sanity (auth + events, ~10s)")
+    print(f"  {CYAN}[n]{RESET} Full sanity (auth + events + logic + enforcement, ~30s)")
     print(f"\n  {BOLD}Runtime Checks:{RESET}")
     print(f"  {CYAN}[s]{RESET} Runtime SMOKE (DRY-RUN, fail-fast, 8s timeout)")
     print(f"  {CYAN}[r]{RESET} Runtime SOAK (30-60s DRY-RUN)")
@@ -628,6 +636,58 @@ def main():
             # Run last failed tests
             args = base_args + ["--lf", "tests/"]
             exit_code = run_pytest(args, "Last failed tests")
+
+        elif choice == "m":
+            # Run all rule smoke tests
+            args = base_args + [
+                "tests/smoke/",
+                "tests/unit/test_rules/test_freq_session_misc_smoke.py",
+                "-v"
+            ]
+            exit_code = run_pytest(args, "All Rule Smoke Tests (27 tests)")
+
+        elif choice == "a":
+            # Run position rules smoke tests
+            args = base_args + ["tests/smoke/test_position_rules_smoke.py", "-v"]
+            exit_code = run_pytest(args, "Position Rules Smoke Tests (RULE-001,002,004,005)")
+
+        elif choice == "b":
+            # Run P&L/Loss rules smoke tests
+            args = base_args + ["tests/smoke/test_pnl_loss_rules_smoke.py", "-v"]
+            exit_code = run_pytest(args, "P&L/Loss Rules Smoke Tests (RULE-003,007,008,013)")
+
+        elif choice == "d":
+            # Run Freq/Session/Misc rules smoke tests
+            args = base_args + ["tests/unit/test_rules/test_freq_session_misc_smoke.py", "-v"]
+            exit_code = run_pytest(args, "Freq/Session/Misc Rules Smoke Tests (RULE-006,009,010,011,012)")
+
+        elif choice == "k":
+            # Quick sanity check (auth + events)
+            print(f"\n{CYAN}{'=' * 70}{RESET}")
+            print(f"{BOLD}Running QUICK Sanity Check: Auth + Events{RESET}")
+            print(f"{CYAN}{'=' * 70}{RESET}\n")
+
+            try:
+                cmd = [sys.executable, "src/sanity/runner.py", "quick"]
+                result = subprocess.run(cmd, cwd=Path(__file__).parent)
+                exit_code = result.returncode
+            except Exception as e:
+                print(f"{RED}Error running sanity checks: {e}{RESET}")
+                exit_code = 1
+
+        elif choice == "n":
+            # Full sanity check (all 4 checks)
+            print(f"\n{CYAN}{'=' * 70}{RESET}")
+            print(f"{BOLD}Running FULL Sanity Check: Auth + Events + Logic + Enforcement{RESET}")
+            print(f"{CYAN}{'=' * 70}{RESET}\n")
+
+            try:
+                cmd = [sys.executable, "src/sanity/runner.py", "full"]
+                result = subprocess.run(cmd, cwd=Path(__file__).parent)
+                exit_code = result.returncode
+            except Exception as e:
+                print(f"{RED}Error running sanity checks: {e}{RESET}")
+                exit_code = 1
 
         elif choice == "v":
             # Toggle verbose mode

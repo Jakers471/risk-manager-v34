@@ -233,6 +233,9 @@ def pytest_configure(config):
         "markers", "integration: mark test as an integration test (slow, requires SDK)"
     )
     config.addinivalue_line(
+        "markers", "smoke: mark test as a smoke test (validates runtime enforcement)"
+    )
+    config.addinivalue_line(
         "markers", "slow: mark test as slow running"
     )
 
