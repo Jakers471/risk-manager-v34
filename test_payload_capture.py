@@ -28,8 +28,7 @@ from datetime import datetime
 from pathlib import Path
 
 from loguru import logger
-from project_x_py import TradingSuite
-from project_x_py.event import EventType as SDKEventType
+from project_x_py import TradingSuite, EventType as SDKEventType
 
 
 # Configure logger to write to both console and file
