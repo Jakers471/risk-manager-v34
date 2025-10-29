@@ -70,16 +70,22 @@ class RiskEngine:
         Returns:
             List of violations detected by rules. Empty list if no violations.
         """
-        # Checkpoint 6: Event received
-        sdk_logger.info(f"📨 Event received: {event.event_type.value} - evaluating {len(self.rules)} rules")
+        # Checkpoint 6: Event received (only log if we have rules to evaluate)
+        if len(self.rules) > 0:
+            sdk_logger.info(f"📨 Event received: {event.event_type.value} - evaluating {len(self.rules)} rules")
+        else:
+            sdk_logger.debug(f"📨 Event received: {event.event_type.value} - no rules configured")
 
         violations = []
         for rule in self.rules:
             try:
                 violation = await rule.evaluate(event, self)
 
-                # Checkpoint 7: Rule evaluated
-                sdk_logger.info(f"🔍 Rule evaluated: {rule.__class__.__name__} - {'VIOLATED' if violation else 'PASSED'}")
+                # Checkpoint 7: Rule evaluated (only log violations, not passes)
+                if violation:
+                    sdk_logger.warning(f"🔍 Rule evaluated: {rule.__class__.__name__} - VIOLATED")
+                else:
+                    sdk_logger.debug(f"🔍 Rule evaluated: {rule.__class__.__name__} - PASSED")
 
                 if violation:
                     await self._handle_violation(rule, violation)

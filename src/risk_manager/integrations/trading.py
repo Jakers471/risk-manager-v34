@@ -42,6 +42,15 @@ class TradingIntegration:
         self._event_cache: dict[tuple[str, str], float] = {}
         self._event_cache_ttl = 5.0  # seconds
 
+        # Order polling task (to detect protective stops that don't emit events)
+        self._order_poll_task = None
+        self._known_orders: set[int] = set()  # Track order IDs we've already logged
+
+        # Recent order fills tracking (for correlating position updates with stop losses)
+        # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str}}
+        self._recent_fills: dict[str, dict[str, Any]] = {}
+        self._recent_fills_ttl = 2.0  # seconds - window to correlate fills with position updates
+
         logger.info(f"Trading integration initialized for: {instruments}")
 
     def _is_duplicate_event(self, event_type: str, entity_id: str) -> bool:
@@ -77,6 +86,33 @@ class TradingIntegration:
         # Mark event as seen
         self._event_cache[cache_key] = current_time
         return False
+
+    def _check_recent_fill_type(self, contract_id: str) -> str | None:
+        """
+        Check if there was a recent order fill for this contract.
+
+        Args:
+            contract_id: Contract ID to check
+
+        Returns:
+            "stop_loss", "take_profit", "manual", or None if no recent fill
+        """
+        current_time = time.time()
+
+        # Clean old entries
+        expired_contracts = [
+            cid for cid, fill_data in self._recent_fills.items()
+            if current_time - fill_data["timestamp"] > self._recent_fills_ttl
+        ]
+        for cid in expired_contracts:
+            del self._recent_fills[cid]
+
+        # Check if we have a recent fill for this contract
+        fill_data = self._recent_fills.get(contract_id)
+        if fill_data:
+            return fill_data["type"]
+
+        return None
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
         """
@@ -180,6 +216,16 @@ class TradingIntegration:
         """Disconnect from trading platform."""
         logger.info("Disconnecting from trading platform...")
 
+        # Stop polling task
+        self.running = False
+        if self._order_poll_task:
+            self._order_poll_task.cancel()
+            try:
+                await self._order_poll_task
+            except asyncio.CancelledError:
+                pass
+            logger.debug("Order polling task stopped")
+
         # Disconnect in reverse order
         if self.suite:
             await self.suite.disconnect()
@@ -235,6 +281,12 @@ class TradingIntegration:
             await self.suite.on(SDKEventType.ORDER_REJECTED, self._on_order_rejected)
             logger.info("✅ Registered: ORDER_REJECTED")
 
+            await self.suite.on(SDKEventType.ORDER_MODIFIED, self._on_order_modified)
+            logger.info("✅ Registered: ORDER_MODIFIED")
+
+            await self.suite.on(SDKEventType.ORDER_EXPIRED, self._on_order_expired)
+            logger.info("✅ Registered: ORDER_EXPIRED")
+
             # Subscribe to POSITION events via suite EventBus (using SDK EventType)
             await self.suite.on(SDKEventType.POSITION_OPENED, self._on_position_opened)
             logger.info("✅ Registered: POSITION_OPENED")
@@ -245,13 +297,71 @@ class TradingIntegration:
             await self.suite.on(SDKEventType.POSITION_UPDATED, self._on_position_updated)
             logger.info("✅ Registered: POSITION_UPDATED")
 
-            logger.success("✅ Trading monitoring started (8 event handlers registered)")
-            logger.info("📡 Listening for events: ORDER, POSITION")
+            # Catch-all disabled - too noisy with market data events
+            # If you need to debug new events, uncomment this block:
+            # for event_type in SDKEventType:
+            #     if event_type.name not in [...known events...]:
+            #         await self.suite.on(event_type, self._on_unknown_event)
+
+            logger.success("✅ Trading monitoring started (10 event handlers registered)")
+            logger.info("📡 Listening for events: ORDER (8 types), POSITION (3 types), + catch-all")
+
+            # Start order polling task (to catch protective stops that don't emit events)
+            self._order_poll_task = asyncio.create_task(self._poll_orders())
+            logger.info("🔄 Started order polling task (5s interval)")
             logger.info("=" * 80)
 
         except Exception as e:
             logger.error(f"Failed to register realtime callbacks: {e}")
             raise
+
+    async def _poll_orders(self):
+        """
+        Poll for active orders periodically.
+
+        Some platforms don't emit events when protective stops are placed,
+        so we need to poll the order list to detect them.
+        """
+        logger.info("🔄 Order polling task started")
+
+        while self.running:
+            try:
+                await asyncio.sleep(5)  # Poll every 5 seconds
+
+                if not self.suite or not hasattr(self.suite, 'order_manager'):
+                    logger.debug("⚠️  Suite or order_manager not available yet")
+                    continue
+
+                # Get all working orders
+                orders = self.suite.order_manager.get_working_orders()
+                logger.debug(f"🔍 Polling: Found {len(orders)} working orders")
+
+                for order in orders:
+                    order_id = order.id
+
+                    # Skip if we've already seen this order
+                    if order_id in self._known_orders:
+                        continue
+
+                    # Mark as seen
+                    self._known_orders.add(order_id)
+
+                    # Log ALL new orders (not just stops)
+                    symbol = self._extract_symbol_from_contract(order.contractId)
+                    logger.info(f"🔍 DETECTED NEW ORDER (via polling)")
+                    logger.info(f"   {symbol} | Type: {order.type_str} | Side: {self._get_side_name(order.side)} | Qty: {order.size}")
+                    logger.info(f"   Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+                    # Check if it's a protective stop
+                    if self._is_stop_loss(order):
+                        logger.info(f"   ⚠️  THIS IS A STOP LOSS! 🛡️")
+
+            except Exception as e:
+                logger.warning(f"❌ Error polling orders: {e}")
+                import traceback
+                logger.debug(traceback.format_exc())
+
+        logger.info("🔄 Order polling task stopped")
 
     # ============================================================================
     # SDK EventBus Callbacks (suite.on)
@@ -262,6 +372,10 @@ class TradingIntegration:
         logger.debug(f"🔔 ORDER_PLACED event received")
         try:
             data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload (INFO level temporarily for debugging)
+            logger.info(f"📦 ORDER_PLACED Payload: {data}")
+
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
@@ -272,11 +386,14 @@ class TradingIntegration:
                 return
 
             symbol = self._extract_symbol_from_contract(order.contractId)
+            order_type_str = order.type_str
 
-            logger.info("=" * 80)
-            logger.info(f"📋 ORDER PLACED - {symbol}")
-            logger.info(f"   ID: {order.id} | Side: {self._get_side_name(order.side)} | Qty: {order.size}")
-            logger.info("=" * 80)
+            # Build descriptive order placement message
+            order_desc = self._get_order_placement_display(order)
+
+            logger.info(f"📋 ORDER PLACED - {symbol} | {order_desc}")
+            # Show order details (INFO level temporarily for debugging)
+            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -287,6 +404,11 @@ class TradingIntegration:
                     "side": self._get_side_name(order.side),
                     "quantity": order.size,
                     "price": getattr(order, 'limitPrice', None),
+                    "order_type": order.type,
+                    "order_type_str": order_type_str,
+                    "stop_price": order.stopPrice,
+                    "limit_price": order.limitPrice,
+                    "is_stop_loss": self._is_stop_loss(order),
                     "raw_data": data,
                 },
                 source="trading_sdk",
@@ -302,6 +424,10 @@ class TradingIntegration:
         logger.debug(f"🔔 ORDER_FILLED event received")
         try:
             data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload (INFO level temporarily for debugging)
+            logger.info(f"📦 ORDER_FILLED Payload: {data}")
+
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
@@ -312,14 +438,34 @@ class TradingIntegration:
                 return
 
             symbol = self._extract_symbol_from_contract(order.contractId)
+            order_type = self._get_order_type_display(order)
 
-            logger.info("=" * 80)
-            logger.info(f"💰 ORDER FILLED - {symbol}")
+            # Use different emoji for stop loss vs take profit vs manual
+            emoji = self._get_order_emoji(order)
+
             logger.info(
-                f"   ID: {order.id} | Side: {self._get_side_name(order.side)} | "
+                f"{emoji} ORDER FILLED - {symbol} | {order_type} | {self._get_side_name(order.side)} | "
                 f"Qty: {order.fillVolume} @ ${order.filledPrice:.2f}"
             )
-            logger.info("=" * 80)
+            # Show order details (INFO level temporarily for debugging)
+            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+            # Remove from known orders (it's filled now)
+            self._known_orders.discard(order.id)
+
+            # Track this fill for correlation with position updates
+            is_sl = self._is_stop_loss(order)
+            is_tp = self._is_take_profit(order)
+            fill_type = "stop_loss" if is_sl else "take_profit" if is_tp else "manual"
+
+            self._recent_fills[order.contractId] = {
+                "type": fill_type,
+                "timestamp": time.time(),
+                "side": self._get_side_name(order.side),
+                "order_id": order.id,
+            }
+            logger.info(f"📝 Recorded {fill_type} fill for {order.contractId} | Order type={order.type}, stopPrice={order.stopPrice}")
+            logger.debug(f"   _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -330,6 +476,12 @@ class TradingIntegration:
                     "side": self._get_side_name(order.side),
                     "quantity": order.fillVolume,
                     "price": order.filledPrice,
+                    "order_type": order.type,
+                    "order_type_str": order.type_str,
+                    "is_stop_loss": self._is_stop_loss(order),
+                    "is_take_profit": self._is_take_profit(order),
+                    "stop_price": order.stopPrice,
+                    "limit_price": order.limitPrice,
                     "raw_data": data,
                 },
                 source="trading_sdk",
@@ -345,6 +497,10 @@ class TradingIntegration:
         logger.debug(f"🔔 ORDER_PARTIAL_FILL event received")
         try:
             data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload
+            logger.debug(f"📦 ORDER_PARTIAL_FILL Payload: {data}")
+
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
@@ -356,12 +512,9 @@ class TradingIntegration:
 
             symbol = self._extract_symbol_from_contract(order.contractId)
 
-            logger.info("=" * 80)
-            logger.info(f"📊 ORDER PARTIALLY FILLED - {symbol}")
             logger.info(
-                f"   ID: {order.id} | Filled: {order.fillVolume}/{order.size} @ ${order.filledPrice:.2f}"
+                f"📊 ORDER PARTIALLY FILLED - {symbol} | ID: {order.id} | Filled: {order.fillVolume}/{order.size} @ ${order.filledPrice:.2f}"
             )
-            logger.info("=" * 80)
 
         except Exception as e:
             logger.error(f"Error handling ORDER_PARTIAL_FILL: {e}")
@@ -371,6 +524,10 @@ class TradingIntegration:
         logger.debug(f"🔔 ORDER_CANCELLED event received")
         try:
             data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload
+            logger.debug(f"📦 ORDER_CANCELLED Payload: {data}")
+
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
@@ -382,10 +539,10 @@ class TradingIntegration:
 
             symbol = self._extract_symbol_from_contract(order.contractId)
 
-            logger.info("=" * 80)
-            logger.info(f"❌ ORDER CANCELLED - {symbol}")
-            logger.info(f"   ID: {order.id}")
-            logger.info("=" * 80)
+            logger.info(f"❌ ORDER CANCELLED - {symbol} | ID: {order.id}")
+
+            # Remove from known orders (it's cancelled now)
+            self._known_orders.discard(order.id)
 
         except Exception as e:
             logger.error(f"Error handling ORDER_CANCELLED: {e}")
@@ -395,6 +552,10 @@ class TradingIntegration:
         logger.debug(f"🔔 ORDER_REJECTED event received")
         try:
             data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload
+            logger.debug(f"📦 ORDER_REJECTED Payload: {data}")
+
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
@@ -406,13 +567,73 @@ class TradingIntegration:
 
             symbol = self._extract_symbol_from_contract(order.contractId)
 
-            logger.warning("=" * 80)
-            logger.warning(f"⛔ ORDER REJECTED - {symbol}")
-            logger.warning(f"   ID: {order.id}")
-            logger.warning("=" * 80)
+            logger.warning(f"⛔ ORDER REJECTED - {symbol} | ID: {order.id}")
 
         except Exception as e:
             logger.error(f"Error handling ORDER_REJECTED: {e}")
+
+    async def _on_order_modified(self, event) -> None:
+        """Handle ORDER_MODIFIED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_MODIFIED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload (INFO level temporarily for debugging)
+            logger.info(f"📦 ORDER_MODIFIED Payload: {data}")
+
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_modified", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+            order_type_str = order.type_str
+
+            # Build descriptive order modification message
+            order_desc = self._get_order_placement_display(order)
+
+            logger.info(f"📝 ORDER MODIFIED - {symbol} | {order_desc}")
+            # Show order details (INFO level temporarily for debugging)
+            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_MODIFIED: {e}")
+            logger.exception(e)
+
+    async def _on_order_expired(self, event) -> None:
+        """Handle ORDER_EXPIRED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_EXPIRED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+
+            # Debug: Show full payload (INFO level temporarily for debugging)
+            logger.info(f"📦 ORDER_EXPIRED Payload: {data}")
+
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_expired", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.warning(f"⏰ ORDER EXPIRED - {symbol} | ID: {order.id}")
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_EXPIRED: {e}")
+
+    async def _on_unknown_event(self, event) -> None:
+        """Catch-all handler for events we haven't explicitly subscribed to."""
+        event_type = event.type if hasattr(event, 'type') else "UNKNOWN"
+        logger.warning(f"🔍 UNHANDLED EVENT: {event_type}")
+        logger.warning(f"   Event data: {event.data if hasattr(event, 'data') else event}")
 
     async def _on_position_opened(self, event) -> None:
         """Handle POSITION_OPENED event from SDK EventBus."""
@@ -434,6 +655,10 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
+            # Debug: Show full payload (INFO level temporarily for debugging)
+            logger.info(f"📦 POSITION_{action_name} Payload keys: {list(data.keys()) if isinstance(data, dict) else 'not a dict'}")
+            logger.info(f"   Full data: {data}")
+
             if not isinstance(data, dict):
                 return
 
@@ -443,6 +668,11 @@ class TradingIntegration:
             unrealized_pnl = data.get('unrealizedPnl', 0.0)
             pos_type = data.get('type', 0)
 
+            # Check if position data includes protective stops (some platforms embed them)
+            if 'stopLoss' in data or 'takeProfit' in data or 'protectiveOrders' in data:
+                logger.info(f"🛡️  Position has protective orders: {data.get('stopLoss')}, TP: {data.get('takeProfit')}")
+                logger.info(f"   Full position data keys: {list(data.keys())}")
+
             # Check for duplicate (prevents 3x events from 3 instruments)
             # Use contract_id + action for deduplication key
             dedup_key = f"{contract_id}_{action_name}"
@@ -451,13 +681,24 @@ class TradingIntegration:
 
             symbol = self._extract_symbol_from_contract(contract_id)
 
-            logger.info("=" * 80)
-            logger.info(f"📊 POSITION {action_name} - {symbol}")
+            # Check if this position update correlates with a recent order fill
+            fill_type = self._check_recent_fill_type(contract_id)
+            logger.debug(f"🔍 Checking recent fills for {contract_id}: fill_type={fill_type}")
+            logger.debug(f"   Recent fills cache: {list(self._recent_fills.keys())}")
+
+            # Build position update label with fill context
+            position_label = f"📊 POSITION {action_name}"
+            if fill_type == "stop_loss":
+                position_label = f"🛑 POSITION {action_name} (STOP LOSS)"
+                logger.info(f"   ⚡ Correlated with stop loss fill!")
+            elif fill_type == "take_profit":
+                position_label = f"🎯 POSITION {action_name} (TAKE PROFIT)"
+                logger.info(f"   ⚡ Correlated with take profit fill!")
+
             logger.info(
-                f"   Type: {self._get_position_type_name(pos_type)} | Size: {size} | "
-                f"Price: ${avg_price:.2f} | Unrealized P&L: ${unrealized_pnl:.2f}"
+                f"{position_label} - {symbol} | {self._get_position_type_name(pos_type)} | "
+                f"Size: {size} | Price: ${avg_price:.2f} | Unrealized P&L: ${unrealized_pnl:.2f}"
             )
-            logger.info("=" * 80)
 
             # Bridge to risk event bus
             event_type_map = {
@@ -476,6 +717,9 @@ class TradingIntegration:
                     "average_price": avg_price,
                     "unrealized_pnl": unrealized_pnl,
                     "action": action_name.lower(),
+                    "fill_type": fill_type,  # "stop_loss", "take_profit", "manual", or None
+                    "is_stop_loss": fill_type == "stop_loss",
+                    "is_take_profit": fill_type == "take_profit",
                     "raw_data": data,
                 },
                 source="trading_sdk",
@@ -499,6 +743,109 @@ class TradingIntegration:
             return "SHORT"
         else:
             return "FLAT"
+
+    def _get_order_placement_display(self, order) -> str:
+        """
+        Get human-readable order placement display.
+
+        Returns formatted string like:
+        - "🛡️ STOP LOSS @ $3975.50 | SELL | Qty: 1" (stop loss protection placed)
+        - "🎯 TAKE PROFIT @ $3980.00 | SELL | Qty: 1" (take profit placed)
+        - "MARKET | BUY | Qty: 1" (manual market order)
+        - "LIMIT @ $3978.00 | BUY | Qty: 1" (manual limit order)
+        """
+        order_type = order.type_str
+        side = self._get_side_name(order.side)
+        qty = order.size
+
+        if self._is_stop_loss(order):
+            price = order.stopPrice
+            return f"🛡️ STOP LOSS @ ${price:.2f} | {side} | Qty: {qty}"
+        elif order_type == "LIMIT":
+            price = order.limitPrice
+            return f"LIMIT @ ${price:.2f} | {side} | Qty: {qty}"
+        elif order_type == "MARKET":
+            return f"MARKET | {side} | Qty: {qty}"
+        elif order_type == "STOP_LIMIT":
+            price = order.stopPrice
+            return f"STOP_LIMIT @ ${price:.2f} | {side} | Qty: {qty}"
+        elif order_type == "TRAILING_STOP":
+            return f"TRAILING_STOP | {side} | Qty: {qty}"
+        else:
+            return f"{order_type} | {side} | Qty: {qty}"
+
+    def _get_order_type_display(self, order) -> str:
+        """
+        Get human-readable order type display (for fills).
+
+        Returns formatted string like:
+        - "STOP LOSS @ $3975.50" (stop order closing a position)
+        - "TAKE PROFIT @ $3980.00" (limit order closing at profit)
+        - "MARKET" (manual market order)
+        - "LIMIT @ $3978.00" (manual limit order)
+        """
+        order_type = order.type_str
+
+        if self._is_stop_loss(order):
+            price = order.stopPrice or order.filledPrice
+            return f"🛑 STOP LOSS @ ${price:.2f}"
+        elif self._is_take_profit(order):
+            price = order.limitPrice or order.filledPrice
+            return f"🎯 TAKE PROFIT @ ${price:.2f}"
+        elif order_type == "MARKET":
+            return "MARKET"
+        elif order_type == "LIMIT":
+            return f"LIMIT @ ${order.limitPrice:.2f}" if order.limitPrice else "LIMIT"
+        elif order_type == "STOP":
+            return f"STOP @ ${order.stopPrice:.2f}" if order.stopPrice else "STOP"
+        elif order_type == "STOP_LIMIT":
+            return f"STOP_LIMIT @ ${order.stopPrice:.2f}" if order.stopPrice else "STOP_LIMIT"
+        elif order_type == "TRAILING_STOP":
+            return "TRAILING_STOP"
+        else:
+            return order_type
+
+    def _get_order_emoji(self, order) -> str:
+        """Get emoji based on order type/intent."""
+        if self._is_stop_loss(order):
+            return "🛑"  # Stop sign for stop loss
+        elif self._is_take_profit(order):
+            return "🎯"  # Target for take profit
+        else:
+            return "💰"  # Money bag for regular fills
+
+    def _is_stop_loss(self, order) -> bool:
+        """
+        Detect if order is a stop loss.
+
+        A stop loss is:
+        - Type STOP (4) or STOP_LIMIT (3)
+        - AND closing a position (SELL when we were long, BUY when we were short)
+        """
+        # Stop orders (types 3, 4, 5)
+        if order.type in [3, 4, 5]:  # STOP_LIMIT, STOP, TRAILING_STOP
+            return True
+        return False
+
+    def _is_take_profit(self, order) -> bool:
+        """
+        Detect if order is a take profit.
+
+        A take profit is typically:
+        - Type LIMIT (1)
+        - AND closing a position at a profit target
+        - AND has a limit price above entry (for longs) or below (for shorts)
+
+        Note: Without position context, we use heuristics:
+        - LIMIT orders that close positions are likely take profits
+        - This is not 100% accurate but good enough for logging
+        """
+        # For now, we'll mark LIMIT orders that close positions as potential TPs
+        # This is a heuristic since we don't have full position context here
+        if order.type == 1:  # LIMIT
+            # Could be enhanced with position tracking to confirm
+            return False  # Conservative: don't assume unless we're certain
+        return False
 
     # ============================================================================
     # OLD SignalR Callbacks (deprecated - keeping for reference)

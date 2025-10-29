@@ -45,11 +45,11 @@ CHECKPOINT_NAMES = {
 
 def _filter_sdk_noise(record: dict) -> bool:
     """
-    Filter out known SDK internal errors that don't affect functionality.
+    Filter out known SDK internal errors and verbose logs.
 
-    The Project-X SDK has internal order tracking components that try to
-    deserialize order data with a 'fills' field, but the Order model doesn't
-    accept this parameter. This causes harmless error messages.
+    The Project-X SDK has internal components that generate noisy logs:
+    1. Order tracking errors (harmless 'fills' field issue)
+    2. Position manager logs (duplicate "Position closed" messages)
 
     Args:
         record: Log record to filter
@@ -59,10 +59,21 @@ def _filter_sdk_noise(record: dict) -> bool:
     """
     message = record.get("message", "")
 
+    # Get logger name if available
+    logger_name = record.get("name", "")
+
     # Suppress SDK's Order.__init__() errors (harmless SDK internal issue)
     if "Failed to create Order object" in message:
         return False
     if "Order.__init__() got an unexpected keyword argument 'fills'" in message:
+        return False
+
+    # Suppress SDK position manager logs (we have our own position tracking)
+    if "project_x_py.position_manager" in logger_name:
+        return False
+
+    # Suppress duplicate "Position closed" messages from SDK
+    if "Position closed:" in message and "CON.F.US." in message:
         return False
 
     # Keep all other logs

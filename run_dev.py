@@ -27,9 +27,11 @@ Security:
 
 import argparse
 import asyncio
+import os
 import signal
 import sys
 from pathlib import Path
+from contextlib import contextmanager
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -41,6 +43,35 @@ load_dotenv()
 from rich.console import Console
 
 console = Console()
+
+
+@contextmanager
+def suppress_sdk_stderr():
+    """Temporarily suppress SDK stderr messages (known harmless errors)."""
+    # Save original stderr
+    original_stderr = sys.stderr
+
+    # Create a filtering stderr that drops SDK noise
+    class FilteredStderr:
+        def write(self, text):
+            # Drop known SDK noise
+            if "Failed to create Order object" in text:
+                return
+            if "Order.__init__() got an unexpected keyword argument 'fills'" in text:
+                return
+            # Pass through everything else
+            original_stderr.write(text)
+
+        def flush(self):
+            original_stderr.flush()
+
+    # Replace stderr temporarily
+    sys.stderr = FilteredStderr()
+    try:
+        yield
+    finally:
+        # Restore original stderr
+        sys.stderr = original_stderr
 
 
 async def main():
@@ -89,6 +120,12 @@ async def main():
             log_file="data/logs/risk_manager.log",
             colorize=True,
         )
+
+        # Show what log level is active
+        from loguru import logger
+        logger.info(f"🎛️  Console Log Level: {args.log_level.upper()}")
+        if args.log_level != "DEBUG":
+            logger.info("💡 Tip: Use --log-level DEBUG to see detailed order payloads")
 
         cp1(details={"version": "1.0.0-dev", "mode": "development"})
 
@@ -175,6 +212,14 @@ async def main():
         risk_manager.trading_integration = trading_integration
         risk_manager.engine.trading_integration = trading_integration
 
+        # Suppress verbose SDK logs (do this AFTER SDK is initialized)
+        import logging
+        for logger_name in ["project_x_py", "project_x_py.position_manager", "project_x_py.position_manager.core"]:
+            sdk_log = logging.getLogger(logger_name)
+            sdk_log.handlers = []  # Remove JSON formatter
+            sdk_log.propagate = True  # Let logs go through our filter
+            sdk_log.setLevel(logging.WARNING)  # Only show warnings
+
         console.print("[green]Connected to TopstepX API![/green]")
 
     except Exception as e:
@@ -257,7 +302,9 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        # Suppress known SDK stderr noise during execution
+        with suppress_sdk_stderr():
+            asyncio.run(main())
     except KeyboardInterrupt:
         console.print()
         console.print("[yellow]Development runtime cancelled by user[/yellow]")
