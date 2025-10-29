@@ -167,9 +167,12 @@ class TradingIntegration:
 
         return None
 
-    def get_stop_loss_for_position(self, contract_id: str) -> dict[str, Any] | None:
+    async def get_stop_loss_for_position(self, contract_id: str) -> dict[str, Any] | None:
         """
         Get the active stop loss order for a position.
+
+        First checks cache, then queries SDK if cache is empty.
+        This handles cases where ORDER_PLACED doesn't fire for broker-UI stops.
 
         Args:
             contract_id: Contract ID of the position
@@ -178,7 +181,13 @@ class TradingIntegration:
             Stop loss data dict or None if no active stop loss
             Dict format: {"order_id": int, "stop_price": float, "side": str, "quantity": int, "timestamp": float}
         """
-        return self._active_stop_losses.get(contract_id)
+        # Check cache first (fast path)
+        cached = self._active_stop_losses.get(contract_id)
+        if cached:
+            return cached
+
+        # Cache miss - query SDK (handles broker-UI stops that don't emit ORDER_PLACED)
+        return await self._query_sdk_for_stop_loss(contract_id)
 
     def get_take_profit_for_position(self, contract_id: str) -> dict[str, Any] | None:
         """
@@ -210,6 +219,102 @@ class TradingIntegration:
             Dict mapping contract_id to take profit data
         """
         return self._active_take_profits.copy()
+
+    async def _query_sdk_for_stop_loss(self, contract_id: str) -> dict[str, Any] | None:
+        """
+        Query SDK directly for stop loss orders (bypasses cache).
+
+        This is called when cache is empty. Handles broker-UI stops that
+        don't emit ORDER_PLACED events.
+
+        This is NOT polling - only called on-demand when position events fire.
+
+        Args:
+            contract_id: Contract ID to query
+
+        Returns:
+            Stop loss data dict or None if no stop found
+        """
+        logger.info(f"🔍 SDK QUERY: Checking for stops on {contract_id}...")
+
+        if not self.suite:
+            logger.warning(f"   ❌ No suite available")
+            return None
+
+        # Debug: Show what attributes suite has
+        logger.info(f"   Suite type: {type(self.suite)}")
+        logger.info(f"   Suite attributes: {[a for a in dir(self.suite) if not a.startswith('_')][:20]}")
+
+        # TradingSuite is dict-like with instrument managers
+        # We need to query orders from the client or iterate instruments
+
+        try:
+            # Get symbol from contract_id to find the right instrument
+            symbol = self._extract_symbol_from_contract(contract_id)
+            logger.info(f"   Symbol: {symbol}")
+
+            # Get the instrument manager for this symbol
+            if symbol not in self.suite:
+                logger.warning(f"   ❌ Symbol {symbol} not in suite")
+                return None
+
+            instrument = self.suite[symbol]
+            if not hasattr(instrument, 'orders'):
+                logger.error(f"   ❌ Instrument has no orders attribute")
+                return None
+
+            # Debug: Show all available methods on orders
+            orders_obj = instrument.orders
+            logger.info(f"   Orders object type: {type(orders_obj)}")
+            order_methods = [m for m in dir(orders_obj) if not m.startswith('_') and callable(getattr(orders_obj, m))]
+            logger.info(f"   Available order methods: {order_methods}")
+
+            # Try get_position_orders first
+            working_orders = await instrument.orders.get_position_orders(contract_id)
+            logger.info(f"   ✅ get_position_orders returned {len(working_orders)} orders for {contract_id}")
+
+            # If empty, try search_open_orders - queries broker API for ALL orders
+            if len(working_orders) == 0 and hasattr(orders_obj, 'search_open_orders'):
+                logger.info(f"   Trying search_open_orders (queries broker API)...")
+                all_orders = await orders_obj.search_open_orders()
+                logger.info(f"   search_open_orders returned {len(all_orders)} orders from broker")
+
+                # Filter for this contract
+                working_orders = [o for o in all_orders if o.contractId == contract_id]
+                logger.info(f"   Filtered to {len(working_orders)} orders for {contract_id}")
+
+            # Find stop loss orders for this contract
+            stops_for_contract = []
+            for order in working_orders:
+                if order.contractId == contract_id:
+                    logger.info(f"   Order on {contract_id}: type={order.type} ({order.type_str}), stopPrice={order.stopPrice}")
+
+                    # Check if it's a stop type (3=STOP_LIMIT, 4=STOP, 5=TRAILING_STOP)
+                    if order.type in [3, 4, 5]:
+                        # Found a stop! Cache it and return
+                        stop_data = {
+                            "order_id": order.id,
+                            "stop_price": order.stopPrice,
+                            "side": self._get_side_name(order.side),
+                            "quantity": order.size,
+                            "timestamp": time.time(),
+                        }
+
+                        # Update cache so next query is faster
+                        self._active_stop_losses[contract_id] = stop_data
+
+                        logger.info(f"   ✅ FOUND stop loss @ ${order.stopPrice}")
+                        return stop_data
+
+            # No stop found
+            logger.warning(f"   ❌ No stop loss orders found for {contract_id}")
+            return None
+
+        except Exception as e:
+            logger.error(f"❌ Error querying SDK for stops: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
         """
@@ -425,12 +530,28 @@ class TradingIntegration:
             try:
                 await asyncio.sleep(5)  # Poll every 5 seconds
 
-                if not self.suite or not hasattr(self.suite, 'order_manager'):
-                    logger.debug("⚠️  Suite or order_manager not available yet")
+                if not self.suite:
+                    logger.debug("⚠️  Suite not available yet")
                     continue
 
-                # Get all working orders
-                orders = self.suite.order_manager.get_working_orders()
+                # Get all working orders from all instruments
+                # Note: get_position_orders() requires contract_id, so we need to get positions first
+                orders = []
+                for symbol, instrument in self.suite.items():
+                    if not hasattr(instrument, 'positions') or not hasattr(instrument, 'orders'):
+                        continue
+
+                    # Get all positions for this instrument
+                    try:
+                        positions = await instrument.positions.get_all_positions()
+                        for position in positions:
+                            # Get orders for this position's contract (needs await)
+                            position_orders = await instrument.orders.get_position_orders(position.contractId)
+                            orders.extend(position_orders)
+                    except Exception as e:
+                        logger.debug(f"Error getting orders for {symbol}: {e}")
+                        continue
+
                 logger.debug(f"🔍 Polling: Found {len(orders)} working orders")
 
                 for order in orders:
@@ -492,17 +613,17 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
-            # Debug: Show full payload (INFO level temporarily for debugging)
-            logger.info(f"📦 ORDER_PLACED Payload: {data}")
-
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
                 return
 
-            # Check for duplicate (prevents 3x events from 3 instruments)
+            # Check for duplicate FIRST (prevents 3x events from 3 instruments)
             if self._is_duplicate_event("order_placed", str(order.id)):
                 return
+
+            # Debug: Show payload AFTER dedup (only for unique events)
+            logger.debug(f"📦 ORDER_PLACED Payload: order_id={order.id}, type={order.type}, stopPrice={order.stopPrice}")
 
             symbol = self._extract_symbol_from_contract(order.contractId)
             order_type_str = order.type_str
@@ -566,17 +687,17 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
-            # Debug: Show full payload (INFO level temporarily for debugging)
-            logger.info(f"📦 ORDER_FILLED Payload: {data}")
-
             order = data.get('order') if isinstance(data, dict) else None
 
             if not order:
                 return
 
-            # Check for duplicate (prevents 3x events from 3 instruments)
+            # Check for duplicate FIRST (prevents 3x events from 3 instruments)
             if self._is_duplicate_event("order_filled", str(order.id)):
                 return
+
+            # Debug: Show payload AFTER dedup (only for unique events)
+            logger.debug(f"📦 ORDER_FILLED Payload: order_id={order.id}, type={order.type}, stopPrice={order.stopPrice}")
 
             symbol = self._extract_symbol_from_contract(order.contractId)
             order_type = self._get_order_type_display(order)
@@ -816,10 +937,6 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
-            # Debug: Show full payload (INFO level temporarily for debugging)
-            logger.info(f"📦 POSITION_{action_name} Payload keys: {list(data.keys()) if isinstance(data, dict) else 'not a dict'}")
-            logger.info(f"   Full data: {data}")
-
             if not isinstance(data, dict):
                 return
 
@@ -829,16 +946,18 @@ class TradingIntegration:
             unrealized_pnl = data.get('unrealizedPnl', 0.0)
             pos_type = data.get('type', 0)
 
-            # Check if position data includes protective stops (some platforms embed them)
-            if 'stopLoss' in data or 'takeProfit' in data or 'protectiveOrders' in data:
-                logger.info(f"🛡️  Position has protective orders: {data.get('stopLoss')}, TP: {data.get('takeProfit')}")
-                logger.info(f"   Full position data keys: {list(data.keys())}")
-
-            # Check for duplicate (prevents 3x events from 3 instruments)
+            # Check for duplicate FIRST (prevents 3x events from 3 instruments)
             # Use contract_id + action for deduplication key
             dedup_key = f"{contract_id}_{action_name}"
             if self._is_duplicate_event(f"position_{action_name.lower()}", dedup_key):
                 return
+
+            # Debug: Show payload AFTER dedup (only for unique events)
+            logger.debug(f"📦 POSITION_{action_name} Payload keys: {list(data.keys())}")
+
+            # Check if position data includes protective stops (some platforms embed them)
+            if 'stopLoss' in data or 'takeProfit' in data or 'protectiveOrders' in data:
+                logger.info(f"🛡️  Position has protective orders: SL={data.get('stopLoss')}, TP={data.get('takeProfit')}")
 
             symbol = self._extract_symbol_from_contract(contract_id)
 
@@ -863,9 +982,12 @@ class TradingIntegration:
 
             # Show active stop loss/take profit for this position (if any)
             if action_name in ["OPENED", "UPDATED"]:
-                stop_loss = self.get_stop_loss_for_position(contract_id)
+                logger.debug(f"🔍 Checking for stop loss on {contract_id}...")
+                stop_loss = await self.get_stop_loss_for_position(contract_id)
                 if stop_loss:
                     logger.info(f"  └─ 🛡️ Active Stop Loss: ${stop_loss['stop_price']:.2f} (Order ID: {stop_loss['order_id']})")
+                else:
+                    logger.warning(f"  └─ ⚠️ NO STOP LOSS for this position!")
 
                 take_profit = self.get_take_profit_for_position(contract_id)
                 if take_profit:
@@ -879,7 +1001,9 @@ class TradingIntegration:
             }
 
             # Get active stop loss/take profit data for this position
-            stop_loss = self.get_stop_loss_for_position(contract_id)
+            # Note: We already queried this above for logging, but query again for event data
+            # (could optimize by reusing the result)
+            stop_loss_for_event = await self.get_stop_loss_for_position(contract_id)
             take_profit = self.get_take_profit_for_position(contract_id)
 
             risk_event = RiskEvent(
@@ -895,7 +1019,7 @@ class TradingIntegration:
                     "fill_type": fill_type,  # "stop_loss", "take_profit", "manual", or None
                     "is_stop_loss": fill_type == "stop_loss",
                     "is_take_profit": fill_type == "take_profit",
-                    "stop_loss": stop_loss,  # Active stop loss order data (or None)
+                    "stop_loss": stop_loss_for_event,  # Active stop loss order data (or None)
                     "take_profit": take_profit,  # Active take profit order data (or None)
                     "raw_data": data,
                 },
