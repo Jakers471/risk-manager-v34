@@ -1,4 +1,49 @@
-"""Trading integration using Project-X-Py SDK."""
+"""
+Trading integration using Project-X-Py SDK.
+
+Stop Loss Cache System
+======================
+
+This module caches active stop loss and take profit orders to enable querying them
+BEFORE they execute. This is critical for risk management.
+
+Example Usage:
+    # Get stop loss for a specific position
+    stop_loss = trading_integration.get_stop_loss_for_position("CON.F.US.MNQ.Z25")
+    if stop_loss:
+        print(f"Stop @ ${stop_loss['stop_price']}")  # e.g., "Stop @ $26242.25"
+        print(f"Order ID: {stop_loss['order_id']}")
+        print(f"Side: {stop_loss['side']}")  # e.g., "SELL"
+        print(f"Qty: {stop_loss['quantity']}")
+
+    # Get all active stop losses across all positions
+    all_stops = trading_integration.get_all_active_stop_losses()
+    for contract_id, stop_data in all_stops.items():
+        print(f"{contract_id} has stop @ ${stop_data['stop_price']}")
+
+    # Check in risk rules
+    # Example: Validate stop loss meets minimum distance requirement
+    stop = trading_integration.get_stop_loss_for_position(contract_id)
+    if not stop:
+        return RuleEvaluation(
+            passed=False,
+            message="Position has no stop loss!",
+            severity="CRITICAL"
+        )
+
+    if abs(position_price - stop['stop_price']) < minimum_distance:
+        return RuleEvaluation(
+            passed=False,
+            message=f"Stop loss too close: {abs(position_price - stop['stop_price'])} < {minimum_distance}",
+            severity="CRITICAL"
+        )
+
+Workflow:
+    1. Stop loss order placed → Cached in `_active_stop_losses`
+    2. Position opened/updated → Query cache to show active stops
+    3. Stop loss fills → Removed from cache
+    4. Stop loss cancelled → Removed from cache
+"""
 
 import asyncio
 import os
@@ -50,6 +95,14 @@ class TradingIntegration:
         # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str}}
         self._recent_fills: dict[str, dict[str, Any]] = {}
         self._recent_fills_ttl = 2.0  # seconds - window to correlate fills with position updates
+
+        # Active stop loss cache (tracks WORKING stop orders before they fill)
+        # Format: {contract_id: {"order_id": int, "stop_price": float, "side": str, "quantity": int, "timestamp": float}}
+        # This allows us to query "What's the stop loss for this position?" BEFORE it gets hit
+        self._active_stop_losses: dict[str, dict[str, Any]] = {}
+
+        # Active take profit cache (tracks WORKING limit orders before they fill)
+        self._active_take_profits: dict[str, dict[str, Any]] = {}
 
         logger.info(f"Trading integration initialized for: {instruments}")
 
@@ -113,6 +166,50 @@ class TradingIntegration:
             return fill_data["type"]
 
         return None
+
+    def get_stop_loss_for_position(self, contract_id: str) -> dict[str, Any] | None:
+        """
+        Get the active stop loss order for a position.
+
+        Args:
+            contract_id: Contract ID of the position
+
+        Returns:
+            Stop loss data dict or None if no active stop loss
+            Dict format: {"order_id": int, "stop_price": float, "side": str, "quantity": int, "timestamp": float}
+        """
+        return self._active_stop_losses.get(contract_id)
+
+    def get_take_profit_for_position(self, contract_id: str) -> dict[str, Any] | None:
+        """
+        Get the active take profit order for a position.
+
+        Args:
+            contract_id: Contract ID of the position
+
+        Returns:
+            Take profit data dict or None if no active take profit
+            Dict format: {"order_id": int, "limit_price": float, "side": str, "quantity": int, "timestamp": float}
+        """
+        return self._active_take_profits.get(contract_id)
+
+    def get_all_active_stop_losses(self) -> dict[str, dict[str, Any]]:
+        """
+        Get all active stop loss orders across all positions.
+
+        Returns:
+            Dict mapping contract_id to stop loss data
+        """
+        return self._active_stop_losses.copy()
+
+    def get_all_active_take_profits(self) -> dict[str, dict[str, Any]]:
+        """
+        Get all active take profit orders across all positions.
+
+        Returns:
+            Dict mapping contract_id to take profit data
+        """
+        return self._active_take_profits.copy()
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
         """
@@ -352,9 +449,31 @@ class TradingIntegration:
                     logger.info(f"   {symbol} | Type: {order.type_str} | Side: {self._get_side_name(order.side)} | Qty: {order.size}")
                     logger.info(f"   Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
-                    # Check if it's a protective stop
+                    # Check if it's a protective stop and cache it
                     if self._is_stop_loss(order):
                         logger.info(f"   ⚠️  THIS IS A STOP LOSS! 🛡️")
+                        # Cache it (if not already cached)
+                        if order.contractId not in self._active_stop_losses:
+                            self._active_stop_losses[order.contractId] = {
+                                "order_id": order.id,
+                                "stop_price": order.stopPrice,
+                                "side": self._get_side_name(order.side),
+                                "quantity": order.size,
+                                "timestamp": time.time(),
+                            }
+                            logger.info(f"   └─ 🛡️ Cached stop loss: {order.contractId} → SL @ ${order.stopPrice}")
+
+                    # Check if it's a take profit and cache it
+                    if self._is_take_profit(order):
+                        if order.contractId not in self._active_take_profits:
+                            self._active_take_profits[order.contractId] = {
+                                "order_id": order.id,
+                                "limit_price": order.limitPrice,
+                                "side": self._get_side_name(order.side),
+                                "quantity": order.size,
+                                "timestamp": time.time(),
+                            }
+                            logger.info(f"   └─ 🎯 Cached take profit: {order.contractId} → TP @ ${order.limitPrice}")
 
             except Exception as e:
                 logger.warning(f"❌ Error polling orders: {e}")
@@ -394,6 +513,28 @@ class TradingIntegration:
             logger.info(f"📋 ORDER PLACED - {symbol} | {order_desc}")
             # Show order details (INFO level temporarily for debugging)
             logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+            # Cache active stop losses (so we can query them before they fill)
+            if self._is_stop_loss(order):
+                self._active_stop_losses[order.contractId] = {
+                    "order_id": order.id,
+                    "stop_price": order.stopPrice,
+                    "side": self._get_side_name(order.side),
+                    "quantity": order.size,
+                    "timestamp": time.time(),
+                }
+                logger.info(f"  └─ 🛡️ Cached stop loss: {order.contractId} → SL @ ${order.stopPrice}")
+
+            # Cache active take profits
+            if self._is_take_profit(order):
+                self._active_take_profits[order.contractId] = {
+                    "order_id": order.id,
+                    "limit_price": order.limitPrice,
+                    "side": self._get_side_name(order.side),
+                    "quantity": order.size,
+                    "timestamp": time.time(),
+                }
+                logger.info(f"  └─ 🎯 Cached take profit: {order.contractId} → TP @ ${order.limitPrice}")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -466,6 +607,15 @@ class TradingIntegration:
             }
             logger.info(f"📝 Recorded {fill_type} fill for {order.contractId} | Order type={order.type}, stopPrice={order.stopPrice}")
             logger.debug(f"   _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
+
+            # Remove from active caches (order is now filled)
+            if is_sl and order.contractId in self._active_stop_losses:
+                del self._active_stop_losses[order.contractId]
+                logger.info(f"  └─ 🛡️ Removed stop loss from cache (filled)")
+
+            if is_tp and order.contractId in self._active_take_profits:
+                del self._active_take_profits[order.contractId]
+                logger.info(f"  └─ 🎯 Removed take profit from cache (filled)")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -543,6 +693,17 @@ class TradingIntegration:
 
             # Remove from known orders (it's cancelled now)
             self._known_orders.discard(order.id)
+
+            # Remove from active caches (order is now cancelled)
+            if order.contractId in self._active_stop_losses:
+                if self._active_stop_losses[order.contractId]["order_id"] == order.id:
+                    del self._active_stop_losses[order.contractId]
+                    logger.info(f"  └─ 🛡️ Removed stop loss from cache (cancelled)")
+
+            if order.contractId in self._active_take_profits:
+                if self._active_take_profits[order.contractId]["order_id"] == order.id:
+                    del self._active_take_profits[order.contractId]
+                    logger.info(f"  └─ 🎯 Removed take profit from cache (cancelled)")
 
         except Exception as e:
             logger.error(f"Error handling ORDER_CANCELLED: {e}")
@@ -700,12 +861,26 @@ class TradingIntegration:
                 f"Size: {size} | Price: ${avg_price:.2f} | Unrealized P&L: ${unrealized_pnl:.2f}"
             )
 
+            # Show active stop loss/take profit for this position (if any)
+            if action_name in ["OPENED", "UPDATED"]:
+                stop_loss = self.get_stop_loss_for_position(contract_id)
+                if stop_loss:
+                    logger.info(f"  └─ 🛡️ Active Stop Loss: ${stop_loss['stop_price']:.2f} (Order ID: {stop_loss['order_id']})")
+
+                take_profit = self.get_take_profit_for_position(contract_id)
+                if take_profit:
+                    logger.info(f"  └─ 🎯 Active Take Profit: ${take_profit['limit_price']:.2f} (Order ID: {take_profit['order_id']})")
+
             # Bridge to risk event bus
             event_type_map = {
                 "OPENED": EventType.POSITION_UPDATED,
                 "CLOSED": EventType.POSITION_UPDATED,
                 "UPDATED": EventType.POSITION_UPDATED,
             }
+
+            # Get active stop loss/take profit data for this position
+            stop_loss = self.get_stop_loss_for_position(contract_id)
+            take_profit = self.get_take_profit_for_position(contract_id)
 
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
@@ -720,6 +895,8 @@ class TradingIntegration:
                     "fill_type": fill_type,  # "stop_loss", "take_profit", "manual", or None
                     "is_stop_loss": fill_type == "stop_loss",
                     "is_take_profit": fill_type == "take_profit",
+                    "stop_loss": stop_loss,  # Active stop loss order data (or None)
+                    "take_profit": take_profit,  # Active take profit order data (or None)
                     "raw_data": data,
                 },
                 source="trading_sdk",
