@@ -169,6 +169,78 @@ def sample_position():
     }
 
 
+# ============================================================================
+# Contract Fixtures
+# ============================================================================
+
+@pytest.fixture
+def contract_mnq():
+    """Micro E-mini Nasdaq-100 (MNQ) contract"""
+    return {
+        "id": "CON.F.US.MNQ.U25",
+        "symbol_id": "MNQ",
+        "name": "Micro E-mini Nasdaq-100 Jun 2025",
+        "exchange": "CME",
+        "tick_size": 0.25,
+        "tick_value": 0.50,
+        "point_value": 2.00,
+        "expiration": "2025-06-20",
+        "currency": "USD",
+        "cached_at": "2025-01-17T08:00:00Z"
+    }
+
+
+@pytest.fixture
+def contract_es():
+    """E-mini S&P 500 (ES) contract"""
+    return {
+        "id": "CON.F.US.ES.H25",
+        "symbol_id": "ES",
+        "name": "E-mini S&P 500 Mar 2025",
+        "exchange": "CME",
+        "tick_size": 0.25,
+        "tick_value": 12.50,
+        "point_value": 50.00,
+        "expiration": "2025-03-21",
+        "currency": "USD",
+        "cached_at": "2025-01-17T08:00:00Z"
+    }
+
+
+@pytest.fixture
+def contract_nq():
+    """E-mini Nasdaq-100 (NQ) contract"""
+    return {
+        "id": "CON.F.US.NQ.H25",
+        "symbol_id": "NQ",
+        "name": "E-mini Nasdaq-100 Mar 2025",
+        "exchange": "CME",
+        "tick_size": 0.25,
+        "tick_value": 5.00,
+        "point_value": 20.00,
+        "expiration": "2025-03-21",
+        "currency": "USD",
+        "cached_at": "2025-01-17T08:00:00Z"
+    }
+
+
+@pytest.fixture
+def contract_mes():
+    """Micro E-mini S&P 500 (MES) contract"""
+    return {
+        "id": "CON.F.US.MES.H25",
+        "symbol_id": "MES",
+        "name": "Micro E-mini S&P 500 Mar 2025",
+        "exchange": "CME",
+        "tick_size": 0.25,
+        "tick_value": 1.25,
+        "point_value": 5.00,
+        "expiration": "2025-03-21",
+        "currency": "USD",
+        "cached_at": "2025-01-17T08:00:00Z"
+    }
+
+
 @pytest.fixture
 def losing_trade():
     """Sample losing trade."""

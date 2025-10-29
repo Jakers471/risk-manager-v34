@@ -1420,13 +1420,25 @@ class RuleTester:
         violations = []
         test_contract_id = "CON.F.US.MNQ.U25"
 
-        # Mock engine
+        # Create proper async mock that accepts self parameter
+        # (type() creates bound methods that receive self as first arg)
+        async def mock_close_position(self, symbol: str, contract_id: str) -> dict:
+            """Proper async mock that returns expected dict.
+
+            Args:
+                self: The executor instance (auto-passed by Python)
+                symbol: Trading symbol
+                contract_id: Contract identifier
+            """
+            return {"success": True}
+
+        # Mock engine with proper method binding
         from risk_manager.core.engine import RiskEngine
         mock_engine = type('MockEngine', (), {
             'current_positions': {},
             'market_prices': {},
             'enforcement_executor': type('MockExecutor', (), {
-                'close_position': lambda symbol, contract_id: asyncio.sleep(0)
+                'close_position': mock_close_position
             })()
         })()
 
@@ -1466,6 +1478,10 @@ class RuleTester:
 
         # Manually check timers (this would normally happen in background task)
         await timer_manager.check_timers()
+
+        # NOTE: The mock_close_position function now has correct signature (symbol, contract_id)
+        # This prevents "lambda() takes 2 positional arguments but 3 were given" error
+        # Check logs for ERROR level messages - there should be NONE
 
         # The violation happens via callback, not return value
         # So we check if timer was removed (indicating callback executed)
