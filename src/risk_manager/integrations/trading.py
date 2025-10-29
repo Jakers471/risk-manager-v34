@@ -167,7 +167,12 @@ class TradingIntegration:
 
         return None
 
-    async def get_stop_loss_for_position(self, contract_id: str) -> dict[str, Any] | None:
+    async def get_stop_loss_for_position(
+        self,
+        contract_id: str,
+        position_entry_price: float = None,
+        position_size: int = None,
+    ) -> dict[str, Any] | None:
         """
         Get the active stop loss order for a position.
 
@@ -176,6 +181,8 @@ class TradingIntegration:
 
         Args:
             contract_id: Contract ID of the position
+            position_entry_price: Optional entry price (from event data, avoids query)
+            position_size: Optional position size (from event data, avoids query)
 
         Returns:
             Stop loss data dict or None if no active stop loss
@@ -187,19 +194,42 @@ class TradingIntegration:
             return cached
 
         # Cache miss - query SDK (handles broker-UI stops that don't emit ORDER_PLACED)
-        return await self._query_sdk_for_stop_loss(contract_id)
+        return await self._query_sdk_for_stop_loss(
+            contract_id, position_entry_price, position_size
+        )
 
-    def get_take_profit_for_position(self, contract_id: str) -> dict[str, Any] | None:
+    async def get_take_profit_for_position(
+        self,
+        contract_id: str,
+        position_entry_price: float = None,
+        position_size: int = None,
+    ) -> dict[str, Any] | None:
         """
         Get the active take profit order for a position.
 
+        First checks cache, then queries SDK if cache is empty.
+        This handles cases where take profits are created in broker UI.
+
         Args:
             contract_id: Contract ID of the position
+            position_entry_price: Optional entry price (from event data, avoids query)
+            position_size: Optional position size (from event data, avoids query)
 
         Returns:
             Take profit data dict or None if no active take profit
-            Dict format: {"order_id": int, "limit_price": float, "side": str, "quantity": int, "timestamp": float}
+            Dict format: {"order_id": int, "take_profit_price": float, "side": str, "quantity": int, "timestamp": float}
         """
+        # Check cache first (fast path)
+        cached = self._active_take_profits.get(contract_id)
+        if cached:
+            return cached
+
+        # Cache miss - query SDK (semantic analysis will populate take profit cache too)
+        await self._query_sdk_for_stop_loss(
+            contract_id, position_entry_price, position_size
+        )
+
+        # Return take profit from cache (populated by query if found)
         return self._active_take_profits.get(contract_id)
 
     def get_all_active_stop_losses(self) -> dict[str, dict[str, Any]]:
@@ -220,7 +250,12 @@ class TradingIntegration:
         """
         return self._active_take_profits.copy()
 
-    async def _query_sdk_for_stop_loss(self, contract_id: str) -> dict[str, Any] | None:
+    async def _query_sdk_for_stop_loss(
+        self,
+        contract_id: str,
+        position_entry_price: float = None,
+        position_size: int = None,
+    ) -> dict[str, Any] | None:
         """
         Query SDK directly for stop loss orders (bypasses cache).
 
@@ -231,6 +266,8 @@ class TradingIntegration:
 
         Args:
             contract_id: Contract ID to query
+            position_entry_price: Optional position entry price (avoids querying)
+            position_size: Optional position size (avoids querying)
 
         Returns:
             Stop loss data dict or None if no stop found
@@ -283,28 +320,86 @@ class TradingIntegration:
                 working_orders = [o for o in all_orders if o.contractId == contract_id]
                 logger.info(f"   Filtered to {len(working_orders)} orders for {contract_id}")
 
-            # Find stop loss orders for this contract
-            stops_for_contract = []
+            # Get position data for semantic analysis
+            if position_entry_price is None or position_size is None:
+                logger.info(f"   Position data not provided, fetching from SDK...")
+
+                try:
+                    # Get all positions and find the one for this contract
+                    logger.info(f"   Calling get_all_positions()...")
+                    all_positions = await instrument.positions.get_all_positions()
+                    logger.info(f"   ✅ get_all_positions returned {len(all_positions)} positions")
+
+                    position = None
+                    for pos in all_positions:
+                        logger.info(f"   Checking position: {pos.contractId}")
+                        if pos.contractId == contract_id:
+                            position = pos
+                            logger.info(f"   ✅ Found matching position!")
+                            break
+
+                    if not position:
+                        logger.warning(f"   ❌ No position found for {contract_id}")
+                        logger.info(f"   Available positions: {[p.contractId for p in all_positions]}")
+                        return None
+
+                    position_entry_price = position.avgPrice
+                    position_size = position.size
+
+                except Exception as pos_error:
+                    logger.error(f"   ❌ Error fetching position: {pos_error}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    return None
+            else:
+                logger.info(f"   Using provided position data (avoids hanging get_all_positions)")
+
+            logger.info(f"   Position: entry=${position_entry_price:.2f}, size={position_size} ({'LONG' if position_size > 0 else 'SHORT'})")
+
+            # Analyze orders using semantic layer
+            stop_loss_data = None
+            take_profit_data = None
+
             for order in working_orders:
                 if order.contractId == contract_id:
-                    logger.info(f"   Order on {contract_id}: type={order.type} ({order.type_str}), stopPrice={order.stopPrice}")
+                    # Determine trigger price
+                    trigger_price = order.stopPrice if order.stopPrice else order.limitPrice
 
-                    # Check if it's a stop type (3=STOP_LIMIT, 4=STOP, 5=TRAILING_STOP)
-                    if order.type in [3, 4, 5]:
-                        # Found a stop! Cache it and return
-                        stop_data = {
+                    logger.info(f"   Order #{order.id}: type={order.type} ({order.type_str}), trigger=${trigger_price}, side={order.side}")
+
+                    # Use semantic analysis to determine intent
+                    intent = self._determine_order_intent(order, position_entry_price, position_size)
+                    logger.info(f"     └─ Semantic intent: {intent}")
+
+                    if intent == "stop_loss":
+                        # Found stop loss!
+                        stop_loss_data = {
                             "order_id": order.id,
-                            "stop_price": order.stopPrice,
+                            "stop_price": trigger_price,
                             "side": self._get_side_name(order.side),
                             "quantity": order.size,
                             "timestamp": time.time(),
                         }
+                        # Cache it
+                        self._active_stop_losses[contract_id] = stop_loss_data
+                        logger.info(f"   ✅ FOUND stop loss @ ${trigger_price:.2f}")
 
-                        # Update cache so next query is faster
-                        self._active_stop_losses[contract_id] = stop_data
+                    elif intent == "take_profit":
+                        # Found take profit!
+                        take_profit_data = {
+                            "order_id": order.id,
+                            "take_profit_price": trigger_price,
+                            "side": self._get_side_name(order.side),
+                            "quantity": order.size,
+                            "timestamp": time.time(),
+                        }
+                        # Cache it
+                        self._active_take_profits[contract_id] = take_profit_data
+                        logger.info(f"   ✅ FOUND take profit @ ${trigger_price:.2f}")
 
-                        logger.info(f"   ✅ FOUND stop loss @ ${order.stopPrice}")
-                        return stop_data
+            # Return stop loss (if found)
+            if stop_loss_data:
+                return stop_loss_data
 
             # No stop found
             logger.warning(f"   ❌ No stop loss orders found for {contract_id}")
@@ -357,6 +452,65 @@ class TradingIntegration:
         fallback = self.instruments[0] if self.instruments else "UNKNOWN"
         logger.warning(f"Using fallback symbol '{fallback}' for contract {contract_id}")
         return fallback
+
+    def _determine_order_intent(
+        self, order, position_entry_price: float, position_size: int
+    ) -> str:
+        """
+        Determine order intent using simplified logic.
+
+        For positions that exist, STOP orders are protective (stop loss),
+        LIMIT orders are profit targets (take profit). This avoids complex
+        side-based logic that varies by broker implementation.
+
+        Args:
+            order: Order object from SDK
+            position_entry_price: Position's average entry price
+            position_size: Position size (positive=long, negative=short)
+
+        Returns:
+            "stop_loss" | "take_profit" | "entry" | "unknown"
+        """
+        if not order or position_entry_price is None:
+            return "unknown"
+
+        # SIMPLIFIED RULE: For existing positions:
+        # - STOP orders (type 3, 4, 5) = Stop Loss (protective)
+        # - LIMIT orders (type 1) = Take Profit (target)
+        # - MARKET orders (type 2) = Manual exit/entry
+
+        if order.type in [3, 4, 5]:  # STOP_LIMIT, STOP, TRAILING_STOP
+            # STOP orders on existing positions are stop losses
+            return "stop_loss"
+
+        elif order.type == 1:  # LIMIT
+            # LIMIT orders on existing positions are take profits
+            # (assuming they're closing orders, not entries)
+            trigger_price = order.limitPrice
+
+            if trigger_price is None:
+                return "unknown"
+
+            is_long_position = position_size > 0
+
+            # Verify this is actually a profit target (above entry for long, below for short)
+            if is_long_position:
+                if trigger_price > position_entry_price:
+                    return "take_profit"
+                else:
+                    return "entry"  # Limit buy below current price = entry
+            else:  # short position
+                if trigger_price < position_entry_price:
+                    return "take_profit"
+                else:
+                    return "entry"  # Limit sell above current price = entry
+
+        elif order.type == 2:  # MARKET
+            # Market orders could be manual exit or entry
+            return "unknown"
+
+        else:
+            return "unknown"
 
     async def connect(self) -> None:
         """
@@ -882,6 +1036,20 @@ class TradingIntegration:
             # Show order details (INFO level temporarily for debugging)
             logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
+            # CRITICAL: Invalidate cache when order is modified
+            # This forces next query to get fresh data from broker
+            if order.contractId in self._active_stop_losses:
+                if self._active_stop_losses[order.contractId]["order_id"] == order.id:
+                    old_price = self._active_stop_losses[order.contractId]["stop_price"]
+                    del self._active_stop_losses[order.contractId]
+                    logger.info(f"  └─ 🔄 Invalidated stop loss cache (modified from ${old_price:.2f} → ${order.stopPrice:.2f})")
+
+            if order.contractId in self._active_take_profits:
+                if self._active_take_profits[order.contractId]["order_id"] == order.id:
+                    old_price = self._active_take_profits[order.contractId]["take_profit_price"]
+                    del self._active_take_profits[order.contractId]
+                    logger.info(f"  └─ 🔄 Invalidated take profit cache (modified from ${old_price:.2f} → ${order.limitPrice:.2f})")
+
         except Exception as e:
             logger.error(f"Error handling ORDER_MODIFIED: {e}")
             logger.exception(e)
@@ -982,16 +1150,24 @@ class TradingIntegration:
 
             # Show active stop loss/take profit for this position (if any)
             if action_name in ["OPENED", "UPDATED"]:
-                logger.debug(f"🔍 Checking for stop loss on {contract_id}...")
-                stop_loss = await self.get_stop_loss_for_position(contract_id)
-                if stop_loss:
-                    logger.info(f"  └─ 🛡️ Active Stop Loss: ${stop_loss['stop_price']:.2f} (Order ID: {stop_loss['order_id']})")
-                else:
-                    logger.warning(f"  └─ ⚠️ NO STOP LOSS for this position!")
+                logger.debug(f"🔍 Checking for stop loss and take profit on {contract_id}...")
+                # Pass position data from event to avoid hanging get_all_positions() call
+                stop_loss = await self.get_stop_loss_for_position(
+                    contract_id, avg_price, size
+                )
+                take_profit = await self.get_take_profit_for_position(
+                    contract_id, avg_price, size
+                )
 
-                take_profit = self.get_take_profit_for_position(contract_id)
+                if stop_loss:
+                    logger.info(f"  └─ 🛡️  Active Stop Loss: ${stop_loss['stop_price']:.2f} (Order ID: {stop_loss['order_id']})")
+                else:
+                    logger.warning(f"  └─ ⚠️  NO STOP LOSS for this position!")
+
                 if take_profit:
-                    logger.info(f"  └─ 🎯 Active Take Profit: ${take_profit['limit_price']:.2f} (Order ID: {take_profit['order_id']})")
+                    logger.info(f"  └─ 🎯 Active Take Profit: ${take_profit['take_profit_price']:.2f} (Order ID: {take_profit['order_id']})")
+                else:
+                    logger.debug(f"  └─ No take profit for this position")
 
             # Bridge to risk event bus
             event_type_map = {
@@ -1001,10 +1177,13 @@ class TradingIntegration:
             }
 
             # Get active stop loss/take profit data for this position
-            # Note: We already queried this above for logging, but query again for event data
-            # (could optimize by reusing the result)
-            stop_loss_for_event = await self.get_stop_loss_for_position(contract_id)
-            take_profit = self.get_take_profit_for_position(contract_id)
+            # Note: We already queried this above for logging, cache will make this instant
+            stop_loss_for_event = await self.get_stop_loss_for_position(
+                contract_id, avg_price, size
+            )
+            take_profit_for_event = await self.get_take_profit_for_position(
+                contract_id, avg_price, size
+            )
 
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
@@ -1020,7 +1199,7 @@ class TradingIntegration:
                     "is_stop_loss": fill_type == "stop_loss",
                     "is_take_profit": fill_type == "take_profit",
                     "stop_loss": stop_loss_for_event,  # Active stop loss order data (or None)
-                    "take_profit": take_profit,  # Active take profit order data (or None)
+                    "take_profit": take_profit_for_event,  # Active take profit order data (or None)
                     "raw_data": data,
                 },
                 source="trading_sdk",
