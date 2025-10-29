@@ -159,15 +159,15 @@ class DailyRealizedProfitRule(RiskRule):
 
         # Ignore half-turn trades (opening positions with no realized P&L)
         profit_and_loss = event.data.get("profitAndLoss")
-        if event.event_type == EventType.POSITION_OPENED and profit_and_loss is None:
+        if profit_and_loss is None:
             logger.debug("Ignoring half-turn trade (no realized P&L)")
             return None
 
-        # Get current daily realized P&L
+        # Update P&L tracker with this trade
         try:
-            daily_pnl = self.pnl_tracker.get_daily_pnl(account_id)
+            daily_pnl = self.pnl_tracker.add_trade_pnl(str(account_id), profit_and_loss)
         except Exception as e:
-            logger.error(f"Error getting daily P&L: {e}", exc_info=True)
+            logger.error(f"Error updating daily P&L: {e}", exc_info=True)
             return None
 
         # Check if daily profit reaches or exceeds target

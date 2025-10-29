@@ -34,26 +34,27 @@ This file tells Claude AI exactly what to read and in what order to get up to sp
 ### 1. Read These Files IN ORDER:
 
 ```
-Priority 1 - Project Status (2 min):
-  1. docs/current/PROJECT_STATUS.md       - Current state & progress
-  2. test_reports/latest.txt              - Most recent test results
+Priority 1 - Latest Session (1 min):
+  1. AI_SESSION_HANDOFF_2025-10-28.md     - ⭐ MOST RECENT SESSION (100% rule tests!)
+  2. docs/current/PROJECT_STATUS.md       - Current state & progress
+  3. test_reports/latest.txt              - Most recent test results
 
 Priority 2 - Testing System (3 min):
-  3. docs/testing/README.md               - Testing navigation
-  4. docs/testing/TESTING_GUIDE.md        - Core testing reference
-  5. docs/testing/RUNTIME_DEBUGGING.md    - Runtime validation system
+  4. docs/testing/README.md               - Testing navigation
+  5. docs/testing/TESTING_GUIDE.md        - Core testing reference
+  6. docs/testing/RUNTIME_DEBUGGING.md    - Runtime validation system
 
 Priority 3 - SDK Integration (3 min):
-  6. docs/current/SDK_INTEGRATION_GUIDE.md  - How we use Project-X SDK
-  7. docs/current/MULTI_SYMBOL_SUPPORT.md   - Account-wide risk
+  7. docs/current/SDK_INTEGRATION_GUIDE.md  - How we use Project-X SDK
+  8. docs/current/MULTI_SYMBOL_SUPPORT.md   - Account-wide risk
 
 Priority 4 - API Reference (For Coding/Testing):
-  8. SDK_API_REFERENCE.md                   - Actual SDK & our API contracts
-  9. SDK_ENFORCEMENT_FLOW.md                - Complete enforcement wiring
-  10. TEST_RUNNER_FINAL_FIXES.md            - Test runner behavior & fixes
+  9. SDK_API_REFERENCE.md                   - Actual SDK & our API contracts
+  10. SDK_ENFORCEMENT_FLOW.md               - Complete enforcement wiring
+  11. TEST_RUNNER_FINAL_FIXES.md            - Test runner behavior & fixes
 ```
 
-**After reading these 10 files, you will know**:
+**After reading these 11 files, you will know**:
 - ✅ What's been built and what's working
 - ✅ Current test status (passing/failing)
 - ✅ How testing and runtime debugging work
@@ -722,11 +723,15 @@ That file contains:
 ### Response Template:
 
 ```markdown
-**Last Session**: 2025-10-23
+**Last Session**: 2025-10-28
+
+**🎯 CRITICAL: Read the handoff document first!**
+→ `AI_SESSION_HANDOFF_2025-10-28.md`
 
 **Reading Status**:
-1. ✅ Read `docs/current/PROJECT_STATUS.md` to see current progress
-2. ✅ Read `test_reports/latest.txt` to see latest test results
+1. ✅ Read `AI_SESSION_HANDOFF_2025-10-28.md` (latest session details)
+2. ✅ Read `docs/current/PROJECT_STATUS.md` to see current progress
+3. ✅ Read `test_reports/latest.txt` to see latest test results
 
 **Status**: [Check PROJECT_STATUS.md for completion percentage]
 

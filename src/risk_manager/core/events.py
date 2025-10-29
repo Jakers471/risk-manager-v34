@@ -32,6 +32,9 @@ class EventType(str, Enum):
     DAILY_LOSS_LIMIT = "daily_loss_limit"
     DRAWDOWN_ALERT = "drawdown_alert"
 
+    # Market data events
+    MARKET_DATA_UPDATED = "market_data_updated"  # Real-time quote/price updates
+
     # Trade events
     TRADE_EXECUTED = "trade_executed"  # For test compatibility
 

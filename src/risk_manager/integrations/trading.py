@@ -73,7 +73,7 @@ class TradingIntegration:
             self.suite = await TradingSuite.create(
                 instruments=self.instruments,
                 timeframes=["1min", "5min"],
-                features=["orderbook", "performance_analytics", "auto_reconnect"],  # Enable orderbook, analytics, and auto-reconnect
+                features=["performance_analytics", "auto_reconnect"],  # Removed orderbook (causes depth entry errors)
             )
 
             # Wire the realtime client to the suite
@@ -154,7 +154,14 @@ class TradingIntegration:
             )
             logger.debug("✅ Registered callback: account_update")
 
-            logger.success("✅ Trading monitoring started (4 realtime callbacks registered)")
+            # Subscribe to market quotes for PnL calculations
+            await self.realtime.add_callback(
+                "quote_update",
+                lambda data: asyncio.create_task(self._on_quote_update(data))
+            )
+            logger.debug("✅ Registered callback: quote_update")
+
+            logger.success("✅ Trading monitoring started (5 realtime callbacks registered)")
 
         except Exception as e:
             logger.error(f"Failed to register realtime callbacks: {e}")
@@ -372,6 +379,54 @@ class TradingIntegration:
 
         except Exception as e:
             logger.error(f"Error handling account update: {e}")
+
+    async def _on_quote_update(self, data: Any) -> None:
+        """
+        Handle market quote update from SignalR.
+
+        Quote updates provide real-time bid/ask prices needed for:
+        - Unrealized PnL calculations
+        - RULE-004 (Daily Unrealized Loss)
+        - RULE-005 (Max Unrealized Profit)
+        - Position monitoring
+        """
+        try:
+            if not isinstance(data, list):
+                return
+
+            for update in data:
+                quote_data = update.get('data', {})
+
+                # Extract quote details
+                symbol = quote_data.get('symbol', 'UNKNOWN')
+                bid = quote_data.get('bid', 0.0)
+                ask = quote_data.get('ask', 0.0)
+                last = quote_data.get('last', 0.0)
+
+                # Use last price or midpoint for PnL calculations
+                market_price = last if last > 0 else (bid + ask) / 2
+
+                if market_price > 0:
+                    logger.trace(f"Quote update: {symbol} @ {market_price:.2f} (bid: {bid:.2f}, ask: {ask:.2f})")
+
+                    # Publish market price event for rules that need it
+                    risk_event = RiskEvent(
+                        event_type=EventType.MARKET_DATA_UPDATED,
+                        data={
+                            "symbol": symbol,
+                            "price": market_price,
+                            "bid": bid,
+                            "ask": ask,
+                            "last": last,
+                            "timestamp": quote_data.get('timestamp'),
+                        },
+                        source="trading_sdk",
+                    )
+
+                    await self.event_bus.publish(risk_event)
+
+        except Exception as e:
+            logger.error(f"Error handling quote update: {e}")
 
     async def flatten_position(self, symbol: str) -> None:
         """Flatten a specific position."""
