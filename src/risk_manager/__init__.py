@@ -7,7 +7,7 @@ Built with:
 """
 
 from risk_manager.core.manager import RiskManager
-from risk_manager.core.config import RiskConfig
+from risk_manager.config.models import RiskConfig
 
 __version__ = "1.0.0-alpha"
 __all__ = ["RiskManager", "RiskConfig"]

@@ -374,7 +374,9 @@ class TestTimerRulesE2E:
         assert risk_system.timer_manager.has_timer(timer_name)
 
         # Wait for cooldown to expire (real async timer)
-        await asyncio.sleep(2.5)
+        # Timer loop checks every 1s, so we need: cooldown + 1s (loop cycle) + 0.5s (buffer)
+        # = 2s + 1s + 0.5s = 3.5s to ensure timer is detected and removed
+        await asyncio.sleep(3.5)
 
         # Verify timer expired
         remaining = risk_system.timer_manager.get_remaining_time(timer_name)
@@ -640,7 +642,9 @@ class TestTimerRulesE2E:
         assert risk_system.timer_manager.has_timer(timer_name)
 
         # Wait for grace period to expire (real async timer)
-        await asyncio.sleep(2.5)
+        # Timer loop checks every 1s, so we need: grace_period + 1s (loop cycle) + 0.5s (buffer)
+        # = 2s + 1s + 0.5s = 3.5s to ensure timer is detected and removed
+        await asyncio.sleep(3.5)
 
         # Verify timer expired
         assert not risk_system.timer_manager.has_timer(timer_name)

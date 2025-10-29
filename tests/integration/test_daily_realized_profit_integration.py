@@ -109,7 +109,6 @@ async def test_full_profit_target_flow_with_database(
     account_id = "123"
 
     # Trade 1: +$300
-    pnl_tracker.add_trade_pnl(account_id, 300.0)
     event1 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 300.0}
@@ -122,7 +121,6 @@ async def test_full_profit_target_flow_with_database(
     assert daily_pnl == 300.0
 
     # Trade 2: +$400
-    pnl_tracker.add_trade_pnl(account_id, 400.0)
     event2 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 400.0}
@@ -135,7 +133,6 @@ async def test_full_profit_target_flow_with_database(
     assert daily_pnl == 700.0
 
     # Trade 3: +$400 (exceeds target)
-    pnl_tracker.add_trade_pnl(account_id, 400.0)
     event3 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 400.0}
@@ -180,7 +177,6 @@ async def test_multi_account_independence(
     account_b = "456"
 
     # Account A hits profit target
-    pnl_tracker.add_trade_pnl(account_a, 1100.0)
     event_a = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_a, "profitAndLoss": 1100.0}
@@ -196,7 +192,6 @@ async def test_multi_account_independence(
     assert not lockout_manager.is_locked_out(int(account_b))
 
     # Account B continues trading
-    pnl_tracker.add_trade_pnl(account_b, 500.0)
     event_b = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_b, "profitAndLoss": 500.0}
@@ -234,7 +229,6 @@ async def test_lockout_persistence_crash_recovery(
     )
 
     # Hit profit target
-    pnl_tracker.add_trade_pnl(account_id, 1100.0)
     event = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 1100.0}
@@ -283,7 +277,6 @@ async def test_reset_scheduler_integration(
     account_id = "123"
 
     # Hit profit target
-    pnl_tracker.add_trade_pnl(account_id, 1100.0)
     event = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 1100.0}
@@ -339,7 +332,6 @@ async def test_event_bus_async_flow(
 
     violations = []
     for pnl in pnls:
-        pnl_tracker.add_trade_pnl(account_id, pnl)
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
             data={"account_id": account_id, "profitAndLoss": pnl}
@@ -376,7 +368,6 @@ async def test_enforcement_action_integration(
     account_id = "123"
 
     # Hit profit target
-    pnl_tracker.add_trade_pnl(account_id, 1250.0)
     event = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 1250.0}
@@ -417,8 +408,12 @@ async def test_half_turn_trades_ignored(
     """
     account_id = "123"
 
-    # Add some profit first
-    pnl_tracker.add_trade_pnl(account_id, 800.0)
+    # Add some profit first by evaluating a real trade
+    event_first = RiskEvent(
+        event_type=EventType.POSITION_CLOSED,
+        data={"account_id": account_id, "profitAndLoss": 800.0}
+    )
+    await rule.evaluate(event_first, mock_engine)
 
     # Half-turn trade (opening position)
     event = RiskEvent(
@@ -490,7 +485,6 @@ async def test_concurrent_access_thread_safety(
 
     async def process_trade(pnl: float):
         """Process a single trade."""
-        pnl_tracker.add_trade_pnl(account_id, pnl)
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
             data={"account_id": account_id, "profitAndLoss": pnl}
@@ -589,7 +583,6 @@ async def test_mixed_profit_loss_day(
     account_id = "123"
 
     # Trade 1: +$600
-    pnl_tracker.add_trade_pnl(account_id, 600.0)
     event1 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 600.0}
@@ -598,7 +591,6 @@ async def test_mixed_profit_loss_day(
     assert violation1 is None
 
     # Trade 2: -$200 (loss)
-    pnl_tracker.add_trade_pnl(account_id, -200.0)
     event2 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": -200.0}
@@ -610,7 +602,6 @@ async def test_mixed_profit_loss_day(
     assert pnl_tracker.get_daily_pnl(account_id) == 400.0
 
     # Trade 3: +$800
-    pnl_tracker.add_trade_pnl(account_id, 800.0)
     event3 = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 800.0}
@@ -754,7 +745,6 @@ async def test_boundary_exactly_at_target(
     account_id = "123"
 
     # Exactly $1000.00
-    pnl_tracker.add_trade_pnl(account_id, 1000.0)
     event = RiskEvent(
         event_type=EventType.POSITION_CLOSED,
         data={"account_id": account_id, "profitAndLoss": 1000.0}

@@ -1,8 +1,8 @@
 ================================================================================
 Risk Manager V34 - Test Report
 ================================================================================
-Test Run: All tests with coverage (with branch)
-Timestamp: 2025-10-29 00:13:00
+Test Run: All tests with coverage + HTML report (with branch)
+Timestamp: 2025-10-28 21:40:15
 Status: FAILED
 Exit Code: 1
 ================================================================================
@@ -86,130 +86,130 @@ tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_trade_frequency_coold
 tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_trade_frequency_rolling_window [32mPASSED[0m[33m [  4%][0m
 tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_no_stop_loss_grace_timer_starts [32mPASSED[0m[33m [  4%][0m
 tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_stop_loss_placed_cancels_timer [32mPASSED[0m[33m [  5%][0m
-tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_grace_period_expires_closes_position [32mPASSED[0m[33m [  5%][0m
-tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_multiple_timers_independent_tracking [32mPASSED[0m[33m [  5%][0m
-tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_timer_cleanup_on_position_close [32mPASSED[0m[33m [  5%][0m
-tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_state_consistency_across_timer_lifecycle [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_full_cooldown_flow_with_timer_expiry [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_selects_correct_duration [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier1 [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier3 [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_callback_clears_lockout [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_winning_trade_no_cooldown_no_timer [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_multi_account_independent_cooldowns [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_persists_to_database [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_loaded_from_database_on_restart [32mPASSED[0m[33m [  5%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_rapid_loss_sequence_only_first_triggers_timer [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_event_flow_from_trade_to_lockout [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_precision_within_tolerance [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_position_closed_event_triggers_cooldown [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_half_turn_trades_no_cooldown_no_timer [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_full_loss_limit_flow_with_database [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_multi_account_independence [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_lockout_persistence_crash_recovery [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_reset_scheduler_integration [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_half_turn_trades_ignored [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_mixed_profit_loss_day [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_concurrent_access_thread_safety [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_database_schema_validation [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_boundary_exactly_at_limit [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_timer_auto_unlock [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_full_profit_target_flow_with_database [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_multi_account_independence [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_lockout_persistence_crash_recovery [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_event_bus_async_flow [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_enforcement_action_integration [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_half_turn_trades_ignored [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_timer_auto_unlock [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_concurrent_access_thread_safety [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_database_schema_validation [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_mixed_profit_loss_day [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_lockout_prevents_further_evaluation [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_pnl_tracker_trade_count [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_reset_time_calculation [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_boundary_exactly_at_target [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_normal_day [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_standard_time [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_daylight_time [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_17_00_still_exists [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_no_duplicate_reset [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_17_00_happens_once [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_no_duplicate_reset [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_spring [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_fall [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_uses_et_not_utc [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_full_unrealized_loss_violation_flow [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_multi_position_independence [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_real_pnl_calculation_accuracy [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_no_lockout_created_on_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_position_closed_before_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_enforcement_action_close_position_not_flatten_all [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_publishes_to_subscribers [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_multiple_subscribers [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_evaluates_rule_on_event [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_skips_rules_when_no_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_triggers_flatten_enforcement [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_publishes_event [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_end_to_end_position_violation_flow [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multiple_rules_evaluated_in_order [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_handles_handler_errors [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_tracks_position_state [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_flatten_action_calls_flatten_all [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_pause_action_triggers_pause_trading [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_processing_is_fast [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multi_symbol_position_tracking [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_boots_and_reaches_checkpoints [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_handles_missing_credentials_gracefully [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_ctrl_c_triggers_graceful_shutdown [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_with_explicit_account_flag [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_within_limit [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_multiple_symbols_independent_limits [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_one_symbol_violates_others_ok [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_symbol_without_configured_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_short_positions_absolute_value [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_event_bus_integration [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_no_lockout_on_violation [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_dynamic_limit_configuration [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_within_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_within_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_short_positions_absolute_value [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_event_bus_integration [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_no_lockout_on_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_zero_position_no_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_performance_many_symbols [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_es_long_position_reaches_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_mnq_short_position_reaches_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_multi_position_independence [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_enforcement_closes_position_not_flatten_all [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_position_closed_before_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_zero_negative_profit_no_violation [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_flatten_and_reduce_to_limit_both_detected [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_close_position_and_flatten_both_detected [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_deterministic_priority_order [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_sort_violations_by_priority [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_multiple_violations_same_priority [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_priority_rationale [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_enforcement_execution_order [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [31mFAILED[0m[31m [ 13%][0m
+tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_grace_period_expires_closes_position [31mFAILED[0m[31m [  5%][0m
+tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_multiple_timers_independent_tracking [32mPASSED[0m[31m [  5%][0m
+tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_timer_cleanup_on_position_close [32mPASSED[0m[31m [  5%][0m
+tests/e2e/test_timer_rules_e2e.py::TestTimerRulesE2E::test_state_consistency_across_timer_lifecycle [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_full_cooldown_flow_with_timer_expiry [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_selects_correct_duration [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier1 [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier3 [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_callback_clears_lockout [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_winning_trade_no_cooldown_no_timer [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_multi_account_independent_cooldowns [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_persists_to_database [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_loaded_from_database_on_restart [32mPASSED[0m[31m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_rapid_loss_sequence_only_first_triggers_timer [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_event_flow_from_trade_to_lockout [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_precision_within_tolerance [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [31mFAILED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_position_closed_event_triggers_cooldown [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_half_turn_trades_no_cooldown_no_timer [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_full_loss_limit_flow_with_database [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_multi_account_independence [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_lockout_persistence_crash_recovery [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_reset_scheduler_integration [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_half_turn_trades_ignored [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_mixed_profit_loss_day [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_concurrent_access_thread_safety [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_database_schema_validation [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_boundary_exactly_at_limit [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_timer_auto_unlock [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_full_profit_target_flow_with_database [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_multi_account_independence [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_persistence_crash_recovery [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_event_bus_async_flow [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_enforcement_action_integration [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_half_turn_trades_ignored [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_timer_auto_unlock [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_concurrent_access_thread_safety [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_database_schema_validation [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_mixed_profit_loss_day [31mFAILED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_prevents_further_evaluation [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_pnl_tracker_trade_count [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_time_calculation [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_boundary_exactly_at_target [31mFAILED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_normal_day [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_standard_time [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_daylight_time [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_17_00_still_exists [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_no_duplicate_reset [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_17_00_happens_once [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_no_duplicate_reset [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_spring [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_fall [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_uses_et_not_utc [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_full_unrealized_loss_violation_flow [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_multi_position_independence [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_real_pnl_calculation_accuracy [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_no_lockout_created_on_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_position_closed_before_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_enforcement_action_close_position_not_flatten_all [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_publishes_to_subscribers [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_multiple_subscribers [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_evaluates_rule_on_event [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_skips_rules_when_no_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_triggers_flatten_enforcement [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_publishes_event [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_end_to_end_position_violation_flow [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multiple_rules_evaluated_in_order [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_handles_handler_errors [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_tracks_position_state [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_flatten_action_calls_flatten_all [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_pause_action_triggers_pause_trading [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_processing_is_fast [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multi_symbol_position_tracking [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_boots_and_reaches_checkpoints [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_handles_missing_credentials_gracefully [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_ctrl_c_triggers_graceful_shutdown [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_with_explicit_account_flag [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_within_limit [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_multiple_symbols_independent_limits [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_one_symbol_violates_others_ok [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_symbol_without_configured_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_short_positions_absolute_value [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_event_bus_integration [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_no_lockout_on_violation [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_dynamic_limit_configuration [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_within_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_within_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_short_positions_absolute_value [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_event_bus_integration [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_no_lockout_on_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_zero_position_no_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_performance_many_symbols [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_es_long_position_reaches_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_mnq_short_position_reaches_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_multi_position_independence [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_enforcement_closes_position_not_flatten_all [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_position_closed_before_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_zero_negative_profit_no_violation [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_flatten_and_reduce_to_limit_both_detected [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_close_position_and_flatten_both_detected [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_deterministic_priority_order [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_sort_violations_by_priority [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_multiple_violations_same_priority [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_priority_rationale [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_enforcement_execution_order [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [31mFAILED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [32mPASSED[0m[31m [ 13%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_order_type_detection_only_stops_cancel_timer [32mPASSED[0m[31m [ 13%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_event_bus_integration_with_rule_events [32mPASSED[0m[31m [ 14%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_timer_recreated_after_manager_restart [32mPASSED[0m[31m [ 14%][0m
@@ -259,7 +259,7 @@ tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyL
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_database_persistence [32mPASSED[0m[31m [ 17%][0m
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_timer_auto_unlock_integration [32mPASSED[0m[31m [ 17%][0m
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_multi_account_independence [32mPASSED[0m[31m [ 17%][0m
-tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_session_reset [32mPASSED[0m[31m [ 17%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_session_reset [31mFAILED[0m[31m [ 17%][0m
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_priority_order [32mPASSED[0m[31m [ 17%][0m
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_concurrent_rapid_fire_trades [32mPASSED[0m[31m [ 17%][0m
 tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_timer_cancellation_and_restart [32mPASSED[0m[31m [ 17%][0m
@@ -560,34 +560,34 @@ tests/unit/test_config/test_config_models.py::TestEdgeCases::test_year_boundary_
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_year_boundary_2100 [32mPASSED[0m[31m [ 38%][0m
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_leap_year_date_valid [32mPASSED[0m[31m [ 38%][0m
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_optional_fields_none [32mPASSED[0m[31m [ 38%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_load_from_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_defaults [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_explicit_params_override_env [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_partial_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_case_insensitive [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_prefix [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_boolean_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_integer_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_float_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_optional_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_optional_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_loading [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_env_file [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_empty_env_variable [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_whitespace_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_special_characters [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_multiline_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_validation_alias [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_url_env_variables [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_all_fields_from_env [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_type_coercion_errors [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_required_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_comments [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_quotes [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_equals_in_value [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_missing [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_combined_yaml_and_env [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_unicode [33mSKIPPED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_load_from_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_defaults [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_explicit_params_override_env [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_partial_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_case_insensitive [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_prefix [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_boolean_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_integer_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_float_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_optional_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_optional_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_loading [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_env_file [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_empty_env_variable [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_whitespace_env_variable [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_special_characters [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_multiline_env_variable [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_validation_alias [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_url_env_variables [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_all_fields_from_env [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_type_coercion_errors [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_required_env_variable [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_comments [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_quotes [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_equals_in_value [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_missing [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_combined_yaml_and_env [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_unicode [32mPASSED[0m[31m [ 40%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_valid_directory [32mPASSED[0m[31m [ 41%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_string_path [32mPASSED[0m[31m [ 41%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_relative_path [32mPASSED[0m[31m [ 41%][0m
@@ -634,35 +634,35 @@ tests/unit/test_config/test_loader.py::TestConfigurationError::test_configuratio
 tests/unit/test_config/test_loader.py::TestConfigurationError::test_configuration_error_raised_properly [32mPASSED[0m[31m [ 44%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderIntegration::test_full_config_loading_workflow [32mPASSED[0m[31m [ 44%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderIntegration::test_error_message_quality [32mPASSED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_minimal [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_all_fields [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_api_key [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_username [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_both_required_fields [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_negative [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_zero [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_positive [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_zero [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_optional_fields_none [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_valid_values [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_case_insensitive [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_true [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_false [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_integer_fields_valid [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_float_fields_valid [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_string_fields_empty [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_extra_fields_ignored [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_to_dict_method [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_model_dump_includes_all_fields [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_environment_field_values [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_url_fields_format [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_int [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_float [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_bool [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_int_field [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_float_field [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_equality [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_immutability_after_creation [33mSKIPPED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_minimal [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_all_fields [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_api_key [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_username [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_both_required_fields [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_negative [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_zero [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_positive [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_zero [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_optional_fields_none [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_valid_values [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_case_insensitive [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_true [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_false [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_integer_fields_valid [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_float_fields_valid [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_string_fields_empty [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_extra_fields_ignored [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_to_dict_method [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_model_dump_includes_all_fields [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_environment_field_values [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_url_fields_format [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_int [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_float [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_bool [32mPASSED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_int_field [32mPASSED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_float_field [32mPASSED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_equality [32mPASSED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_immutability_after_creation [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_midnight [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_noon [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_end_of_day [32mPASSED[0m[31m [ 46%][0m
@@ -812,42 +812,42 @@ tests/unit/test_core/test_events.py::TestEventBus::test_unsubscribe_from_event 
 tests/unit/test_core/test_events.py::TestRiskEvent::test_create_event [32mPASSED[0m[31m [ 56%][0m
 tests/unit/test_core/test_events.py::TestRiskEvent::test_event_has_timestamp [32mPASSED[0m[31m [ 56%][0m
 tests/unit/test_core/test_events.py::TestEventType::test_event_types_exist [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_creates_components [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_sets_up_logging [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_logs_startup [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_with_log_file [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_default_config [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_instruments [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_rules_override [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_config_file [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_ai_enabled [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_without_ai [32mPASSED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_creates_components [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_sets_up_logging [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_logs_startup [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_with_log_file [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_default_config [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_instruments [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_rules_override [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_config_file [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_ai_enabled [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_without_ai [31mFAILED[0m[31m [ 57%][0m
 tests/unit/test_core/test_manager.py::TestRiskManagerIntegrations::test_init_trading_integration [33mSKIPPED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerIntegrations::test_init_ai_integration_success [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerIntegrations::test_init_ai_integration_import_error [32mPASSED[0m[31m [ 57%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_daily_loss [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_max_position [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_both [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_none [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_rule [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_when_not_running [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_when_already_running [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_without_integrations [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_subscribes_to_events [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_when_running [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_when_not_running [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_cancels_tasks [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_wait_until_stopped [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_handle_fill_event [32mPASSED[0m[31m [ 58%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_handle_position_update_event [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_on_subscribe_to_events [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerStats::test_get_stats_with_all_components [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerStats::test_get_stats_without_trading [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_start_with_engine_error [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_stop_with_component_error [32mPASSED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_handle_fill_with_engine_error [32mPASSED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerIntegrations::test_init_ai_integration_success [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerIntegrations::test_init_ai_integration_import_error [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_daily_loss [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_max_position [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_both [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_none [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_rule [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_when_not_running [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_when_already_running [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_without_integrations [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_start_subscribes_to_events [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_when_running [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_when_not_running [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_stop_cancels_tasks [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerLifecycle::test_wait_until_stopped [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_handle_fill_event [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_handle_position_update_event [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_on_subscribe_to_events [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerStats::test_get_stats_with_all_components [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerStats::test_get_stats_without_trading [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_start_with_engine_error [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_stop_with_component_error [31mFAILED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerErrorHandling::test_handle_fill_with_engine_error [31mFAILED[0m[31m [ 59%][0m
 tests/unit/test_core/test_manager.py::TestRiskManagerIntegration::test_full_lifecycle_with_trading [33mSKIPPED[0m[31m [ 59%][0m
-tests/unit/test_core/test_manager.py::TestRiskManagerIntegration::test_event_flow_integration [32mPASSED[0m[31m [ 59%][0m
+tests/unit/test_core/test_manager.py::TestRiskManagerIntegration::test_event_flow_integration [31mFAILED[0m[31m [ 59%][0m
 tests/unit/test_instrument_economics.py::TestInstrumentEconomics::test_tick_sizes_all_025 [32mPASSED[0m[31m [ 59%][0m
 tests/unit/test_instrument_economics.py::TestInstrumentEconomics::test_point_values_correct [32mPASSED[0m[31m [ 59%][0m
 tests/unit/test_instrument_economics.py::TestInstrumentEconomics::test_tick_value_consistency [32mPASSED[0m[31m [ 59%][0m
@@ -974,25 +974,25 @@ tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_rule_initialization_validates_target [32mPASSED[0m[31m [ 68%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_profit_below_target_passes [32mPASSED[0m[31m [ 68%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_losing_day_passes [32mPASSED[0m[31m [ 68%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_profit_at_target_violates [32mPASSED[0m[31m [ 68%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_profit_exceeds_target_violates [32mPASSED[0m[31m [ 68%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_large_profit_violates [32mPASSED[0m[31m [ 68%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_violation_triggers_lockout [32mPASSED[0m[31m [ 68%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_profit_at_target_violates [31mFAILED[0m[31m [ 68%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_profit_exceeds_target_violates [31mFAILED[0m[31m [ 68%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_large_profit_violates [31mFAILED[0m[31m [ 68%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_violation_triggers_lockout [31mFAILED[0m[31m [ 68%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_lockout_persists_until_reset [32mPASSED[0m[31m [ 68%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_multi_symbol_profit_tracking [32mPASSED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_multi_symbol_profit_tracking [31mFAILED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_ignores_half_turn_trades [32mPASSED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_counts_only_closed_positions [32mPASSED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_approaching_target_no_violation [32mPASSED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_rule_disabled_when_locked [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_enforcement_action_correct [32mPASSED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_enforcement_action_correct [31mFAILED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_only_evaluates_pnl_events [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_evaluates_pnl_updated_event [32mPASSED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_evaluates_pnl_updated_event [31mFAILED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_zero_pnl [32mPASSED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_missing_pnl_data [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_violation_message_clarity [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_mixed_trades_reach_target [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_success_message_positive_tone [32mPASSED[0m[31m [ 69%][0m
-tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_cannot_trigger_both_profit_and_loss [32mPASSED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_violation_message_clarity [31mFAILED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_mixed_trades_reach_target [31mFAILED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_success_message_positive_tone [31mFAILED[0m[31m [ 69%][0m
+tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_cannot_trigger_both_profit_and_loss [31mFAILED[0m[31m [ 69%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_rule_can_be_disabled [32mPASSED[0m[31m [ 70%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_enforce_method_sets_lockout [32mPASSED[0m[31m [ 70%][0m
 tests/unit/test_rules/test_daily_realized_profit.py::TestDailyRealizedProfitRule::test_reset_time_calculation [32mPASSED[0m[31m [ 70%][0m
@@ -1414,10 +1414,87 @@ tests/unit/test_state/test_timer_manager.py::test_has_timer_returns_false_for_no
 tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_raises_error [32mPASSED[0m[31m [100%][0m
 
 =================================== FAILURES ===================================
-[31m[1m___ TestNoStopLossGraceIntegration.test_real_async_timer_callback_execution ____[0m
-[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:364: in test_real_async_timer_callback_execution
+[31m[1m_________ TestTimerRulesE2E.test_grace_period_expires_closes_position __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_timer_rules_e2e.py[0m:646: in test_grace_period_expires_closes_position
     [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
-[1m[31mE   assert 0 == 1[0m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('no_stop_loss_grace_CON.F.US.MNQ.Z25')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x737577a54320>.has_timer[0m
+[1m[31mE    +      where <risk_manager.state.timer_manager.TimerManager object at 0x737577a54320> = <test_timer_rules_e2e.TestTimerRulesE2E.risk_system.<locals>.SimpleRiskSystem object at 0x737577d79400>.timer_manager[0m
+---------------------------- Captured stdout setup -----------------------------
+2025-10-29T02:35:34.369973Z | INFO     | engine.start:40 | ✅ Event loop running: 0 active rules monitoring events
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_grace_period_expires_clos0/test_risk_manager.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Starting Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout expiry background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine started
+----------------------------- Captured stdout call -----------------------------
+2025-10-29T02:35:34.371762Z | INFO     | engine.evaluate_rules:74 | 📨 Event received: position_opened - evaluating 1 rules
+2025-10-29T02:35:34.372097Z | INFO     | engine.evaluate_rules:82 | 🔍 Rule evaluated: NoStopLossGraceRule - PASSED
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Added rule: NoStopLossGraceRule
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=21:35:36)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ⚠️ RULE-008 BREACH: No stop-loss placed within 2s for MNQ/CON.F.US.MNQ.Z25
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 🚨 ENFORCING RULE-008: Closing position MNQ/CON.F.US.MNQ.Z25 (no stop-loss placed within grace period)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ✅ RULE-008 ENFORCED: Position MNQ/CON.F.US.MNQ.Z25 closed (grace period expired without stop-loss)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer callback executed: no_stop_loss_grace_CON.F.US.MNQ.Z25
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer expired and removed: no_stop_loss_grace_CON.F.US.MNQ.Z25
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Stopping Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m___ TestCooldownAfterLossIntegration.test_database_cleanup_on_lockout_clear ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_cooldown_after_loss_integration.py[0m:701: in test_database_cleanup_on_lockout_clear
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 1 == 0[0m
+[1m[31mE    +  where 1 = len([<sqlite3.Row object at 0x7375779b1ba0>])[0m
 ------------------------------ Captured log setup ------------------------------
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
 
@@ -1426,14 +1503,935 @@ tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_r
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_database_cleanup_on_locko0/test_cooldown_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Starting Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout expiry background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 CooldownAfterLossRule initialized: 1 tiers
 ------------------------------ Captured log call -------------------------------
-[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: test_timer (duration=1s, expires=00:09:50)
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Cooldown triggered for account 1010: Loss=$-150.00, Cooldown=2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ENFORCING RULE-007: Account 1010 Loss: $-150.00, Cooldown: 2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: lockout_1010 (duration=2s, expires=21:36:10)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started for account 1010 cooldown
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 cooldown for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 locked for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Shutting down Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer cancelled: lockout_1010
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Error cancelling timer for account 1010: object NoneType can't be used in 'await' expression
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Stopping Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager shutdown complete
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m__________________ test_full_profit_target_flow_with_database __________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:122: in test_full_profit_target_flow_with_database
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 600.0 == 300.0[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_full_profit_target_flow_w0/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +300.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 300.00 → 600.00 (trade: +300.00)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m_______________________ test_multi_account_independence ________________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:205: in test_multi_account_independence
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert {'account_id': '456', 'action': 'flatten', 'current_profit': 1000.0, 'lockout_required': True, ...} is None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_multi_account_independenc1/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +1100.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1100.00 → 2200.00 (trade: +1100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$2200.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ENFORCING RULE-013: Account 123 Daily P&L: $2200.00, Target: $1000.00 - Great trading!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Next reset time: 2025-10-29T17:00:00-04:00 (America/New_York) = 2025-10-29T21:00:00+00:00 (UTC)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 123 locked until 2025-10-29T21:00:00+00:00: Daily profit target reached: $2200.00 (target: $1000.00) - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 123 locked until 2025-10-29T21:00:00+00:00: Daily profit target reached: $2200.00 (target: $1000.00) - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 456 on 2025-10-28: +500.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 456 on 2025-10-28: 500.00 → 1000.00 (trade: +500.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 456: P&L=$1000.00, Target=$1000.00 - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m_______________________ test_reset_scheduler_integration _______________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:299: in test_reset_scheduler_integration
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 2200.0 == 1100.0[0m
+[1m[31mE    +  where 2200.0 = get_daily_pnl('123')[0m
+[1m[31mE    +    where get_daily_pnl = <risk_manager.state.pnl_tracker.PnLTracker object at 0x7375779ed400>.get_daily_pnl[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_reset_scheduler_integrati1/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset scheduler ready to load last reset times from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset Scheduler initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Starting Reset Scheduler
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset Scheduler started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset loop started
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +1100.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1100.00 → 2200.00 (trade: +1100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$2200.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ENFORCING RULE-013: Account 123 Daily P&L: $2200.00, Target: $1000.00 - Great trading!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Next reset time: 2025-10-29T17:00:00-04:00 (America/New_York) = 2025-10-29T21:00:00+00:00 (UTC)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 123 locked until 2025-10-29T21:00:00+00:00: Daily profit target reached: $2200.00 (target: $1000.00) - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 123 locked until 2025-10-29T21:00:00+00:00: Daily profit target reached: $2200.00 (target: $1000.00) - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Stopping Reset Scheduler
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Reset Scheduler stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m__________________________ test_event_bus_async_flow ___________________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:352: in test_event_bus_async_flow
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert {'account_id': '123', 'action': 'flatten', 'current_profit': 1300.0, 'lockout_required': True, ...} is None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_event_bus_async_flow0/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +200.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 200.00 → 400.00 (trade: +200.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 400.00 → 550.00 (trade: +150.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 550.00 → 700.00 (trade: +150.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 700.00 → 1000.00 (trade: +300.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1000.00 → 1300.00 (trade: +300.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1300.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1300.00 → 1550.00 (trade: +250.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1550.00 → 1800.00 (trade: +250.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1800.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1800.00 → 2000.00 (trade: +200.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 2000.00 → 2200.00 (trade: +200.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$2200.00, Target=$1000.00 - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m_____________________ test_concurrent_access_thread_safety _____________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:508: in test_concurrent_access_thread_safety
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 2000.0 == 1000.0[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_concurrent_access_thread_1/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +100.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 100.00 → 200.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 200.00 → 300.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 300.00 → 400.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 400.00 → 500.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 500.00 → 600.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 600.00 → 700.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 700.00 → 800.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 800.00 → 900.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 900.00 → 1000.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1000.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1000.00 → 1100.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1100.00 → 1200.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1200.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1200.00 → 1300.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1300.00 → 1400.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1400.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1400.00 → 1500.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1500.00 → 1600.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1600.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1600.00 → 1700.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1700.00 → 1800.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1800.00, Target=$1000.00 - Good job!
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1800.00 → 1900.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1900.00 → 2000.00 (trade: +100.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$2000.00, Target=$1000.00 - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m__________________________ test_mixed_profit_loss_day __________________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:598: in test_mixed_profit_loss_day
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert {'account_id': '123', 'action': 'flatten', 'current_profit': 1200.0, 'lockout_required': True, ...} is None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_mixed_profit_loss_day1/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +600.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 600.00 → 1200.00 (trade: +600.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$1200.00, Target=$1000.00 - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m_______________________ test_boundary_exactly_at_target ________________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_daily_realized_profit_integration.py[0m:767: in test_boundary_exactly_at_target
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 2000.0 == 1000.0[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-21/test_boundary_exactly_at_targe0/test_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Created P&L record for 123 on 2025-10-28: +1000.00
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Updated P&L for 123 on 2025-10-28: 1000.00 → 2000.00 (trade: +1000.00)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Daily profit target reached for account 123: P&L=$2000.00, Target=$1000.00 - Good job!
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m_ TestNoStopLossGraceIntegration.test_grace_period_timer_expires_and_closes_position _[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:116: in test_grace_period_timer_expires_and_closes_position
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('no_stop_loss_grace_CON.F.US.MNQ.Z25')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x737577b06570>.has_timer[0m
+[1m[31mE    +      where <risk_manager.state.timer_manager.TimerManager object at 0x737577b06570> = <risk_manager.rules.no_stop_loss_grace.NoStopLossGraceRule object at 0x737577b0b570>.timer_manager[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=21:36:53)
 ---------------------------- Captured log teardown -----------------------------
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m____________ TestTradeFrequencyLimitIntegration.test_session_reset _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_trade_frequency_limit_integration.py[0m:492: in test_session_reset
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_trade_frequency_limit_integration.py[0m:121: in add_trade
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/state/database.py[0m:284: in execute_write
+    [0mcursor.execute(query, params)[90m[39;49;00m
+[1m[31mE   sqlite3.IntegrityError: UNIQUE constraint failed: trades.account_id, trades.trade_id[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/tmpenghjttm.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TradeFrequencyLimitRule initialized: limits={'per_minute': 3, 'per_hour': 10, 'per_session': 50}, cooldowns={'per_minute_breach': 2, 'per_hour_breach': 5, 'per_session_breach': 8}
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+[31m[1m______ TestRiskManagerInitialization.test_manager_init_creates_components ______[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:42: in test_manager_init_creates_components
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______ TestRiskManagerInitialization.test_manager_init_sets_up_logging ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:69: in test_manager_init_sets_up_logging
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_________ TestRiskManagerInitialization.test_manager_init_logs_startup _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:87: in test_manager_init_logs_startup
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m________ TestRiskManagerInitialization.test_manager_init_with_log_file _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:106: in test_manager_init_with_log_file
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m____________ TestRiskManagerCreate.test_create_with_default_config _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:132: in test_create_with_default_config
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m______________ TestRiskManagerCreate.test_create_with_instruments ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:154: in test_create_with_instruments
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m____________ TestRiskManagerCreate.test_create_with_rules_override _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:180: in test_create_with_rules_override
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m______________ TestRiskManagerCreate.test_create_with_config_file ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:202: in test_create_with_config_file
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m______________ TestRiskManagerCreate.test_create_with_ai_enabled _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:224: in test_create_with_ai_enabled
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_________________ TestRiskManagerCreate.test_create_without_ai _________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:245: in test_create_without_ai
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:118: in create
+    [0mmanager = [96mcls[39;49;00m(config)[90m[39;49;00m
+              ^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_________ TestRiskManagerIntegrations.test_init_ai_integration_success _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:280: in test_init_ai_integration_success
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m______ TestRiskManagerIntegrations.test_init_ai_integration_import_error _______[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:308: in test_init_ai_integration_import_error
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m____________ TestRiskManagerRules.test_add_default_rules_daily_loss ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:336: in test_add_default_rules_daily_loss
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerRules.test_add_default_rules_max_position ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:361: in test_add_default_rules_max_position
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______________ TestRiskManagerRules.test_add_default_rules_both _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:387: in test_add_default_rules_both
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______________ TestRiskManagerRules.test_add_default_rules_none _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:410: in test_add_default_rules_none
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m______________________ TestRiskManagerRules.test_add_rule ______________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:432: in test_add_rule
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_____________ TestRiskManagerLifecycle.test_start_when_not_running _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:460: in test_start_when_not_running
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerLifecycle.test_start_when_already_running ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:490: in test_start_when_already_running
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerLifecycle.test_start_without_integrations ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:511: in test_start_without_integrations
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerLifecycle.test_start_subscribes_to_events ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:532: in test_start_subscribes_to_events
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______________ TestRiskManagerLifecycle.test_stop_when_running ________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:555: in test_stop_when_running
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_____________ TestRiskManagerLifecycle.test_stop_when_not_running ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:585: in test_stop_when_not_running
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______________ TestRiskManagerLifecycle.test_stop_cancels_tasks _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:606: in test_stop_cancels_tasks
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______________ TestRiskManagerLifecycle.test_wait_until_stopped _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:636: in test_wait_until_stopped
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_____________ TestRiskManagerEventHandling.test_handle_fill_event ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:669: in test_handle_fill_event
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m________ TestRiskManagerEventHandling.test_handle_position_update_event ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:694: in test_handle_position_update_event
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerEventHandling.test_on_subscribe_to_events ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:719: in test_on_subscribe_to_events
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m___________ TestRiskManagerStats.test_get_stats_with_all_components ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:745: in test_get_stats_with_all_components
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_____________ TestRiskManagerStats.test_get_stats_without_trading ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:772: in test_get_stats_without_trading
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m__________ TestRiskManagerErrorHandling.test_start_with_engine_error ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:801: in test_start_with_engine_error
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_________ TestRiskManagerErrorHandling.test_stop_with_component_error __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:819: in test_stop_with_component_error
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m_______ TestRiskManagerErrorHandling.test_handle_fill_with_engine_error ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:841: in test_handle_fill_with_engine_error
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m____________ TestRiskManagerIntegration.test_event_flow_integration ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py[0m:883: in test_event_flow_integration
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:43: in __init__
+    [0m[96mself[39;49;00m._setup_logging()[90m[39;49;00m
+[1m[31msrc/risk_manager/core/manager.py[0m:52: in _setup_logging
+    [0mlog_config = [96mself[39;49;00m.config.general.logging[90m[39;49;00m
+                 ^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic/main.py[0m:1026: in __getattr__
+    [0m[94mraise[39;49;00m [96mAttributeError[39;49;00m([33mf[39;49;00m[33m'[39;49;00m[33m{[39;49;00m[96mtype[39;49;00m([96mself[39;49;00m).[91m__name__[39;49;00m[33m!r}[39;49;00m[33m object has no attribute [39;49;00m[33m{[39;49;00mitem[33m!r}[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'general'[0m
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Risk Engine initialized
+[31m[1m__________ TestDailyRealizedProfitRule.test_profit_at_target_violates __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:173: in test_profit_at_target_violates
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m_______ TestDailyRealizedProfitRule.test_profit_exceeds_target_violates ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:200: in test_profit_exceeds_target_violates
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m____________ TestDailyRealizedProfitRule.test_large_profit_violates ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:224: in test_large_profit_violates
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m_________ TestDailyRealizedProfitRule.test_violation_triggers_lockout __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:250: in test_violation_triggers_lockout
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m________ TestDailyRealizedProfitRule.test_multi_symbol_profit_tracking _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:327: in test_multi_symbol_profit_tracking
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m_________ TestDailyRealizedProfitRule.test_enforcement_action_correct __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:448: in test_enforcement_action_correct
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m_________ TestDailyRealizedProfitRule.test_evaluates_pnl_updated_event _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:492: in test_evaluates_pnl_updated_event
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Ignoring half-turn trade (no realized P&L)
+[31m[1m__________ TestDailyRealizedProfitRule.test_violation_message_clarity __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:561: in test_violation_message_clarity
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m__________ TestDailyRealizedProfitRule.test_mixed_trades_reach_target __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:592: in test_mixed_trades_reach_target
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m________ TestDailyRealizedProfitRule.test_success_message_positive_tone ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:617: in test_success_message_positive_tone
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
+[31m[1m_____ TestDailyRealizedProfitRule.test_cannot_trigger_both_profit_and_loss _____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_daily_realized_profit.py[0m:645: in test_cannot_trigger_both_profit_and_loss
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 DailyRealizedProfitRule initialized: target=$1000.00, reset=17:00 America/New_York
 [33m=============================== warnings summary ===============================[0m
 .venv/lib/python3.13/site-packages/uvloop/__init__.py:154
   /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
@@ -1451,17 +2449,11 @@ tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manage
 tests/unit/test_core/test_manager.py::TestRiskManagerInitialization::test_manager_init_with_log_file
   C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py:92: PytestWarning: The test <Function test_manager_init_with_log_file> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
 
-tests/unit/test_core/test_manager.py::TestRiskManagerCreate::test_create_with_rules_override
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_daily_loss
-tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_default_rules_both
-  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/config/models.py:1095: UserWarning: daily_unrealized_loss.limit (-750.0) should be >= daily_realized_loss.limit (-500.0) to trigger before realized loss
-    warnings.warn(
-
 tests/unit/test_core/test_manager.py::TestRiskManagerRules::test_add_rule
-  C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py:426: PytestWarning: The test <Function test_add_rule> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+  C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py:421: PytestWarning: The test <Function test_add_rule> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
 
 tests/unit/test_core/test_manager.py::TestRiskManagerEventHandling::test_on_subscribe_to_events
-  C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py:713: PytestWarning: The test <Function test_on_subscribe_to_events> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
+  C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_manager.py:708: PytestWarning: The test <Function test_on_subscribe_to_events> is marked with '@pytest.mark.asyncio' but it is not an async function. Please remove the asyncio mark. If the test is not marked explicitly, check for global marks applied via 'pytestmark'.
 
 tests/unit/test_sdk/test_event_bridge.py::TestPositionEventHandling::test_position_opened_event
 tests/unit/test_sdk/test_event_bridge.py::TestPositionEventHandling::test_position_update_short_position
@@ -1501,7 +2493,7 @@ Name                                                     Stmts   Miss Branch BrP
 -----------------------------------------------------------------------------------------------------
 src/risk_manager/__init__.py                                 4      0      0      0 100.00%
 src/risk_manager/ai/__init__.py                              0      0      0      0 100.00%
-src/risk_manager/ai/integration.py                          48     32      6      0  29.63%   31-39, 43-49, 53-62, 66-67, 72, 77, 81-90, 94-103, 108, 121
+src/risk_manager/ai/integration.py                          48     48      6      0   0.00%   10-121
 src/risk_manager/cli/__init__.py                             5      5      0      0   0.00%   8-41
 src/risk_manager/cli/admin.py                              635    635    118      0   0.00%   14-1237
 src/risk_manager/cli/admin_config_enhanced.py              113    113     20      0   0.00%   8-261
@@ -1520,22 +2512,22 @@ src/risk_manager/config/loader.py                          126     22     16    
 src/risk_manager/config/models.py                          603     19    118     22  94.31%   163->173, 168->165, 171->170, 193->exit, 227, 247, 285, 294-295, 599, 641, 669, 697, 725, 769, 819, 845, 874, 906, 932, 965, 973, 1213->1217, 1246
 src/risk_manager/config/validator.py                       172      1     98      8  96.67%   189, 336->369, 352->360, 392->402, 424->436, 436->448, 440->439, 468->499
 src/risk_manager/core/__init__.py                            5      0      0      0 100.00%
-src/risk_manager/core/config.py                             50      9      2      1  80.77%   88, 195, 199, 205, 210-217
+src/risk_manager/core/config.py                             72      3     12      4  91.67%   143, 150, 161->156, 189
 src/risk_manager/core/engine.py                             96      9     18      0  90.35%   150-151, 175-176, 209-214, 218
 src/risk_manager/core/events.py                             66      2     10      1  96.05%   71, 82, 105->exit
-src/risk_manager/core/manager.py                           140      8     32      2  94.19%   114, 119->118, 144-160
+src/risk_manager/core/manager.py                           110     67     32      2  35.92%   46-47, 53-69, 109, 114->113, 121-135, 139-155, 159-170, 184, 188-210, 214-233, 237-238, 242, 246, 250, 254, 258
 src/risk_manager/daemon/__init__.py                          3      3      0      0   0.00%   8-11
 src/risk_manager/daemon/runner.py                          131    131     26      0   0.00%   8-346
 src/risk_manager/daemon/service.py                         110    110     18      0   0.00%   8-295
 src/risk_manager/integrations/__init__.py                    0      0      0      0 100.00%
-src/risk_manager/integrations/trading.py                   250    250     66      0   0.00%   3-547
+src/risk_manager/integrations/trading.py                   226    226     64      0   0.00%   3-518
 src/risk_manager/rules/__init__.py                          16      0      0      0 100.00%
 src/risk_manager/rules/auth_loss_guard.py                   51      1     18      1  97.10%   172
 src/risk_manager/rules/base.py                              17      2      0      0  88.24%   42, 46
 src/risk_manager/rules/cooldown_after_loss.py               61      3     24      1  95.29%   154, 262-263
 src/risk_manager/rules/daily_loss.py                        17      0      8      0 100.00%
-src/risk_manager/rules/daily_realized_loss.py               63     10     16      3  83.54%   130, 143-144, 160-162, 275, 287-290
-src/risk_manager/rules/daily_realized_profit.py             67     11     16      2  84.34%   152-153, 169-171, 237-238, 287, 299-302
+src/risk_manager/rules/daily_realized_loss.py               63      9     16      3  84.81%   130, 143-144, 160-162, 274->278, 287-290
+src/risk_manager/rules/daily_realized_profit.py             67     10     16      2  85.54%   152-153, 169-171, 237-238, 286->290, 299-302
 src/risk_manager/rules/daily_unrealized_loss.py             45      2     20      2  93.85%   105, 178
 src/risk_manager/rules/max_contracts_per_instrument.py      81      1     36      4  95.73%   140->180, 161->180, 227, 231->246
 src/risk_manager/rules/max_position.py                      24      1     14      3  89.47%   34, 47->72, 49->47
@@ -1553,7 +2545,7 @@ src/risk_manager/state/__init__.py                           6      0      0    
 src/risk_manager/state/database.py                         104     17     20      2  81.45%   86->exit, 286, 317-333, 359-369, 381-391
 src/risk_manager/state/lockout_manager.py                  145     19     48      9  84.46%   159, 256-257, 290, 328, 355-363, 395-396, 421, 457, 459, 483-484, 489
 src/risk_manager/state/pnl_tracker.py                       56      2     16      3  93.06%   225, 257->260, 277
-src/risk_manager/state/reset_scheduler.py                  140     19     38     10  81.46%   121->128, 227, 233, 268-271, 338, 352-353, 357-360, 382->390, 386-387, 390->398, 408-409, 434->445, 441-443
+src/risk_manager/state/reset_scheduler.py                  140     19     38     11  80.90%   121->128, 227, 233, 246->277, 268-271, 338, 352-353, 357-360, 382->390, 386-387, 390->398, 408-409, 434->445, 441-443
 src/risk_manager/state/timer_manager.py                     95      8     26      5  89.26%   62-63, 77->85, 180-181, 213->224, 220-222, 235
 src/runtime/__init__.py                                      6      6      0      0   0.00%   15-21
 src/runtime/async_debug.py                                 101    101     28      0   0.00%   18-258
@@ -1568,10 +2560,66 @@ src/sanity/events_sanity.py                                177    177     34    
 src/sanity/logic_sanity.py                                  77     77      8      0   0.00%   19-127
 src/sanity/runner.py                                       162    162     26      0   0.00%   15-266
 -----------------------------------------------------------------------------------------------------
-TOTAL                                                     6852   3951   1718    112  42.67%
+TOTAL                                                     6820   3994   1726    116  41.73%
+Coverage HTML written to dir htmlcov
 [36m[1m=========================== short test summary info ============================[0m
-[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_real_async_timer_callback_execution[0m - assert 0 == 1
-[31m===== [31m[1m1 failed[0m, [32m1334 passed[0m, [33m61 skipped[0m, [33m28 warnings[0m[31m in 317.19s (0:05:17)[0m[31m ======[0m
+[31mFAILED[0m tests/e2e/test_timer_rules_e2e.py::[1mTestTimerRulesE2E::test_grace_period_expires_closes_position[0m - AssertionError: assert not True
+[31mFAILED[0m tests/integration/test_cooldown_after_loss_integration.py::[1mTestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear[0m - assert 1 == 0
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_full_profit_target_flow_with_database[0m - assert 600.0 == 300.0
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_multi_account_independence[0m - AssertionError: assert {'account_id': '456', 'action': 'flatten', 'current_...
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_reset_scheduler_integration[0m - AssertionError: assert 2200.0 == 1100.0
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_event_bus_async_flow[0m - AssertionError: assert {'account_id': '123', 'action': 'flatten', 'current_...
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_concurrent_access_thread_safety[0m - assert 2000.0 == 1000.0
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_mixed_profit_loss_day[0m - AssertionError: assert {'account_id': '123', 'action': 'flatten', 'current_...
+[31mFAILED[0m tests/integration/test_daily_realized_profit_integration.py::[1mtest_boundary_exactly_at_target[0m - assert 2000.0 == 1000.0
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position[0m - AssertionError: assert not True
+[31mFAILED[0m tests/integration/test_trade_frequency_limit_integration.py::[1mTestTradeFrequencyLimitIntegration::test_session_reset[0m - sqlite3.IntegrityError: UNIQUE constraint failed: trades.account_id, trades...
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerInitialization::test_manager_init_creates_components[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerInitialization::test_manager_init_sets_up_logging[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerInitialization::test_manager_init_logs_startup[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerInitialization::test_manager_init_with_log_file[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_with_default_config[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_with_instruments[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_with_rules_override[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_with_config_file[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_with_ai_enabled[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerCreate::test_create_without_ai[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerIntegrations::test_init_ai_integration_success[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerIntegrations::test_init_ai_integration_import_error[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerRules::test_add_default_rules_daily_loss[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerRules::test_add_default_rules_max_position[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerRules::test_add_default_rules_both[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerRules::test_add_default_rules_none[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerRules::test_add_rule[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_start_when_not_running[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_start_when_already_running[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_start_without_integrations[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_start_subscribes_to_events[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_stop_when_running[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_stop_when_not_running[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_stop_cancels_tasks[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerLifecycle::test_wait_until_stopped[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerEventHandling::test_handle_fill_event[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerEventHandling::test_handle_position_update_event[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerEventHandling::test_on_subscribe_to_events[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerStats::test_get_stats_with_all_components[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerStats::test_get_stats_without_trading[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerErrorHandling::test_start_with_engine_error[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerErrorHandling::test_stop_with_component_error[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerErrorHandling::test_handle_fill_with_engine_error[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_core/test_manager.py::[1mTestRiskManagerIntegration::test_event_flow_integration[0m - AttributeError: 'RiskConfig' object has no attribute 'general'
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_profit_at_target_violates[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_profit_exceeds_target_violates[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_large_profit_violates[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_violation_triggers_lockout[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_multi_symbol_profit_tracking[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_enforcement_action_correct[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_evaluates_pnl_updated_event[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_violation_message_clarity[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_mixed_trades_reach_target[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_success_message_positive_tone[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_rules/test_daily_realized_profit.py::[1mTestDailyRealizedProfitRule::test_cannot_trigger_both_profit_and_loss[0m - assert None is not None
+[31m===== [31m[1m56 failed[0m, [32m1336 passed[0m, [33m4 skipped[0m, [33m25 warnings[0m[31m in 311.69s (0:05:11)[0m[31m ======[0m
 
 
 ================================================================================

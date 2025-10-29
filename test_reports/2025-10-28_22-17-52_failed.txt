@@ -2,7 +2,7 @@
 Risk Manager V34 - Test Report
 ================================================================================
 Test Run: All tests with coverage (with branch)
-Timestamp: 2025-10-29 00:13:00
+Timestamp: 2025-10-28 22:17:52
 Status: FAILED
 Exit Code: 1
 ================================================================================
@@ -102,114 +102,114 @@ tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLoss
 tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_rapid_loss_sequence_only_first_triggers_timer [32mPASSED[0m[33m [  6%][0m
 tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_event_flow_from_trade_to_lockout [32mPASSED[0m[33m [  6%][0m
 tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_precision_within_tolerance [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_position_closed_event_triggers_cooldown [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_half_turn_trades_no_cooldown_no_timer [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_full_loss_limit_flow_with_database [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_multi_account_independence [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_lockout_persistence_crash_recovery [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_reset_scheduler_integration [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_half_turn_trades_ignored [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_mixed_profit_loss_day [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_concurrent_access_thread_safety [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_database_schema_validation [32mPASSED[0m[33m [  6%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_boundary_exactly_at_limit [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_timer_auto_unlock [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_full_profit_target_flow_with_database [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_multi_account_independence [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_lockout_persistence_crash_recovery [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_event_bus_async_flow [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_enforcement_action_integration [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_half_turn_trades_ignored [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_timer_auto_unlock [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_concurrent_access_thread_safety [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_database_schema_validation [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_mixed_profit_loss_day [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_lockout_prevents_further_evaluation [32mPASSED[0m[33m [  7%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_pnl_tracker_trade_count [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_reset_time_calculation [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_realized_profit_integration.py::test_boundary_exactly_at_target [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_normal_day [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_standard_time [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_daylight_time [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_17_00_still_exists [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_no_duplicate_reset [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_17_00_happens_once [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_no_duplicate_reset [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_spring [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_fall [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_uses_et_not_utc [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_full_unrealized_loss_violation_flow [32mPASSED[0m[33m [  8%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_multi_position_independence [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_real_pnl_calculation_accuracy [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_no_lockout_created_on_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_position_closed_before_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_enforcement_action_close_position_not_flatten_all [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_publishes_to_subscribers [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_multiple_subscribers [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_evaluates_rule_on_event [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_skips_rules_when_no_violation [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_triggers_flatten_enforcement [32mPASSED[0m[33m [  9%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_publishes_event [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_end_to_end_position_violation_flow [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multiple_rules_evaluated_in_order [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_handles_handler_errors [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_tracks_position_state [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_flatten_action_calls_flatten_all [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_pause_action_triggers_pause_trading [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_processing_is_fast [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multi_symbol_position_tracking [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_boots_and_reaches_checkpoints [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_handles_missing_credentials_gracefully [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_ctrl_c_triggers_graceful_shutdown [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_with_explicit_account_flag [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_within_limit [32mPASSED[0m[33m [ 10%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_multiple_symbols_independent_limits [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_one_symbol_violates_others_ok [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_symbol_without_configured_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_short_positions_absolute_value [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_event_bus_integration [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_no_lockout_on_violation [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_dynamic_limit_configuration [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_within_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_within_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_exceeds_limit [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_short_positions_absolute_value [32mPASSED[0m[33m [ 11%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_event_bus_integration [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_no_lockout_on_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_zero_position_no_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_performance_many_symbols [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_es_long_position_reaches_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_mnq_short_position_reaches_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_multi_position_independence [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_enforcement_closes_position_not_flatten_all [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_position_closed_before_target [32mPASSED[0m[33m [ 12%][0m
-tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_zero_negative_profit_no_violation [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_flatten_and_reduce_to_limit_both_detected [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_close_position_and_flatten_both_detected [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_deterministic_priority_order [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_sort_violations_by_priority [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_multiple_violations_same_priority [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_priority_rationale [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_enforcement_execution_order [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[33m [ 13%][0m
-tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [31mFAILED[0m[31m [ 13%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [31mFAILED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_position_closed_event_triggers_cooldown [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_half_turn_trades_no_cooldown_no_timer [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_full_loss_limit_flow_with_database [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_multi_account_independence [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_lockout_persistence_crash_recovery [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_reset_scheduler_integration [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_half_turn_trades_ignored [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_mixed_profit_loss_day [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_concurrent_access_thread_safety [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_database_schema_validation [32mPASSED[0m[31m [  6%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_boundary_exactly_at_limit [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_loss_integration.py::TestDailyRealizedLossIntegration::test_timer_auto_unlock [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_full_profit_target_flow_with_database [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_multi_account_independence [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_persistence_crash_recovery [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_event_bus_async_flow [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_enforcement_action_integration [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_half_turn_trades_ignored [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_timer_auto_unlock [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_concurrent_access_thread_safety [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_database_schema_validation [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_mixed_profit_loss_day [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_prevents_further_evaluation [32mPASSED[0m[31m [  7%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_pnl_tracker_trade_count [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_time_calculation [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_boundary_exactly_at_target [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_normal_day [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_standard_time [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_daylight_time [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_17_00_still_exists [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_no_duplicate_reset [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_17_00_happens_once [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_no_duplicate_reset [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_spring [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_fall [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_uses_et_not_utc [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_full_unrealized_loss_violation_flow [32mPASSED[0m[31m [  8%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_multi_position_independence [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_real_pnl_calculation_accuracy [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_no_lockout_created_on_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_position_closed_before_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_enforcement_action_close_position_not_flatten_all [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_publishes_to_subscribers [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_multiple_subscribers [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_evaluates_rule_on_event [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_skips_rules_when_no_violation [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_triggers_flatten_enforcement [32mPASSED[0m[31m [  9%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_publishes_event [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_end_to_end_position_violation_flow [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multiple_rules_evaluated_in_order [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_handles_handler_errors [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_tracks_position_state [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_flatten_action_calls_flatten_all [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_pause_action_triggers_pause_trading [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_processing_is_fast [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multi_symbol_position_tracking [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_boots_and_reaches_checkpoints [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_handles_missing_credentials_gracefully [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_ctrl_c_triggers_graceful_shutdown [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_live_system_smoke.py::TestLiveSystemSmoke::test_system_with_explicit_account_flag [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_within_limit [32mPASSED[0m[31m [ 10%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_multiple_symbols_independent_limits [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_one_symbol_violates_others_ok [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_symbol_without_configured_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_short_positions_absolute_value [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_event_bus_integration [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_no_lockout_on_violation [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_contracts_per_instrument_integration.py::TestMaxContractsPerInstrumentIntegration::test_dynamic_limit_configuration [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_within_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_single_symbol_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_within_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_multi_symbol_total_exceeds_limit [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_short_positions_absolute_value [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_event_bus_integration [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_no_lockout_on_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_zero_position_no_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_exactly_at_limit_no_violation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_position_integration.py::TestMaxPositionIntegration::test_performance_many_symbols [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_es_long_position_reaches_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_mnq_short_position_reaches_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_multi_position_independence [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_enforcement_closes_position_not_flatten_all [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_position_closed_before_target [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_max_unrealized_profit_integration.py::TestMaxUnrealizedProfitIntegration::test_zero_negative_profit_no_violation [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_flatten_and_reduce_to_limit_both_detected [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_close_position_and_flatten_both_detected [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_deterministic_priority_order [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_sort_violations_by_priority [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestMultipleBreachArbitration::test_multiple_violations_same_priority [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_priority_rationale [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_multiple_breach_arbitration.py::TestPriorityDocumentation::test_enforcement_execution_order [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [32mPASSED[0m[31m [ 13%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_order_type_detection_only_stops_cancel_timer [32mPASSED[0m[31m [ 13%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_event_bus_integration_with_rule_events [32mPASSED[0m[31m [ 14%][0m
 tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_timer_recreated_after_manager_restart [32mPASSED[0m[31m [ 14%][0m
@@ -560,34 +560,34 @@ tests/unit/test_config/test_config_models.py::TestEdgeCases::test_year_boundary_
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_year_boundary_2100 [32mPASSED[0m[31m [ 38%][0m
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_leap_year_date_valid [32mPASSED[0m[31m [ 38%][0m
 tests/unit/test_config/test_config_models.py::TestEdgeCases::test_optional_fields_none [32mPASSED[0m[31m [ 38%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_load_from_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_defaults [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_explicit_params_override_env [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_partial_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_case_insensitive [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_prefix [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_boolean_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_integer_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_float_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_optional_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_optional_env_variables [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_loading [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_env_file [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_empty_env_variable [33mSKIPPED[0m[31m [ 39%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_whitespace_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_special_characters [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_multiline_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_validation_alias [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_url_env_variables [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_all_fields_from_env [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_type_coercion_errors [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_required_env_variable [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_comments [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_quotes [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_equals_in_value [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_missing [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_combined_yaml_and_env [33mSKIPPED[0m[31m [ 40%][0m
-tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_unicode [33mSKIPPED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_load_from_env_variables [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_defaults [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_explicit_params_override_env [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_partial_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_case_insensitive [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_prefix [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_boolean_env_variables [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_integer_env_variables [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_float_env_variables [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_optional_env_variables [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_optional_env_variables [32mPASSED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_loading [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_env_file [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_empty_env_variable [31mFAILED[0m[31m [ 39%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_whitespace_env_variable [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_with_special_characters [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_multiline_env_variable [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_validation_alias [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_url_env_variables [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_all_fields_from_env [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_type_coercion_errors [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_missing_required_env_variable [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_comments [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_quotes [32mPASSED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_equals_in_value [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_missing [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_combined_yaml_and_env [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variable_unicode [31mFAILED[0m[31m [ 40%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_valid_directory [32mPASSED[0m[31m [ 41%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_string_path [32mPASSED[0m[31m [ 41%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderInit::test_init_with_relative_path [32mPASSED[0m[31m [ 41%][0m
@@ -634,35 +634,35 @@ tests/unit/test_config/test_loader.py::TestConfigurationError::test_configuratio
 tests/unit/test_config/test_loader.py::TestConfigurationError::test_configuration_error_raised_properly [32mPASSED[0m[31m [ 44%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderIntegration::test_full_config_loading_workflow [32mPASSED[0m[31m [ 44%][0m
 tests/unit/test_config/test_loader.py::TestConfigLoaderIntegration::test_error_message_quality [32mPASSED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_minimal [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_all_fields [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_api_key [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_username [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_both_required_fields [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_negative [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_zero [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_positive [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_zero [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_optional_fields_none [33mSKIPPED[0m[31m [ 44%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_valid_values [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_case_insensitive [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_true [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_false [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_integer_fields_valid [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_float_fields_valid [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_string_fields_empty [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_extra_fields_ignored [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_to_dict_method [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_model_dump_includes_all_fields [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_environment_field_values [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_url_fields_format [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_int [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_float [33mSKIPPED[0m[31m [ 45%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_bool [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_int_field [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_float_field [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_equality [33mSKIPPED[0m[31m [ 46%][0m
-tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_immutability_after_creation [33mSKIPPED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_minimal [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_valid_config_all_fields [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_api_key [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_required_field_username [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_missing_both_required_fields [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_negative [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_max_contracts_zero [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_positive [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_max_daily_loss_zero [31mFAILED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_optional_fields_none [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_valid_values [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_log_level_case_insensitive [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_true [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_boolean_fields_false [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_integer_fields_valid [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_float_fields_valid [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_string_fields_empty [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_extra_fields_ignored [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_to_dict_method [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_model_dump_includes_all_fields [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_environment_field_values [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_url_fields_format [32mPASSED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_int [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_float [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_type_coercion_string_to_bool [31mFAILED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_int_field [31mFAILED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_invalid_type_for_float_field [31mFAILED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_equality [31mFAILED[0m[31m [ 46%][0m
+tests/unit/test_config/test_models.py::TestRiskConfigModel::test_config_immutability_after_creation [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_midnight [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_noon [32mPASSED[0m[31m [ 46%][0m
 tests/unit/test_config/test_validator.py::TestValidationHelpers::TestValidateTimeFormat::test_valid_time_end_of_day [32mPASSED[0m[31m [ 46%][0m
@@ -1414,10 +1414,11 @@ tests/unit/test_state/test_timer_manager.py::test_has_timer_returns_false_for_no
 tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_raises_error [32mPASSED[0m[31m [100%][0m
 
 =================================== FAILURES ===================================
-[31m[1m___ TestNoStopLossGraceIntegration.test_real_async_timer_callback_execution ____[0m
-[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:364: in test_real_async_timer_callback_execution
+[31m[1m___ TestCooldownAfterLossIntegration.test_database_cleanup_on_lockout_clear ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_cooldown_after_loss_integration.py[0m:701: in test_database_cleanup_on_lockout_clear
     [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
-[1m[31mE   assert 0 == 1[0m
+[1m[31mE   assert 1 == 0[0m
+[1m[31mE    +  where 1 = len([<sqlite3.Row object at 0x783a31256b90>])[0m
 ------------------------------ Captured log setup ------------------------------
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
 
@@ -1426,14 +1427,322 @@ tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_r
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-22/test_database_cleanup_on_locko0/test_cooldown_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Starting Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout expiry background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 CooldownAfterLossRule initialized: 1 tiers
 ------------------------------ Captured log call -------------------------------
-[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: test_timer (duration=1s, expires=00:09:50)
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Cooldown triggered for account 1010: Loss=$-150.00, Cooldown=2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ENFORCING RULE-007: Account 1010 Loss: $-150.00, Cooldown: 2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: lockout_1010 (duration=2s, expires=22:13:51)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started for account 1010 cooldown
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 cooldown for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 locked for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
 ---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Shutting down Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer cancelled: lockout_1010
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Error cancelling timer for account 1010: object NoneType can't be used in 'await' expression
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Stopping Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager shutdown complete
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
 
 [32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_load_from_env_variables _______[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:26: in test_load_from_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'env_api_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- env_api_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m___ TestEnvironmentVariableSubstitution.test_env_variables_override_defaults ___[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:38: in test_env_variables_override_defaults
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 5 == 20[0m
+[1m[31mE    +  where 5 = <risk_manager.core.config.RiskConfig object at 0x783a311c4d10>.max_contracts[0m
+[31m[1m____ TestEnvironmentVariableSubstitution.test_env_variable_case_insensitive ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:75: in test_env_variable_case_insensitive
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'lower_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- lower_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m______ TestEnvironmentVariableSubstitution.test_env_variable_with_prefix _______[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:88: in test_env_variable_with_prefix
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'INFO' == 'DEBUG'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- DEBUG[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ INFO[39;49;00m[90m[39;49;00m[0m
+[31m[1m________ TestEnvironmentVariableSubstitution.test_boolean_env_variables ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:101: in test_boolean_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert True is False[0m
+[1m[31mE    +  where True = <risk_manager.core.config.RiskConfig object at 0x783a311c46b0>.require_stop_loss[0m
+[31m[1m________ TestEnvironmentVariableSubstitution.test_integer_env_variables ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:115: in test_integer_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 5 == 15[0m
+[1m[31mE    +  where 5 = <risk_manager.core.config.RiskConfig object at 0x783a311c7020>.max_contracts[0m
+[31m[1m_________ TestEnvironmentVariableSubstitution.test_float_env_variables _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:127: in test_float_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert -1000.0 == -2500.75[0m
+[1m[31mE    +  where -1000.0 = <risk_manager.core.config.RiskConfig object at 0x783a311c79b0>.max_daily_loss[0m
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_optional_env_variables ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:138: in test_optional_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert None == 'sk-ant-test'[0m
+[1m[31mE    +  where None = <risk_manager.core.config.RiskConfig object at 0x783a2f6a0160>.anthropic_api_key[0m
+[31m[1m__________ TestEnvironmentVariableSubstitution.test_env_file_loading ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:174: in test_env_file_loading
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'dotenv_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- dotenv_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m___ TestEnvironmentVariableSubstitution.test_env_variables_override_env_file ___[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:194: in test_env_variables_override_env_file
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'env_override_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- env_override_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m_________ TestEnvironmentVariableSubstitution.test_empty_env_variable __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:204: in test_empty_env_variable
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == ''[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_whitespace_env_variable _______[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:213: in test_whitespace_env_variable
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == '   '[0m
+[1m[31mE     [0m
+[1m[31mE     Strings contain only whitespace, escaping them using repr()[0m
+[1m[31mE     [0m[91m- '   '[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ 'test_key'[39;49;00m[90m[39;49;00m[0m
+[31m[1m_ TestEnvironmentVariableSubstitution.test_env_variable_with_special_characters _[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:222: in test_env_variable_with_special_characters
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'key!@#$%^&*()'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- key!@#$%^&*()[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_multiline_env_variable ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:232: in test_multiline_env_variable
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert '\n' in 'test_key'[0m
+[1m[31mE    +  where 'test_key' = <risk_manager.core.config.RiskConfig object at 0x783a311c6250>.project_x_api_key[0m
+[31m[1m____ TestEnvironmentVariableSubstitution.test_env_variable_validation_alias ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:242: in test_env_variable_validation_alias
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'alias_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- alias_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m__________ TestEnvironmentVariableSubstitution.test_url_env_variables __________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:254: in test_url_env_variables
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'https://api.topstepx.com/api' == 'https://custom.api.com'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- https://custom.api.com[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ https://api.topstepx.com/api[39;49;00m[90m[39;49;00m[0m
+[31m[1m_________ TestEnvironmentVariableSubstitution.test_all_fields_from_env _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:284: in test_all_fields_from_env
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 5 == 30[0m
+[1m[31mE    +  where 5 = <risk_manager.core.config.RiskConfig object at 0x783a2f6a0f30>.max_contracts[0m
+[31m[1m__ TestEnvironmentVariableSubstitution.test_env_variable_type_coercion_errors __[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:296: in test_env_variable_type_coercion_errors
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   Failed: DID NOT RAISE <class 'Exception'>[0m
+[31m[1m____ TestEnvironmentVariableSubstitution.test_missing_required_env_variable ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:303: in test_missing_required_env_variable
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   Failed: DID NOT RAISE <class 'Exception'>[0m
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_env_file_with_comments ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:325: in test_env_file_with_comments
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'dotenv_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- dotenv_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m____ TestEnvironmentVariableSubstitution.test_env_file_with_equals_in_value ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:359: in test_env_file_with_equals_in_value
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert '=' in 'test_key'[0m
+[1m[31mE    +  where 'test_key' = <risk_manager.core.config.RiskConfig object at 0x783a311c5150>.project_x_api_key[0m
+[31m[1m__________ TestEnvironmentVariableSubstitution.test_env_file_missing ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:369: in test_env_file_missing
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == 'env_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- env_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m________ TestEnvironmentVariableSubstitution.test_combined_yaml_and_env ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:386: in test_combined_yaml_and_env
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:213: in from_file
+    [0mloader = ConfigLoader(config_dir=config_path.parent, env_file=[94mNone[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31msrc/risk_manager/config/loader.py[0m:65: in __init__
+    [0m[96mself[39;49;00m.env_file = Path(env_file)[90m[39;49;00m
+                    ^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m/home/jakers/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py[0m:503: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m(*args)[90m[39;49;00m
+[1m[31m/home/jakers/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py[0m:132: in __init__
+    [0m[94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'[0m
+[31m[1m________ TestEnvironmentVariableSubstitution.test_env_variable_unicode _________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_env_substitution.py[0m:399: in test_env_variable_unicode
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert '™' in 'test_key'[0m
+[1m[31mE    +  where 'test_key' = <risk_manager.core.config.RiskConfig object at 0x783a311c56a0>.project_x_api_key[0m
+[31m[1m___________ TestRiskConfigModel.test_missing_required_field_api_key ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:66: in test_missing_required_field_api_key
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>[0m
+[31m[1m___________ TestRiskConfigModel.test_missing_required_field_username ___________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:74: in test_missing_required_field_username
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>[0m
+[31m[1m____________ TestRiskConfigModel.test_missing_both_required_fields _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:82: in test_missing_both_required_fields
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>[0m
+[31m[1m___________ TestRiskConfigModel.test_invalid_max_contracts_negative ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:94: in test_invalid_max_contracts_negative
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:108: in __init__
+    [0mmax_contracts=MaxContractsConfig(enabled=[94mTrue[39;49;00m, limit=max_contracts),[90m[39;49;00m
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for MaxContractsConfig[0m
+[1m[31mE   limit[0m
+[1m[31mE     Input should be greater than 0 [type=greater_than, input_value=-5, input_type=int][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/greater_than[0m
+[31m[1m_____________ TestRiskConfigModel.test_invalid_max_contracts_zero ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:103: in test_invalid_max_contracts_zero
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:108: in __init__
+    [0mmax_contracts=MaxContractsConfig(enabled=[94mTrue[39;49;00m, limit=max_contracts),[90m[39;49;00m
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for MaxContractsConfig[0m
+[1m[31mE   limit[0m
+[1m[31mE     Input should be greater than 0 [type=greater_than, input_value=0, input_type=int][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/greater_than[0m
+[31m[1m_______________ TestRiskConfigModel.test_max_daily_loss_positive _______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:113: in test_max_daily_loss_positive
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:131: in __init__
+    [0mdaily_realized_loss=DailyRealizedLossConfig([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for DailyRealizedLossConfig[0m
+[1m[31mE   limit[0m
+[1m[31mE     Input should be less than 0 [type=less_than, input_value=1000.0, input_type=float][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/less_than[0m
+[31m[1m_________________ TestRiskConfigModel.test_max_daily_loss_zero _________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:122: in test_max_daily_loss_zero
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:131: in __init__
+    [0mdaily_realized_loss=DailyRealizedLossConfig([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for DailyRealizedLossConfig[0m
+[1m[31mE   limit[0m
+[1m[31mE     Input should be less than 0 [type=less_than, input_value=0.0, input_type=float][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/less_than[0m
+[31m[1m_______________ TestRiskConfigModel.test_log_level_valid_values ________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:148: in test_log_level_valid_values
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:91: in __init__
+    [0mlogging_config = LoggingConfig([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for LoggingConfig[0m
+[1m[31mE   level[0m
+[1m[31mE     Input should be 'DEBUG', 'INFO', 'WARNING' or 'ERROR' [type=literal_error, input_value='CRITICAL', input_type=str][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/literal_error[0m
+[31m[1m_____________ TestRiskConfigModel.test_log_level_case_insensitive ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:157: in test_log_level_case_insensitive
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31msrc/risk_manager/core/config.py[0m:91: in __init__
+    [0mlogging_config = LoggingConfig([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 1 validation error for LoggingConfig[0m
+[1m[31mE   level[0m
+[1m[31mE     Input should be 'DEBUG', 'INFO', 'WARNING' or 'ERROR' [type=literal_error, input_value='debug', input_type=str][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/literal_error[0m
+[31m[1m_________________ TestRiskConfigModel.test_string_fields_empty _________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:228: in test_string_fields_empty
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'test_key' == ''[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[92m+ test_key[39;49;00m[90m[39;49;00m[0m
+[31m[1m___________________ TestRiskConfigModel.test_to_dict_method ____________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:255: in test_to_dict_method
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   KeyError: 'project_x_api_key'[0m
+[31m[1m___________ TestRiskConfigModel.test_model_dump_includes_all_fields ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:267: in test_model_dump_includes_all_fields
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'model_dump'[0m
+[31m[1m_____________ TestRiskConfigModel.test_type_coercion_string_to_int _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:309: in test_type_coercion_string_to_int
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert '10' == 10[0m
+[1m[31mE    +  where '10' = <risk_manager.core.config.RiskConfig object at 0x783a2f6a1590>.max_contracts[0m
+[31m[1m____________ TestRiskConfigModel.test_type_coercion_string_to_float ____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:320: in test_type_coercion_string_to_float
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert '-1000.0' == -1000.0[0m
+[1m[31mE    +  where '-1000.0' = <risk_manager.core.config.RiskConfig object at 0x783a2f6a19d0>.max_daily_loss[0m
+[31m[1m____________ TestRiskConfigModel.test_type_coercion_string_to_bool _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:332: in test_type_coercion_string_to_bool
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'true' is True[0m
+[1m[31mE    +  where 'true' = <risk_manager.core.config.RiskConfig object at 0x783a2f6a3240>.require_stop_loss[0m
+[31m[1m_____________ TestRiskConfigModel.test_invalid_type_for_int_field ______________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:345: in test_invalid_type_for_int_field
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False[0m
+[1m[31mE    +  where False = any(<generator object TestRiskConfigModel.test_invalid_type_for_int_field.<locals>.<genexpr> at 0x783a2f76cba0>)[0m
+[31m[1m____________ TestRiskConfigModel.test_invalid_type_for_float_field _____________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:357: in test_invalid_type_for_float_field
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False[0m
+[1m[31mE    +  where False = any(<generator object TestRiskConfigModel.test_invalid_type_for_float_field.<locals>.<genexpr> at 0x783a2f77f030>)[0m
+[31m[1m___________________ TestRiskConfigModel.test_config_equality ___________________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_config\test_models.py[0m:373: in test_config_equality
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AttributeError: 'RiskConfig' object has no attribute 'model_dump'[0m
 [33m=============================== warnings summary ===============================[0m
 .venv/lib/python3.13/site-packages/uvloop/__init__.py:154
   /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
@@ -1520,22 +1829,22 @@ src/risk_manager/config/loader.py                          126     22     16    
 src/risk_manager/config/models.py                          603     19    118     22  94.31%   163->173, 168->165, 171->170, 193->exit, 227, 247, 285, 294-295, 599, 641, 669, 697, 725, 769, 819, 845, 874, 906, 932, 965, 973, 1213->1217, 1246
 src/risk_manager/config/validator.py                       172      1     98      8  96.67%   189, 336->369, 352->360, 392->402, 424->436, 436->448, 440->439, 468->499
 src/risk_manager/core/__init__.py                            5      0      0      0 100.00%
-src/risk_manager/core/config.py                             50      9      2      1  80.77%   88, 195, 199, 205, 210-217
+src/risk_manager/core/config.py                             50      4      2      1  90.38%   88, 195, 214-217
 src/risk_manager/core/engine.py                             96      9     18      0  90.35%   150-151, 175-176, 209-214, 218
 src/risk_manager/core/events.py                             66      2     10      1  96.05%   71, 82, 105->exit
-src/risk_manager/core/manager.py                           140      8     32      2  94.19%   114, 119->118, 144-160
+src/risk_manager/core/manager.py                           113      8     32      2  93.10%   114, 119->118, 144-160
 src/risk_manager/daemon/__init__.py                          3      3      0      0   0.00%   8-11
 src/risk_manager/daemon/runner.py                          131    131     26      0   0.00%   8-346
 src/risk_manager/daemon/service.py                         110    110     18      0   0.00%   8-295
 src/risk_manager/integrations/__init__.py                    0      0      0      0 100.00%
-src/risk_manager/integrations/trading.py                   250    250     66      0   0.00%   3-547
+src/risk_manager/integrations/trading.py                   226    226     64      0   0.00%   3-518
 src/risk_manager/rules/__init__.py                          16      0      0      0 100.00%
 src/risk_manager/rules/auth_loss_guard.py                   51      1     18      1  97.10%   172
 src/risk_manager/rules/base.py                              17      2      0      0  88.24%   42, 46
 src/risk_manager/rules/cooldown_after_loss.py               61      3     24      1  95.29%   154, 262-263
 src/risk_manager/rules/daily_loss.py                        17      0      8      0 100.00%
-src/risk_manager/rules/daily_realized_loss.py               63     10     16      3  83.54%   130, 143-144, 160-162, 275, 287-290
-src/risk_manager/rules/daily_realized_profit.py             67     11     16      2  84.34%   152-153, 169-171, 237-238, 287, 299-302
+src/risk_manager/rules/daily_realized_loss.py               63      9     16      3  84.81%   130, 143-144, 160-162, 274->278, 287-290
+src/risk_manager/rules/daily_realized_profit.py             67     10     16      2  85.54%   152-153, 169-171, 237-238, 286->290, 299-302
 src/risk_manager/rules/daily_unrealized_loss.py             45      2     20      2  93.85%   105, 178
 src/risk_manager/rules/max_contracts_per_instrument.py      81      1     36      4  95.73%   140->180, 161->180, 227, 231->246
 src/risk_manager/rules/max_position.py                      24      1     14      3  89.47%   34, 47->72, 49->47
@@ -1553,7 +1862,7 @@ src/risk_manager/state/__init__.py                           6      0      0    
 src/risk_manager/state/database.py                         104     17     20      2  81.45%   86->exit, 286, 317-333, 359-369, 381-391
 src/risk_manager/state/lockout_manager.py                  145     19     48      9  84.46%   159, 256-257, 290, 328, 355-363, 395-396, 421, 457, 459, 483-484, 489
 src/risk_manager/state/pnl_tracker.py                       56      2     16      3  93.06%   225, 257->260, 277
-src/risk_manager/state/reset_scheduler.py                  140     19     38     10  81.46%   121->128, 227, 233, 268-271, 338, 352-353, 357-360, 382->390, 386-387, 390->398, 408-409, 434->445, 441-443
+src/risk_manager/state/reset_scheduler.py                  140     19     38     11  80.90%   121->128, 227, 233, 246->277, 268-271, 338, 352-353, 357-360, 382->390, 386-387, 390->398, 408-409, 434->445, 441-443
 src/risk_manager/state/timer_manager.py                     95      8     26      5  89.26%   62-63, 77->85, 180-181, 213->224, 220-222, 235
 src/runtime/__init__.py                                      6      6      0      0   0.00%   15-21
 src/runtime/async_debug.py                                 101    101     28      0   0.00%   18-258
@@ -1568,10 +1877,52 @@ src/sanity/events_sanity.py                                177    177     34    
 src/sanity/logic_sanity.py                                  77     77      8      0   0.00%   19-127
 src/sanity/runner.py                                       162    162     26      0   0.00%   15-266
 -----------------------------------------------------------------------------------------------------
-TOTAL                                                     6852   3951   1718    112  42.67%
+TOTAL                                                     6801   3920   1716    113  42.69%
 [36m[1m=========================== short test summary info ============================[0m
-[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_real_async_timer_callback_execution[0m - assert 0 == 1
-[31m===== [31m[1m1 failed[0m, [32m1334 passed[0m, [33m61 skipped[0m, [33m28 warnings[0m[31m in 317.19s (0:05:17)[0m[31m ======[0m
+[31mFAILED[0m tests/integration/test_cooldown_after_loss_integration.py::[1mTestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear[0m - assert 1 == 0
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_load_from_env_variables[0m - AssertionError: assert 'test_key' == 'env_api_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variables_override_defaults[0m - assert 5 == 20
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_case_insensitive[0m - AssertionError: assert 'test_key' == 'lower_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_with_prefix[0m - AssertionError: assert 'INFO' == 'DEBUG'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_boolean_env_variables[0m - assert True is False
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_integer_env_variables[0m - assert 5 == 15
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_float_env_variables[0m - assert -1000.0 == -2500.75
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_optional_env_variables[0m - AssertionError: assert None == 'sk-ant-test'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_loading[0m - AssertionError: assert 'test_key' == 'dotenv_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variables_override_env_file[0m - AssertionError: assert 'test_key' == 'env_override_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_empty_env_variable[0m - AssertionError: assert 'test_key' == ''
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_whitespace_env_variable[0m - AssertionError: assert 'test_key' == '   '
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_with_special_characters[0m - AssertionError: assert 'test_key' == 'key!@#$%^&*()'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_multiline_env_variable[0m - AssertionError: assert '\n' in 'test_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_validation_alias[0m - AssertionError: assert 'test_key' == 'alias_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_url_env_variables[0m - AssertionError: assert 'https://api.topstepx.com/api' == 'https://custom.ap...
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_all_fields_from_env[0m - assert 5 == 30
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_type_coercion_errors[0m - Failed: DID NOT RAISE <class 'Exception'>
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_missing_required_env_variable[0m - Failed: DID NOT RAISE <class 'Exception'>
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_with_comments[0m - AssertionError: assert 'test_key' == 'dotenv_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_with_equals_in_value[0m - AssertionError: assert '=' in 'test_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_missing[0m - AssertionError: assert 'test_key' == 'env_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_combined_yaml_and_env[0m - TypeError: argument should be a str or an os.PathLike object where __fspath...
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variable_unicode[0m - AssertionError: assert '™' in 'test_key'
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_missing_required_field_api_key[0m - Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_missing_required_field_username[0m - Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_missing_both_required_fields[0m - Failed: DID NOT RAISE <class 'pydantic_core._pydantic_core.ValidationError'>
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_invalid_max_contracts_negative[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for MaxCon...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_invalid_max_contracts_zero[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for MaxCon...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_max_daily_loss_positive[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for DailyR...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_max_daily_loss_zero[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for DailyR...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_log_level_valid_values[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for Loggin...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_log_level_case_insensitive[0m - pydantic_core._pydantic_core.ValidationError: 1 validation error for Loggin...
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_string_fields_empty[0m - AssertionError: assert 'test_key' == ''
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_to_dict_method[0m - KeyError: 'project_x_api_key'
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_model_dump_includes_all_fields[0m - AttributeError: 'RiskConfig' object has no attribute 'model_dump'
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_type_coercion_string_to_int[0m - AssertionError: assert '10' == 10
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_type_coercion_string_to_float[0m - AssertionError: assert '-1000.0' == -1000.0
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_type_coercion_string_to_bool[0m - AssertionError: assert 'true' is True
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_invalid_type_for_int_field[0m - assert False
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_invalid_type_for_float_field[0m - assert False
+[31mFAILED[0m tests/unit/test_config/test_models.py::[1mTestRiskConfigModel::test_config_equality[0m - AttributeError: 'RiskConfig' object has no attribute 'model_dump'
+[31m===== [31m[1m43 failed[0m, [32m1349 passed[0m, [33m4 skipped[0m, [33m28 warnings[0m[31m in 310.63s (0:05:10)[0m[31m ======[0m
 
 
 ================================================================================

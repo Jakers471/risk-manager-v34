@@ -156,7 +156,7 @@ class TestDailyRealizedProfitRule:
     async def test_profit_at_target_violates(self, rule, mock_engine, mock_pnl_tracker):
         """Test that daily P&L at exact target triggers violation."""
         # Given: Daily P&L = exactly $1000 (at target)
-        mock_pnl_tracker.get_daily_pnl.return_value = 1000.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1000.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -183,7 +183,7 @@ class TestDailyRealizedProfitRule:
     async def test_profit_exceeds_target_violates(self, rule, mock_engine, mock_pnl_tracker):
         """Test that daily P&L exceeding target triggers violation."""
         # Given: Daily P&L = $1200 (exceeds $1000 target)
-        mock_pnl_tracker.get_daily_pnl.return_value = 1200.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1200.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -207,7 +207,7 @@ class TestDailyRealizedProfitRule:
     async def test_large_profit_violates(self, rule, mock_engine, mock_pnl_tracker):
         """Test that significantly larger profit triggers violation."""
         # Given: Daily P&L = $2500 (far exceeds $1000 target)
-        mock_pnl_tracker.get_daily_pnl.return_value = 2500.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 2500.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -233,7 +233,7 @@ class TestDailyRealizedProfitRule:
     async def test_violation_triggers_lockout(self, rule, mock_engine, mock_pnl_tracker, mock_lockout_manager):
         """Test that violation triggers lockout via LockoutManager."""
         # Given: Daily P&L exceeds target
-        mock_pnl_tracker.get_daily_pnl.return_value = 1100.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1100.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -309,7 +309,7 @@ class TestDailyRealizedProfitRule:
         """Test that profits are tracked across all symbols."""
         # Given: Profits from multiple symbols
         # MNQ: +$400, ES: +$300, NQ: +$400 = +$1100 total
-        mock_pnl_tracker.get_daily_pnl.return_value = 1100.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1100.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -431,7 +431,7 @@ class TestDailyRealizedProfitRule:
     async def test_enforcement_action_correct(self, rule, mock_engine, mock_pnl_tracker):
         """Test violation includes correct enforcement action."""
         # Given: Profit exceeds target
-        mock_pnl_tracker.get_daily_pnl.return_value = 1150.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1150.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -474,14 +474,14 @@ class TestDailyRealizedProfitRule:
     @pytest.mark.asyncio
     async def test_evaluates_pnl_updated_event(self, rule, mock_engine, mock_pnl_tracker):
         """Test rule evaluates PNL_UPDATED events."""
-        # Given: P&L update event
-        mock_pnl_tracker.get_daily_pnl.return_value = 1100.0
+        # Given: P&L update event with profitAndLoss field
+        mock_pnl_tracker.add_trade_pnl.return_value = 1100.0
 
         event = RiskEvent(
             event_type=EventType.PNL_UPDATED,
             data={
                 "account_id": "ACC-001",
-                "daily_pnl": 1100.0
+                "profitAndLoss": 1100.0  # Must have profitAndLoss field
             }
         )
 
@@ -544,7 +544,7 @@ class TestDailyRealizedProfitRule:
     async def test_violation_message_clarity(self, rule, mock_engine, mock_pnl_tracker):
         """Test violation message is clear and actionable."""
         # Given: Profit exceeds target
-        mock_pnl_tracker.get_daily_pnl.return_value = 1250.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1250.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -575,7 +575,7 @@ class TestDailyRealizedProfitRule:
     async def test_mixed_trades_reach_target(self, rule, mock_engine, mock_pnl_tracker):
         """Test that mixed profit/loss trades can reach target."""
         # Given: Mixed day: +$600, -$200, +$800 = +$1200 total
-        mock_pnl_tracker.get_daily_pnl.return_value = 1200.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1200.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -600,7 +600,7 @@ class TestDailyRealizedProfitRule:
     async def test_success_message_positive_tone(self, rule, mock_engine, mock_pnl_tracker):
         """Test violation message has positive tone (good job!)."""
         # Given: Profit exceeds target
-        mock_pnl_tracker.get_daily_pnl.return_value = 1050.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1050.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
@@ -628,7 +628,7 @@ class TestDailyRealizedProfitRule:
         """Test that a trader cannot simultaneously hit profit target and loss limit."""
         # Given: Daily P&L can only be one value (not both profit and loss)
         # If P&L = +$1000 (profit target), it cannot be -$500 (loss limit)
-        mock_pnl_tracker.get_daily_pnl.return_value = 1000.0
+        mock_pnl_tracker.add_trade_pnl.return_value = 1000.0
 
         event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,

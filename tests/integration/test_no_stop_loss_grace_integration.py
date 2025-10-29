@@ -110,7 +110,9 @@ class TestNoStopLossGraceIntegration:
         assert 1 <= remaining <= 2  # Should be close to 2 seconds
 
         # Step 2: Wait for grace period to expire (real asyncio timer)
-        await asyncio.sleep(2.5)
+        # Timer loop checks every 1s, so we need: grace_period + 1s (loop cycle) + 0.5s (buffer)
+        # = 2s + 1s + 0.5s = 3.5s to ensure timer is detected and removed
+        await asyncio.sleep(3.5)
 
         # Step 3: Verify timer expired and callback executed
         assert not rule.timer_manager.has_timer(timer_name)

@@ -7,7 +7,7 @@ from typing import Any
 from loguru import logger
 from project_x_py.utils import ProjectXLogger
 
-from risk_manager.core.config import RiskConfig
+from risk_manager.config.models import RiskConfig
 from risk_manager.core.events import EventBus, EventType, RiskEvent
 
 # Get SDK logger for standardized logging

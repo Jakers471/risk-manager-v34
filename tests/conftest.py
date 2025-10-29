@@ -138,6 +138,74 @@ def sample_position_event():
 
 
 @pytest.fixture
+def test_risk_config():
+    """Properly structured RiskConfig for unit tests (loads from actual YAML)."""
+    from pathlib import Path
+    from risk_manager.core.config import RiskConfig
+    from risk_manager.config.loader import ConfigLoader
+
+    # Load from actual risk_config.yaml
+    config_dir = Path("config")
+    loader = ConfigLoader(config_dir=config_dir, env_file=None)
+
+    try:
+        config = loader.load_risk_config(file_name="risk_config.yaml")
+        return config
+    except Exception:
+        # Fallback: create minimal config if file doesn't exist
+        from risk_manager.config.models import (
+            GeneralConfig, RulesConfig, LoggingConfig,
+            MaxContractsConfig, MaxContractsPerInstrumentConfig,
+            DailyUnrealizedLossConfig, MaxUnrealizedProfitConfig,
+            NoStopLossGraceConfig, TradeFrequencyLimitConfig,
+            CooldownAfterLossConfig, DailyRealizedLossConfig,
+            DailyRealizedProfitConfig, SessionBlockOutsideConfig,
+            AuthLossGuardConfig
+        )
+
+        return RiskConfig(
+            general=GeneralConfig(
+                instruments=["MNQ", "ES"],
+                timezone="America/Chicago",
+                logging=LoggingConfig(level="INFO")
+            ),
+            rules=RulesConfig(
+                max_contracts=MaxContractsConfig(enabled=True, limit=5),
+                max_contracts_per_instrument=MaxContractsPerInstrumentConfig(
+                    enabled=True, default_limit=3
+                ),
+                daily_unrealized_loss=DailyUnrealizedLossConfig(
+                    enabled=True, limit=-750
+                ),
+                max_unrealized_profit=MaxUnrealizedProfitConfig(
+                    enabled=True, target=500
+                ),
+                no_stop_loss_grace=NoStopLossGraceConfig(
+                    enabled=False, require_within_seconds=60
+                ),
+                trade_frequency_limit=TradeFrequencyLimitConfig(
+                    enabled=True, limits={"per_minute": 3, "per_hour": 10}
+                ),
+                cooldown_after_loss=CooldownAfterLossConfig(
+                    enabled=True, loss_threshold=-100
+                ),
+                daily_realized_loss=DailyRealizedLossConfig(
+                    enabled=True, limit=-500
+                ),
+                daily_realized_profit=DailyRealizedProfitConfig(
+                    enabled=True, target=1000
+                ),
+                session_block_outside=SessionBlockOutsideConfig(
+                    enabled=True, start_time="08:30", end_time="15:00", timezone="America/Chicago"
+                ),
+                auth_loss_guard=AuthLossGuardConfig(
+                    enabled=True, check_interval_seconds=30
+                )
+            )
+        )
+
+
+@pytest.fixture
 def sample_order_event():
     """Sample order event for testing."""
     return RiskEvent(

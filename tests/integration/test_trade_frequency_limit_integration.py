@@ -114,9 +114,9 @@ class TestTradeFrequencyLimitIntegration:
             if timestamp is None:
                 timestamp = datetime.now()
 
-            # Generate unique trade ID using timestamp + random component
-            import random
-            trade_id = f"TRADE-{timestamp.timestamp()}-{random.randint(1000, 9999)}"
+            # Generate unique trade ID using UUID to avoid collisions
+            import uuid
+            trade_id = f"TRADE-{uuid.uuid4().hex[:12]}"
 
             db.execute_write(
                 """

@@ -13,7 +13,7 @@ from typing import Any
 
 from loguru import logger
 
-from risk_manager.core.config import RiskConfig
+from risk_manager.config.models import RiskConfig
 from risk_manager.core.manager import RiskManager
 
 

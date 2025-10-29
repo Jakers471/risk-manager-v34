@@ -1,0 +1,36 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Position Rules Smoke Tests (RULE-001,002,004,005)
+Timestamp: 2025-10-28 22:12:05
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 5 items
+
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_001_max_contracts_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 20%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_002_max_contracts_per_instrument_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 40%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_004_daily_unrealized_loss_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 60%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_005_max_unrealized_profit_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 80%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_multi_rule_smoke_all_position_rules <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m========================= [32m5 passed[0m, [33m[1m1 warning[0m[33m in 1.06s[0m[33m =========================[0m
+
+
+================================================================================
+End of Report
+================================================================================

@@ -2,13 +2,15 @@
 
 import asyncio
 import os
+import time
+from collections import defaultdict
 from typing import Any
 
 from loguru import logger
 from project_x_py import ProjectX, TradingSuite, EventType as SDKEventType
 from project_x_py.realtime import ProjectXRealtimeClient
 
-from risk_manager.core.config import RiskConfig
+from risk_manager.config.models import RiskConfig
 from risk_manager.core.events import EventBus, EventType, RiskEvent
 
 
@@ -35,7 +37,46 @@ class TradingIntegration:
         # Contract ID → Symbol mapping (populated as events arrive)
         self.contract_to_symbol: dict[str, str] = {}
 
+        # Event deduplication cache: {(event_type, entity_id): timestamp}
+        # Prevents duplicate events from multiple instrument managers
+        self._event_cache: dict[tuple[str, str], float] = {}
+        self._event_cache_ttl = 5.0  # seconds
+
         logger.info(f"Trading integration initialized for: {instruments}")
+
+    def _is_duplicate_event(self, event_type: str, entity_id: str) -> bool:
+        """
+        Check if this event is a duplicate.
+
+        The SDK EventBus emits events from each instrument manager separately,
+        so a single order can trigger 3 identical events (one per instrument).
+
+        Args:
+            event_type: Type of event (e.g., "order_filled", "position_opened")
+            entity_id: Unique identifier (order_id or position_id)
+
+        Returns:
+            True if this is a duplicate event (recently seen)
+        """
+        current_time = time.time()
+        cache_key = (event_type, entity_id)
+
+        # Clean old entries from cache
+        expired_keys = [
+            key for key, timestamp in self._event_cache.items()
+            if current_time - timestamp > self._event_cache_ttl
+        ]
+        for key in expired_keys:
+            del self._event_cache[key]
+
+        # Check if we've seen this event recently
+        if cache_key in self._event_cache:
+            logger.debug(f"🔄 Duplicate {event_type} event for {entity_id} - skipping")
+            return True
+
+        # Mark event as seen
+        self._event_cache[cache_key] = current_time
+        return False
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
         """
@@ -167,52 +208,303 @@ class TradingIntegration:
         if not self.realtime.is_connected:
             raise RuntimeError("SignalR not connected")
 
+        # Prevent duplicate callback registration
+        if self.running:
+            logger.warning("⚠️ Trading monitoring already started - skipping duplicate registration")
+            return
+
         self.running = True
         logger.info("Starting trading event monitoring...")
 
         try:
-            # Subscribe to position updates via DIRECT realtime callback
-            await self.realtime.add_callback(
-                "position_update",
-                lambda data: asyncio.create_task(self._on_position_update(data))
-            )
-            logger.debug("✅ Registered callback: position_update")
+            logger.info("Registering event callbacks via suite.on()...")
 
-            # Subscribe to order updates via DIRECT realtime callback
-            await self.realtime.add_callback(
-                "order_update",
-                lambda data: asyncio.create_task(self._on_order_update(data))
-            )
-            logger.debug("✅ Registered callback: order_update")
+            # Subscribe to ORDER events via suite EventBus (using SDK EventType)
+            await self.suite.on(SDKEventType.ORDER_PLACED, self._on_order_placed)
+            logger.info("✅ Registered: ORDER_PLACED")
 
-            # Subscribe to trade updates via DIRECT realtime callback
-            await self.realtime.add_callback(
-                "trade_update",
-                lambda data: asyncio.create_task(self._on_trade_update(data))
-            )
-            logger.debug("✅ Registered callback: trade_update")
+            await self.suite.on(SDKEventType.ORDER_FILLED, self._on_order_filled)
+            logger.info("✅ Registered: ORDER_FILLED")
 
-            # Subscribe to account updates for logging
-            await self.realtime.add_callback(
-                "account_update",
-                lambda data: asyncio.create_task(self._on_account_update(data))
-            )
-            logger.debug("✅ Registered callback: account_update")
+            await self.suite.on(SDKEventType.ORDER_PARTIAL_FILL, self._on_order_partial_fill)
+            logger.info("✅ Registered: ORDER_PARTIAL_FILL")
 
-            # Subscribe to market quotes for PnL calculations
-            await self.realtime.add_callback(
-                "quote_update",
-                lambda data: asyncio.create_task(self._on_quote_update(data))
-            )
-            logger.debug("✅ Registered callback: quote_update")
+            await self.suite.on(SDKEventType.ORDER_CANCELLED, self._on_order_cancelled)
+            logger.info("✅ Registered: ORDER_CANCELLED")
 
-            logger.success("✅ Trading monitoring started (5 realtime callbacks registered)")
+            await self.suite.on(SDKEventType.ORDER_REJECTED, self._on_order_rejected)
+            logger.info("✅ Registered: ORDER_REJECTED")
+
+            # Subscribe to POSITION events via suite EventBus (using SDK EventType)
+            await self.suite.on(SDKEventType.POSITION_OPENED, self._on_position_opened)
+            logger.info("✅ Registered: POSITION_OPENED")
+
+            await self.suite.on(SDKEventType.POSITION_CLOSED, self._on_position_closed)
+            logger.info("✅ Registered: POSITION_CLOSED")
+
+            await self.suite.on(SDKEventType.POSITION_UPDATED, self._on_position_updated)
+            logger.info("✅ Registered: POSITION_UPDATED")
+
+            logger.success("✅ Trading monitoring started (8 event handlers registered)")
+            logger.info("📡 Listening for events: ORDER, POSITION")
+            logger.info("=" * 80)
 
         except Exception as e:
             logger.error(f"Failed to register realtime callbacks: {e}")
             raise
 
-    async def _on_position_update(self, data: Any) -> None:
+    # ============================================================================
+    # SDK EventBus Callbacks (suite.on)
+    # ============================================================================
+
+    async def _on_order_placed(self, event) -> None:
+        """Handle ORDER_PLACED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_PLACED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_placed", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.info("=" * 80)
+            logger.info(f"📋 ORDER PLACED - {symbol}")
+            logger.info(f"   ID: {order.id} | Side: {self._get_side_name(order.side)} | Qty: {order.size}")
+            logger.info("=" * 80)
+
+            # Bridge to risk event bus
+            risk_event = RiskEvent(
+                event_type=EventType.ORDER_PLACED,
+                data={
+                    "symbol": symbol,
+                    "order_id": order.id,
+                    "side": self._get_side_name(order.side),
+                    "quantity": order.size,
+                    "price": getattr(order, 'limitPrice', None),
+                    "raw_data": data,
+                },
+                source="trading_sdk",
+            )
+            await self.event_bus.publish(risk_event)
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_PLACED: {e}")
+            logger.exception(e)
+
+    async def _on_order_filled(self, event) -> None:
+        """Handle ORDER_FILLED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_FILLED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_filled", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.info("=" * 80)
+            logger.info(f"💰 ORDER FILLED - {symbol}")
+            logger.info(
+                f"   ID: {order.id} | Side: {self._get_side_name(order.side)} | "
+                f"Qty: {order.fillVolume} @ ${order.filledPrice:.2f}"
+            )
+            logger.info("=" * 80)
+
+            # Bridge to risk event bus
+            risk_event = RiskEvent(
+                event_type=EventType.ORDER_FILLED,
+                data={
+                    "symbol": symbol,
+                    "order_id": order.id,
+                    "side": self._get_side_name(order.side),
+                    "quantity": order.fillVolume,
+                    "price": order.filledPrice,
+                    "raw_data": data,
+                },
+                source="trading_sdk",
+            )
+            await self.event_bus.publish(risk_event)
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_FILLED: {e}")
+            logger.exception(e)
+
+    async def _on_order_partial_fill(self, event) -> None:
+        """Handle ORDER_PARTIAL_FILL event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_PARTIAL_FILL event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_partial_fill", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.info("=" * 80)
+            logger.info(f"📊 ORDER PARTIALLY FILLED - {symbol}")
+            logger.info(
+                f"   ID: {order.id} | Filled: {order.fillVolume}/{order.size} @ ${order.filledPrice:.2f}"
+            )
+            logger.info("=" * 80)
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_PARTIAL_FILL: {e}")
+
+    async def _on_order_cancelled(self, event) -> None:
+        """Handle ORDER_CANCELLED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_CANCELLED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_cancelled", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.info("=" * 80)
+            logger.info(f"❌ ORDER CANCELLED - {symbol}")
+            logger.info(f"   ID: {order.id}")
+            logger.info("=" * 80)
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_CANCELLED: {e}")
+
+    async def _on_order_rejected(self, event) -> None:
+        """Handle ORDER_REJECTED event from SDK EventBus."""
+        logger.debug(f"🔔 ORDER_REJECTED event received")
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+            order = data.get('order') if isinstance(data, dict) else None
+
+            if not order:
+                return
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            if self._is_duplicate_event("order_rejected", str(order.id)):
+                return
+
+            symbol = self._extract_symbol_from_contract(order.contractId)
+
+            logger.warning("=" * 80)
+            logger.warning(f"⛔ ORDER REJECTED - {symbol}")
+            logger.warning(f"   ID: {order.id}")
+            logger.warning("=" * 80)
+
+        except Exception as e:
+            logger.error(f"Error handling ORDER_REJECTED: {e}")
+
+    async def _on_position_opened(self, event) -> None:
+        """Handle POSITION_OPENED event from SDK EventBus."""
+        logger.debug(f"🔔 POSITION_OPENED event received")
+        await self._handle_position_event(event, "OPENED")
+
+    async def _on_position_closed(self, event) -> None:
+        """Handle POSITION_CLOSED event from SDK EventBus."""
+        logger.debug(f"🔔 POSITION_CLOSED event received")
+        await self._handle_position_event(event, "CLOSED")
+
+    async def _on_position_updated(self, event) -> None:
+        """Handle POSITION_UPDATED event from SDK EventBus."""
+        logger.debug(f"🔔 POSITION_UPDATED event received")
+        await self._handle_position_event(event, "UPDATED")
+
+    async def _handle_position_event(self, event, action_name: str) -> None:
+        """Common handler for all position events."""
+        try:
+            data = event.data if hasattr(event, 'data') else {}
+
+            if not isinstance(data, dict):
+                return
+
+            contract_id = data.get('contractId')
+            size = data.get('size', 0)
+            avg_price = data.get('averagePrice', 0.0)
+            unrealized_pnl = data.get('unrealizedPnl', 0.0)
+            pos_type = data.get('type', 0)
+
+            # Check for duplicate (prevents 3x events from 3 instruments)
+            # Use contract_id + action for deduplication key
+            dedup_key = f"{contract_id}_{action_name}"
+            if self._is_duplicate_event(f"position_{action_name.lower()}", dedup_key):
+                return
+
+            symbol = self._extract_symbol_from_contract(contract_id)
+
+            logger.info("=" * 80)
+            logger.info(f"📊 POSITION {action_name} - {symbol}")
+            logger.info(
+                f"   Type: {self._get_position_type_name(pos_type)} | Size: {size} | "
+                f"Price: ${avg_price:.2f} | Unrealized P&L: ${unrealized_pnl:.2f}"
+            )
+            logger.info("=" * 80)
+
+            # Bridge to risk event bus
+            event_type_map = {
+                "OPENED": EventType.POSITION_UPDATED,
+                "CLOSED": EventType.POSITION_UPDATED,
+                "UPDATED": EventType.POSITION_UPDATED,
+            }
+
+            risk_event = RiskEvent(
+                event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
+                data={
+                    "symbol": symbol,
+                    "contract_id": contract_id,
+                    "size": size,
+                    "side": "long" if size > 0 else "short" if size < 0 else "flat",
+                    "average_price": avg_price,
+                    "unrealized_pnl": unrealized_pnl,
+                    "action": action_name.lower(),
+                    "raw_data": data,
+                },
+                source="trading_sdk",
+            )
+
+            await self.event_bus.publish(risk_event)
+
+        except Exception as e:
+            logger.error(f"Error handling POSITION_{action_name}: {e}")
+            logger.exception(e)
+
+    def _get_side_name(self, side: int) -> str:
+        """Convert side int to name (0=BUY, 1=SELL)."""
+        return "BUY" if side == 0 else "SELL"
+
+    def _get_position_type_name(self, pos_type: int) -> str:
+        """Convert position type to name (1=LONG, 2=SHORT)."""
+        if pos_type == 1:
+            return "LONG"
+        elif pos_type == 2:
+            return "SHORT"
+        else:
+            return "FLAT"
+
+    # ============================================================================
+    # OLD SignalR Callbacks (deprecated - keeping for reference)
+    # ============================================================================
+
+    async def _on_position_update_old(self, data: Any) -> None:
         """
         Handle position update from SignalR.
 
@@ -223,6 +515,7 @@ class TradingIntegration:
         - 1 = Add/Update
         - 2 = Remove/Close
         """
+        logger.debug(f"🔔 _on_position_update callback invoked (received {len(data) if isinstance(data, list) else 1} update(s))")
         try:
             if not isinstance(data, list):
                 logger.warning(f"Position update not a list: {type(data)}")
@@ -241,11 +534,13 @@ class TradingIntegration:
                 # Determine symbol from contract ID
                 symbol = self._extract_symbol_from_contract(contract_id)
 
+                logger.info("=" * 80)
+                logger.info(f"📊 POSITION UPDATE - {symbol}")
                 logger.info(
-                    f"📨 Position update for {symbol}: "
-                    f"action={action}, size={size}, price={avg_price:.2f}, "
-                    f"pnl={unrealized_pnl:.2f}"
+                    f"   Action: {action} | Size: {size} | Price: ${avg_price:.2f} | "
+                    f"Unrealized P&L: ${unrealized_pnl:.2f}"
                 )
+                logger.info("=" * 80)
 
                 # Determine event type based on action and size
                 if action == 1 and size != 0:
@@ -296,6 +591,7 @@ class TradingIntegration:
         SignalR sends data in format:
         [{'action': 1, 'data': {'id': 123, 'status': 'Filled', ...}}]
         """
+        logger.debug(f"🔔 _on_order_update callback invoked (received {len(data) if isinstance(data, list) else 1} update(s))")
         try:
             if not isinstance(data, list):
                 logger.warning(f"Order update not a list: {type(data)}")
@@ -316,11 +612,13 @@ class TradingIntegration:
 
                 symbol = self._extract_symbol_from_contract(contract_id)
 
+                logger.info("=" * 80)
+                logger.info(f"📋 ORDER UPDATE - {symbol}")
                 logger.info(
-                    f"📨 Order update for {symbol}: "
-                    f"id={order_id}, status={status}, side={side}, "
-                    f"qty={quantity}, filled={filled_quantity}"
+                    f"   ID: {order_id} | Status: {status} | Side: {side} | "
+                    f"Qty: {quantity} | Filled: {filled_quantity}"
                 )
+                logger.info("=" * 80)
 
                 # Map status to event type
                 event_type = None
@@ -363,6 +661,7 @@ class TradingIntegration:
         SignalR sends data in format:
         [{'action': 1, 'data': {'id': 123, 'price': 21500.0, ...}}]
         """
+        logger.debug(f"🔔 _on_trade_update callback invoked (received {len(data) if isinstance(data, list) else 1} update(s))")
         try:
             if not isinstance(data, list):
                 logger.warning(f"Trade update not a list: {type(data)}")
@@ -381,10 +680,13 @@ class TradingIntegration:
 
                 symbol = self._extract_symbol_from_contract(contract_id)
 
+                logger.info("=" * 80)
+                logger.info(f"💰 TRADE EXECUTED - {symbol}")
                 logger.info(
-                    f"📨 Trade update for {symbol}: "
-                    f"id={trade_id}, side={side}, qty={quantity}, price={price:.2f}"
+                    f"   ID: {trade_id} | Side: {side} | Qty: {quantity} | "
+                    f"Price: ${price:.2f}"
                 )
+                logger.info("=" * 80)
 
                 risk_event = RiskEvent(
                     event_type=EventType.TRADE_EXECUTED,
@@ -413,6 +715,7 @@ class TradingIntegration:
         Account updates are frequent (every few seconds) and mostly contain
         balance changes. We log them but don't forward to risk engine.
         """
+        logger.debug(f"🔔 _on_account_update callback invoked (received {len(data) if isinstance(data, list) else 1} update(s))")
         try:
             if not isinstance(data, list):
                 return
@@ -420,9 +723,18 @@ class TradingIntegration:
             for update in data:
                 account_data = update.get('data', {})
                 balance = account_data.get('balance', 0.0)
+                realized_pnl = account_data.get('realizedPnl', 0.0)
+                unrealized_pnl = account_data.get('unrealizedPnl', 0.0)
 
-                # Only log significant updates
-                logger.trace(f"Account update: balance=${balance:,.2f}")
+                # Log account updates with P&L info
+                logger.info("=" * 80)
+                logger.info(f"💼 ACCOUNT UPDATE")
+                logger.info(
+                    f"   Balance: ${balance:,.2f} | "
+                    f"Realized P&L: ${realized_pnl:.2f} | "
+                    f"Unrealized P&L: ${unrealized_pnl:.2f}"
+                )
+                logger.info("=" * 80)
 
         except Exception as e:
             logger.error(f"Error handling account update: {e}")

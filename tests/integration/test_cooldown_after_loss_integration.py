@@ -675,6 +675,15 @@ class TestCooldownAfterLossIntegration:
         """
         account_id = 1010
 
+        # Setup: Clean up any existing lockouts for this account (test isolation)
+        db.execute(
+            "DELETE FROM lockouts WHERE account_id = ?",
+            (str(account_id),)
+        )
+        # Also clear in-memory state
+        if account_id in lockout_manager.lockout_state:
+            del lockout_manager.lockout_state[account_id]
+
         # Given: Cooldown triggered
         event = RiskEvent(
             event_type=EventType.TRADE_EXECUTED,
@@ -692,6 +701,14 @@ class TestCooldownAfterLossIntegration:
 
         # When: Timer expires
         await asyncio.sleep(2.5)
+
+        # Wait for lockout to actually clear (with timeout)
+        max_wait = 2.0  # Additional 2 seconds max
+        start_time = asyncio.get_event_loop().time()
+        while lockout_manager.is_locked_out(account_id):
+            if asyncio.get_event_loop().time() - start_time > max_wait:
+                break
+            await asyncio.sleep(0.1)
 
         # Then: Lockout inactive in database
         rows_active = db.execute(
