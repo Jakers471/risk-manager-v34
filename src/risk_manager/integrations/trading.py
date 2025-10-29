@@ -32,7 +32,52 @@ class TradingIntegration:
         self.realtime: ProjectXRealtimeClient | None = None
         self.running = False
 
+        # Contract ID → Symbol mapping (populated as events arrive)
+        self.contract_to_symbol: dict[str, str] = {}
+
         logger.info(f"Trading integration initialized for: {instruments}")
+
+    def _extract_symbol_from_contract(self, contract_id: str) -> str:
+        """
+        Extract symbol from contract ID.
+
+        Contract ID format: CON.F.US.{SYMBOL}.{EXPIRY}
+        Examples:
+        - CON.F.US.MNQ.U25 → MNQ
+        - CON.F.US.ES.H25 → ES
+        - CON.F.US.NQ.Z25 → NQ
+
+        Args:
+            contract_id: Full contract ID from SDK
+
+        Returns:
+            Symbol (e.g., "MNQ", "ES", "NQ")
+        """
+        if not contract_id:
+            return self.instruments[0] if self.instruments else "UNKNOWN"
+
+        # Check cache first
+        if contract_id in self.contract_to_symbol:
+            return self.contract_to_symbol[contract_id]
+
+        # Parse contract ID
+        try:
+            parts = contract_id.split('.')
+            if len(parts) >= 4:
+                symbol = parts[3]  # CON.F.US.{SYMBOL}.{EXPIRY}
+
+                # Cache for future lookups
+                self.contract_to_symbol[contract_id] = symbol
+                logger.debug(f"Mapped contract {contract_id} → {symbol}")
+
+                return symbol
+        except Exception as e:
+            logger.warning(f"Could not parse contract ID '{contract_id}': {e}")
+
+        # Fallback: use first instrument
+        fallback = self.instruments[0] if self.instruments else "UNKNOWN"
+        logger.warning(f"Using fallback symbol '{fallback}' for contract {contract_id}")
+        return fallback
 
     async def connect(self) -> None:
         """
@@ -193,8 +238,8 @@ class TradingIntegration:
                 avg_price = position_data.get('averagePrice', 0.0)
                 unrealized_pnl = position_data.get('unrealizedPnl', 0.0)
 
-                # Determine symbol from contract (you may need to map this)
-                symbol = self.instruments[0] if self.instruments else "UNKNOWN"
+                # Determine symbol from contract ID
+                symbol = self._extract_symbol_from_contract(contract_id)
 
                 logger.info(
                     f"📨 Position update for {symbol}: "
@@ -267,8 +312,9 @@ class TradingIntegration:
                 quantity = order_data.get('quantity', 0)
                 price = order_data.get('price', 0.0)
                 filled_quantity = order_data.get('filledQuantity', 0)
+                contract_id = order_data.get('contractId')
 
-                symbol = self.instruments[0] if self.instruments else "UNKNOWN"
+                symbol = self._extract_symbol_from_contract(contract_id)
 
                 logger.info(
                     f"📨 Order update for {symbol}: "
@@ -331,8 +377,9 @@ class TradingIntegration:
                 price = trade_data.get('price', 0.0)
                 quantity = trade_data.get('quantity', 0)
                 side = trade_data.get('side', 'Unknown')
+                contract_id = trade_data.get('contractId')
 
-                symbol = self.instruments[0] if self.instruments else "UNKNOWN"
+                symbol = self._extract_symbol_from_contract(contract_id)
 
                 logger.info(
                     f"📨 Trade update for {symbol}: "

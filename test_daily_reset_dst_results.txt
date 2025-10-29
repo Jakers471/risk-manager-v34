@@ -1,0 +1,21 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jakers\Desktop\risk-manager-v34\.venv-1\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jakers\Desktop\risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_normal_day PASSED [ 10%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_standard_time PASSED [ 20%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_timezone_conversion_et_to_utc_daylight_time PASSED [ 30%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_17_00_still_exists PASSED [ 40%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_spring_forward_no_duplicate_reset PASSED [ 50%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_17_00_happens_once PASSED [ 60%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_dst_fall_back_no_duplicate_reset PASSED [ 70%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_spring PASSED [ 80%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_lockout_expiry_respects_dst_fall PASSED [ 90%]
+tests/integration/test_daily_reset_dst.py::TestDailyResetAndDST::test_reset_uses_et_not_utc PASSED [100%]
+
+============================= 10 passed in 0.16s ==============================

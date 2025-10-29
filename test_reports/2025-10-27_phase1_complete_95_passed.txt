@@ -1,0 +1,130 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jakers\Desktop\risk-manager-v34\.venv-1\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jakers\Desktop\risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 95 items
+
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_engine_accepts_trading_integration <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_enforcement_wiring.py PASSED [  1%]
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_flatten_all_calls_trading_integration <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_enforcement_wiring.py PASSED [  2%]
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_flatten_all_without_trading_integration <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_enforcement_wiring.py PASSED [  3%]
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_enforcement_from_violation <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_enforcement_wiring.py PASSED [  4%]
+tests/unit/test_core/test_events.py::TestEventBus::test_create_event_bus <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [  5%]
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_to_event <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [  6%]
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_multiple_callbacks <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [  7%]
+tests/unit/test_core/test_events.py::TestEventBus::test_unsubscribe_from_event <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [  8%]
+tests/unit/test_core/test_events.py::TestRiskEvent::test_create_event <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [  9%]
+tests/unit/test_core/test_events.py::TestRiskEvent::test_event_has_timestamp <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [ 10%]
+tests/unit/test_core/test_events.py::TestEventType::test_event_types_exist <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_core\test_events.py PASSED [ 11%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_rule_initialization <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 12%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_rule_initialization_custom_action <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 13%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_below_limit_passes <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 14%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_zero_position_passes <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 15%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_at_limit_passes <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 16%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_exceeds_limit_violates <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 17%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_large_position_violates <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 18%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_multi_symbol_total_below_limit <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 20%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_multi_symbol_total_exceeds_limit <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 21%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_short_position_below_limit <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 22%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_short_position_exceeds_limit <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 23%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_flatten_action_in_violation <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 24%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_reject_action_in_violation <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 25%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_only_evaluates_position_events <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 26%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_evaluates_order_filled_event <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 27%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_negative_limit_raises_error <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 28%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_zero_limit <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 29%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_missing_position_data <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 30%]
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_violation_message_clarity <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_max_position_rule.py PASSED [ 31%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_set_lockout_locks_account PASSED [ 32%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_is_locked_out_returns_true_when_locked PASSED [ 33%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_is_locked_out_returns_false_when_not_locked PASSED [ 34%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_get_lockout_info_returns_details PASSED [ 35%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_get_lockout_info_returns_none_when_not_locked PASSED [ 36%]
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_clear_lockout_removes_lockout PASSED [ 37%]
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_set_cooldown_creates_timer PASSED [ 38%]
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_auto_expires_after_duration PASSED [ 40%]
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_remaining_time_decreases PASSED [ 41%]
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_cleared_cancels_timer PASSED [ 42%]
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_integrates_with_timer_manager PASSED [ 43%]
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_check_expired_lockouts_runs_every_second PASSED [ 44%]
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_expired_lockout_auto_cleared PASSED [ 45%]
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_background_task_stops_on_shutdown PASSED [ 46%]
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_multiple_accounts_locked_independently PASSED [ 47%]
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_lockout_affects_only_target_account PASSED [ 48%]
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_clear_lockout_affects_only_target_account PASSED [ 49%]
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_lockout_saved_to_database PASSED [ 50%]
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_lockout_deleted_from_database_on_clear PASSED [ 51%]
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_load_lockouts_populates_memory_state PASSED [ 52%]
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_expired_lockout_removed_from_database PASSED [ 53%]
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_database_schema_correct PASSED [ 54%]
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_lockout_until_past_time_immediately_expired PASSED [ 55%]
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_lockout_reason_persisted_correctly PASSED [ 56%]
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_double_lockout_overwrites_previous PASSED [ 57%]
+tests/unit/test_state/test_lockout_manager.py::TestEventRouterIntegration::test_locked_account_blocks_rule_processing PASSED [ 58%]
+tests/unit/test_state/test_lockout_manager.py::TestEventRouterIntegration::test_unlocked_account_allows_rule_processing PASSED [ 60%]
+tests/unit/test_state/test_lockout_manager.py::TestLockoutTypes::test_hard_lockout_type_stored_correctly PASSED [ 61%]
+tests/unit/test_state/test_lockout_manager.py::TestLockoutTypes::test_cooldown_type_stored_correctly PASSED [ 62%]
+tests/unit/test_state/test_lockout_manager.py::TestStartupShutdown::test_lockouts_restored_on_startup PASSED [ 63%]
+tests/unit/test_state/test_lockout_manager.py::TestStartupShutdown::test_shutdown_cancels_all_timers PASSED [ 64%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_tracker_initializes <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 65%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_get_daily_pnl_returns_zero_for_new_account <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 66%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_add_trade_pnl_updates_daily_total <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 67%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_pnl_survives_restart <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 68%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_multiple_accounts_tracked_independently <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 69%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 70%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_different_dates_tracked_separately <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 71%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_increments <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 72%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 73%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_zero_pnl_trades <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 74%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_large_pnl_values <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 75%]
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_get_all_account_pnls <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_pnl_tracker.py PASSED [ 76%]
+tests/unit/test_state/test_timer_manager.py::test_start_timer_creates_timer <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 77%]
+tests/unit/test_state/test_timer_manager.py::test_get_remaining_time_decreases <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 78%]
+tests/unit/test_state/test_timer_manager.py::test_cancel_timer_removes_timer <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 80%]
+tests/unit/test_state/test_timer_manager.py::test_expired_timer_executes_callback <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 81%]
+tests/unit/test_state/test_timer_manager.py::test_expired_timer_auto_removed <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 82%]
+tests/unit/test_state/test_timer_manager.py::test_multiple_timers_run_simultaneously <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 83%]
+tests/unit/test_state/test_timer_manager.py::test_timers_expire_independently <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 84%]
+tests/unit/test_state/test_timer_manager.py::test_cancel_specific_timer_preserves_others <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 85%]
+tests/unit/test_state/test_timer_manager.py::test_callback_receives_correct_context <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 86%]
+tests/unit/test_state/test_timer_manager.py::test_callback_exception_doesnt_crash_manager <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 87%]
+tests/unit/test_state/test_timer_manager.py::test_callback_executes_exactly_once <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 88%]
+tests/unit/test_state/test_timer_manager.py::test_async_callback_supported <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 89%]
+tests/unit/test_state/test_timer_manager.py::test_zero_duration_timer_executes_immediately <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 90%]
+tests/unit/test_state/test_timer_manager.py::test_negative_duration_raises_error <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 91%]
+tests/unit/test_state/test_timer_manager.py::test_timer_precision_within_tolerance <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 92%]
+tests/unit/test_state/test_timer_manager.py::test_check_timers_runs_every_second <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 93%]
+tests/unit/test_state/test_timer_manager.py::test_check_timers_stops_on_shutdown <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 94%]
+tests/unit/test_state/test_timer_manager.py::test_get_remaining_time_nonexistent_timer_returns_zero <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 95%]
+tests/unit/test_state/test_timer_manager.py::test_cancel_nonexistent_timer_no_error <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 96%]
+tests/unit/test_state/test_timer_manager.py::test_duplicate_timer_name_overwrites_previous <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 97%]
+tests/unit/test_state/test_timer_manager.py::test_has_timer_returns_false_for_nonexistent <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [ 98%]
+tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_raises_error <- ..\..\..\..\mnt\c\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_state\test_timer_manager.py PASSED [100%]
+
+============================== warnings summary ===============================
+tests/unit/test_state/test_lockout_manager.py: 31 warnings
+tests/unit/test_state/test_pnl_tracker.py: 12 warnings
+  C:\Users\jakers\Desktop\risk-manager-v34\src\risk_manager\state\database.py:82: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    (1, datetime.utcnow().isoformat()),
+
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_auto_expires_after_duration
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_cleared_cancels_timer
+  C:\Users\jakers\Desktop\risk-manager-v34\src\risk_manager\state\lockout_manager.py:394: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    self.timer_manager.cancel_timer(f"lockout_{account_id}")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/test_state/test_pnl_tracker.py: 23 warnings
+  C:\Users\jakers\Desktop\risk-manager-v34\src\risk_manager\state\pnl_tracker.py:63: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl
+  C:\Users\jakers\Desktop\risk-manager-v34\src\risk_manager\state\pnl_tracker.py:194: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 95 passed, 70 warnings in 78.26s (0:01:18) ==================
+Exit code: 0

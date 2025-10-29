@@ -1,0 +1,372 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Integration tests only
+Timestamp: 2025-10-27 21:01:36
+Status: FAILED
+Exit Code: 1
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 119 items
+
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_full_cooldown_flow_with_timer_expiry [32mPASSED[0m[33m [  0%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_selects_correct_duration [32mPASSED[0m[33m [  1%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier1 [32mPASSED[0m[33m [  2%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_tiered_cooldown_tier3 [32mPASSED[0m[33m [  3%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_callback_clears_lockout [32mPASSED[0m[33m [  4%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_winning_trade_no_cooldown_no_timer [32mPASSED[0m[33m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_multi_account_independent_cooldowns [32mPASSED[0m[33m [  5%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_persists_to_database [32mPASSED[0m[33m [  6%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_lockout_loaded_from_database_on_restart [32mPASSED[0m[33m [  7%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_rapid_loss_sequence_only_first_triggers_timer [32mPASSED[0m[33m [  8%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_event_flow_from_trade_to_lockout [32mPASSED[0m[33m [  9%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_timer_precision_within_tolerance [32mPASSED[0m[33m [ 10%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [31mFAILED[0m[31m [ 10%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_position_closed_event_triggers_cooldown [32mPASSED[0m[31m [ 11%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_half_turn_trades_no_cooldown_no_timer [32mPASSED[0m[31m [ 12%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_full_profit_target_flow_with_database [32mPASSED[0m[31m [ 13%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_multi_account_independence [32mPASSED[0m[31m [ 14%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_persistence_crash_recovery [32mPASSED[0m[31m [ 15%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration [32mPASSED[0m[31m [ 15%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_event_bus_async_flow [32mPASSED[0m[31m [ 16%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_enforcement_action_integration [32mPASSED[0m[31m [ 17%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_half_turn_trades_ignored [32mPASSED[0m[31m [ 18%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_timer_auto_unlock [32mPASSED[0m[31m [ 19%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_concurrent_access_thread_safety [32mPASSED[0m[31m [ 20%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_database_schema_validation [32mPASSED[0m[31m [ 21%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_mixed_profit_loss_day [32mPASSED[0m[31m [ 21%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_lockout_prevents_further_evaluation [32mPASSED[0m[31m [ 22%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_pnl_tracker_trade_count [32mPASSED[0m[31m [ 23%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_reset_time_calculation [32mPASSED[0m[31m [ 24%][0m
+tests/integration/test_daily_realized_profit_integration.py::test_boundary_exactly_at_target [32mPASSED[0m[31m [ 25%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_full_unrealized_loss_violation_flow [32mPASSED[0m[31m [ 26%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_multi_position_independence [32mPASSED[0m[31m [ 26%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_real_pnl_calculation_accuracy [32mPASSED[0m[31m [ 27%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_market_price_updates_real_time_monitoring [32mPASSED[0m[31m [ 28%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_different_tick_sizes_calculation [32mPASSED[0m[31m [ 29%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_no_lockout_created_on_violation [32mPASSED[0m[31m [ 30%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_event_bus_integration_complete_flow [32mPASSED[0m[31m [ 31%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_position_closed_before_violation [32mPASSED[0m[31m [ 31%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_long_and_short_positions_accuracy [32mPASSED[0m[31m [ 32%][0m
+tests/integration/test_daily_unrealized_loss_integration.py::TestDailyUnrealizedLossIntegration::test_enforcement_action_close_position_not_flatten_all [32mPASSED[0m[31m [ 33%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_publishes_to_subscribers [32mPASSED[0m[31m [ 34%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_multiple_subscribers [32mPASSED[0m[31m [ 35%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_evaluates_rule_on_event [32mPASSED[0m[31m [ 36%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_skips_rules_when_no_violation [32mPASSED[0m[31m [ 36%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_triggers_flatten_enforcement [32mPASSED[0m[31m [ 37%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_violation_publishes_event [32mPASSED[0m[31m [ 38%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_end_to_end_position_violation_flow [32mPASSED[0m[31m [ 39%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multiple_rules_evaluated_in_order [32mPASSED[0m[31m [ 40%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_bus_handles_handler_errors [32mPASSED[0m[31m [ 41%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_engine_tracks_position_state [32mPASSED[0m[31m [ 42%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_flatten_action_calls_flatten_all [32mPASSED[0m[31m [ 42%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_pause_action_triggers_pause_trading [32mPASSED[0m[31m [ 43%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_event_processing_is_fast [32mPASSED[0m[31m [ 44%][0m
+tests/integration/test_event_pipeline_integration.py::TestEventPipelineIntegration::test_multi_symbol_position_tracking [32mPASSED[0m[31m [ 45%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [31mFAILED[0m[31m [ 46%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[31m [ 47%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [31mFAILED[0m[31m [ 47%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[31m [ 48%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [31mFAILED[0m[31m [ 49%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_order_type_detection_only_stops_cancel_timer [32mPASSED[0m[31m [ 50%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_event_bus_integration_with_rule_events [32mPASSED[0m[31m [ 51%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_timer_recreated_after_manager_restart [32mPASSED[0m[31m [ 52%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_concurrent_timer_operations [31mFAILED[0m[31m [ 52%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_enforcement_failure_does_not_crash [32mPASSED[0m[31m [ 53%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_rule_status_shows_active_timers [32mPASSED[0m[31m [ 54%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_disabled_rule_integration [32mPASSED[0m[31m [ 55%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_outside_hours_lockout_flow [32mPASSED[0m[31m [ 56%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_inside_hours_no_violation [32mPASSED[0m[31m [ 57%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_weekend_blocking_saturday [32mPASSED[0m[31m [ 57%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_weekend_blocking_sunday [32mPASSED[0m[31m [ 58%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_dst_spring_forward_transition [32mPASSED[0m[31m [ 59%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_dst_fall_back_transition [32mPASSED[0m[31m [ 60%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_lockout_persistence_across_restarts [32mPASSED[0m[31m [ 61%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_multi_account_independence [32mPASSED[0m[31m [ 62%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_event_bus_integration [32mPASSED[0m[31m [ 63%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_database_schema_validation [32mPASSED[0m[31m [ 63%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_lockout_auto_expiry [32mPASSED[0m[31m [ 64%][0m
+tests/integration/test_session_block_outside_integration.py::TestSessionBlockOutsideIntegration::test_different_timezone_support [32mPASSED[0m[31m [ 65%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_order_rejection_flow_integration [32mPASSED[0m[31m [ 66%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_allowed_symbol_passes_integration [32mPASSED[0m[31m [ 67%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_position_close_flow_integration [32mPASSED[0m[31m [ 68%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_position_opened_triggers_violation [32mPASSED[0m[31m [ 68%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_wildcard_prefix_matching_integration [32mPASSED[0m[31m [ 69%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_wildcard_contains_matching_integration [32mPASSED[0m[31m [ 70%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_wildcard_does_not_match_allowed_symbols [32mPASSED[0m[31m [ 71%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_case_insensitive_matching_integration [32mPASSED[0m[31m [ 72%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_wildcard_case_insensitive_integration [32mPASSED[0m[31m [ 73%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_multi_symbol_account_selective_close [32mPASSED[0m[31m [ 73%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_multiple_blocked_symbols_in_account [32mPASSED[0m[31m [ 74%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_event_bus_handles_violation_errors [32mPASSED[0m[31m [ 75%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_no_lockout_trade_by_trade_enforcement [32mPASSED[0m[31m [ 76%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_end_to_end_multiple_event_types [32mPASSED[0m[31m [ 77%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_symbol_matching_performance [32mPASSED[0m[31m [ 78%][0m
+tests/integration/test_symbol_blocks_integration.py::TestSymbolBlocksRuleIntegration::test_dynamic_blocked_list_update [32mPASSED[0m[31m [ 78%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_frequency_limit_cooldown_flow [32mPASSED[0m[31m [ 79%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_rolling_window_tracking [32mPASSED[0m[31m [ 80%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_multi_tier_limits [32mPASSED[0m[31m [ 81%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_database_persistence [32mPASSED[0m[31m [ 82%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_timer_auto_unlock_integration [32mPASSED[0m[31m [ 83%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_multi_account_independence [32mPASSED[0m[31m [ 84%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_session_reset [32mPASSED[0m[31m [ 84%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_priority_order [32mPASSED[0m[31m [ 85%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_concurrent_rapid_fire_trades [32mPASSED[0m[31m [ 86%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_timer_cancellation_and_restart [32mPASSED[0m[31m [ 87%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_database_query_performance [32mPASSED[0m[31m [ 88%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_error_recovery_database_unavailable [32mPASSED[0m[31m [ 89%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_stop_loss_placement_es_long [32mPASSED[0m[31m [ 89%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_stop_loss_placement_mnq_short [32mPASSED[0m[31m [ 90%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_take_profit_placement [32mPASSED[0m[31m [ 91%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_bracket_order_creation [32mPASSED[0m[31m [ 92%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_trailing_stop_adjustment_on_profit [32mPASSED[0m[31m [ 93%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_trailing_stop_not_adjusted_on_loss [32mPASSED[0m[31m [ 94%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_multi_symbol_independent_management [32mPASSED[0m[31m [ 94%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_position_closed_orders_cleanup [32mPASSED[0m[31m [ 95%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_event_bus_routes_to_rule [32mPASSED[0m[31m [ 96%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_stop_loss_disabled_only_take_profit [32mPASSED[0m[31m [ 97%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_take_profit_disabled_only_stop_loss [32mPASSED[0m[31m [ 98%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_complete_order_placement_flow [32mPASSED[0m[31m [ 99%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_event_processing_performance [32mPASSED[0m[31m [100%][0m
+
+=================================== FAILURES ===================================
+[31m[1m___ TestCooldownAfterLossIntegration.test_database_cleanup_on_lockout_clear ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_cooldown_after_loss_integration.py[0m:701: in test_database_cleanup_on_lockout_clear
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 1 == 0[0m
+[1m[31mE    +  where 1 = len([<sqlite3.Row object at 0x758426076b60>])[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-1/test_database_cleanup_on_locko0/test_cooldown_integration.db
+
+[32mINFO    [0m root:conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:conftest.py:37 Starting Lockout Manager
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager started
+
+[32mINFO    [0m root:conftest.py:37 Lockout expiry background task started
+
+[32mINFO    [0m root:conftest.py:37 CooldownAfterLossRule initialized: 1 tiers
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Cooldown triggered for account 1010: Loss=$-150.00, Cooldown=2s
+
+[32mINFO    [0m root:conftest.py:37 ENFORCING RULE-007: Account 1010 Loss: $-150.00, Cooldown: 2s
+
+[32mINFO    [0m root:conftest.py:37 Timer started: lockout_1010 (duration=2s, expires=21:00:30)
+
+[32mINFO    [0m root:conftest.py:37 Timer started for account 1010 cooldown
+
+[32mINFO    [0m root:conftest.py:37 Account 1010 cooldown for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+
+[32mINFO    [0m root:conftest.py:37 Account 1010 locked for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Shutting down Lockout Manager
+
+[32mINFO    [0m root:conftest.py:37 Timer cancelled: lockout_1010
+
+[32mINFO    [0m root:conftest.py:37 Error cancelling timer for account 1010: object NoneType can't be used in 'await' expression
+
+[32mINFO    [0m root:conftest.py:37 Stopping Lockout Manager
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager stopped
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager shutdown complete
+
+[32mINFO    [0m root:conftest.py:37 Database closed
+
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m_ TestNoStopLossGraceIntegration.test_grace_period_timer_expires_and_closes_position _[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:116: in test_grace_period_timer_expires_and_closes_position
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('no_stop_loss_grace_CON.F.US.MNQ.Z25')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x758426003710>.has_timer[0m
+[1m[31mE    +      where <risk_manager.state.timer_manager.TimerManager object at 0x758426003710> = <risk_manager.rules.no_stop_loss_grace.NoStopLossGraceRule object at 0x7584261234d0>.timer_manager[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=21:00:44)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m__ TestNoStopLossGraceIntegration.test_multiple_positions_independent_timers ___[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:264: in test_multiple_positions_independent_timers
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 1[0m
+[1m[31mE    +  where 0 = len([])[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened ES/CON.F.US.ES.H25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.ES.H25 (duration=2s, expires=21:00:49)
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=21:00:49)
+
+[32mINFO    [0m root:conftest.py:37 Timer cancelled: no_stop_loss_grace_CON.F.US.ES.H25
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Stop-loss order placed for ES/CON.F.US.ES.H25 (stopPrice=5180.0), grace period cancelled ✅
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m___ TestNoStopLossGraceIntegration.test_real_async_timer_callback_execution ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:361: in test_real_async_timer_callback_execution
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 1[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Timer started: test_timer (duration=1s, expires=21:00:54)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m_______ TestNoStopLossGraceIntegration.test_concurrent_timer_operations ________[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:642: in test_concurrent_timer_operations
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 2[0m
+[1m[31mE    +  where 0 = len([])[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened SYM0/CON.F.US.MNQ.Z25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=21:00:59)
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened SYM1/CON.F.US.ES.H25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.ES.H25 (duration=2s, expires=21:00:59)
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened SYM2/CON.F.US.NQ.Z25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.NQ.Z25 (duration=2s, expires=21:00:59)
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened SYM3/CON.F.US.YM.H25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.YM.H25 (duration=2s, expires=21:00:59)
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position opened SYM4/CON.F.US.RTY.Z25 (size=1), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.RTY.Z25 (duration=2s, expires=21:00:59)
+
+[32mINFO    [0m root:conftest.py:37 Timer cancelled: no_stop_loss_grace_CON.F.US.MNQ.Z25
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Stop-loss order placed for SYM0/CON.F.US.MNQ.Z25 (stopPrice=1000.0), grace period cancelled ✅
+
+[32mINFO    [0m root:conftest.py:37 Timer cancelled: no_stop_loss_grace_CON.F.US.ES.H25
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Stop-loss order placed for SYM1/CON.F.US.ES.H25 (stopPrice=1001.0), grace period cancelled ✅
+
+[32mINFO    [0m root:conftest.py:37 Timer cancelled: no_stop_loss_grace_CON.F.US.NQ.Z25
+
+[32mINFO    [0m root:conftest.py:37 RULE-008: Position closed for SYM2/CON.F.US.NQ.Z25, grace period cancelled
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+tests/integration/test_cooldown_after_loss_integration.py: 15 warnings
+tests/integration/test_daily_realized_profit_integration.py: 15 warnings
+tests/integration/test_session_block_outside_integration.py: 12 warnings
+tests/integration/test_trade_frequency_limit_integration.py: 12 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/database.py:82: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    (1, datetime.utcnow().isoformat()),
+
+tests/integration/test_daily_realized_profit_integration.py: 34 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:63: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+tests/integration/test_daily_realized_profit_integration.py::test_reset_scheduler_integration
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:194: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/integration/test_cooldown_after_loss_integration.py::[1mTestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear[0m - assert 1 == 0
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position[0m - AssertionError: assert not True
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_multiple_positions_independent_timers[0m - assert 0 == 1
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_real_async_timer_callback_execution[0m - assert 0 == 1
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_concurrent_timer_operations[0m - assert 0 == 2
+[31m============ [31m[1m5 failed[0m, [32m114 passed[0m, [33m90 warnings[0m[31m in 82.55s (0:01:22)[0m[31m =============[0m
+
+
+================================================================================
+End of Report
+================================================================================

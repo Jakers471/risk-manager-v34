@@ -1,0 +1,354 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Last failed tests
+Timestamp: 2025-10-27 23:52:16
+Status: FAILED
+Exit Code: 1
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 740 items / 721 deselected / 19 selected
+run-last-failure: rerun previous 19 failures
+
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_position_below_limit_no_enforcement [31mERROR[0m[31m [  5%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_position_exceeds_limit_triggers_enforcement [31mERROR[0m[31m [ 10%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_complete_flow_sdk_to_enforcement [31mERROR[0m[31m [ 15%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_multiple_position_updates [31mERROR[0m[31m [ 21%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_multi_symbol_total_exceeds_limit [31mERROR[0m[31m [ 26%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_enforcement_closes_positions_via_sdk [31mERROR[0m[31m [ 31%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_system_continues_after_handler_error [31mERROR[0m[31m [ 36%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_end_to_end_latency [31mERROR[0m[31m [ 42%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_state_remains_consistent_across_events [31mERROR[0m[31m [ 47%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_realistic_day_trading_scenario [31mERROR[0m[31m [ 52%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_full_cooldown_flow_with_timer_expiry [32mPASSED[0m[31m [ 57%][0m
+tests/integration/test_cooldown_after_loss_integration.py::TestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear [31mFAILED[0m[31m [ 63%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [31mFAILED[0m[31m [ 68%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_enforcement_failure_does_not_crash [31mFAILED[0m[31m [ 73%][0m
+tests/integration/test_trade_frequency_limit_integration.py::TestTradeFrequencyLimitIntegration::test_database_query_performance [32mPASSED[0m[31m [ 78%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_loading [31mFAILED[0m[31m [ 84%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_variables_override_env_file [31mFAILED[0m[31m [ 89%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_comments [31mFAILED[0m[31m [ 94%][0m
+tests/unit/test_config/test_env_substitution.py::TestEnvironmentVariableSubstitution::test_env_file_with_quotes [31mFAILED[0m[31m [100%][0m
+
+==================================== ERRORS ====================================
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_position_below_limit_no_enforcement _[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_position_exceeds_limit_triggers_enforcement _[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_complete_flow_sdk_to_enforcement __[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_____ ERROR at setup of TestMaxContractsE2E.test_multiple_position_updates _____[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_multi_symbol_total_exceeds_limit __[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_enforcement_closes_positions_via_sdk _[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_system_continues_after_handler_error _[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m________ ERROR at setup of TestMaxContractsE2E.test_end_to_end_latency _________[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m_ ERROR at setup of TestMaxContractsE2E.test_state_remains_consistent_across_events _[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[31m[1m__ ERROR at setup of TestMaxContractsE2E.test_realistic_day_trading_scenario ___[0m
+[1m[31mtests/e2e/test_max_contracts_e2e.py[0m:93: in risk_manager
+    [0mconfig = RiskConfig(max_contracts=[94m2[39;49;00m)[90m[39;49;00m
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31m.venv/lib/python3.13/site-packages/pydantic_settings/main.py[0m:193: in __init__
+    [0m[96msuper[39;49;00m().[92m__init__[39;49;00m([90m[39;49;00m
+[1m[31mE   pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskConfig[0m
+[1m[31mE   project_x_api_key[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+[1m[31mE   project_x_username[0m
+[1m[31mE     Field required [type=missing, input_value={'max_contracts': 2}, input_type=dict][0m
+[1m[31mE       For further information visit https://errors.pydantic.dev/2.12/v/missing[0m
+=================================== FAILURES ===================================
+[31m[1m___ TestCooldownAfterLossIntegration.test_database_cleanup_on_lockout_clear ____[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_cooldown_after_loss_integration.py[0m:701: in test_database_cleanup_on_lockout_clear
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 1 == 0[0m
+[1m[31mE    +  where 1 = len([<sqlite3.Row object at 0x7e57f946c7f0>])[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database initialized at /tmp/pytest-of-jakers/pytest-7/test_database_cleanup_on_locko0/test_cooldown_integration.db
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 PnLTracker initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Starting Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout expiry background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 CooldownAfterLossRule initialized: 1 tiers
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Cooldown triggered for account 1010: Loss=$-150.00, Cooldown=2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 ENFORCING RULE-007: Account 1010 Loss: $-150.00, Cooldown: 2s
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: lockout_1010 (duration=2s, expires=23:52:01)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started for account 1010 cooldown
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 cooldown for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Account 1010 locked for 2s: Cooldown triggered after $-150.00 loss (2s cooldown)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Shutting down Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer cancelled: lockout_1010
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Error cancelling timer for account 1010: object NoneType can't be used in 'await' expression
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Stopping Lockout Manager
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Lockout Manager shutdown complete
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Database closed
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m_ TestNoStopLossGraceIntegration.test_grace_period_timer_expires_and_closes_position _[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:116: in test_grace_period_timer_expires_and_closes_position
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('no_stop_loss_grace_CON.F.US.MNQ.Z25')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x7e57f938b890>.has_timer[0m
+[1m[31mE    +      where <risk_manager.state.timer_manager.TimerManager object at 0x7e57f938b890> = <risk_manager.rules.no_stop_loss_grace.NoStopLossGraceRule object at 0x7e57f9562900>.timer_manager[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=23:52:03)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m____ TestNoStopLossGraceIntegration.test_enforcement_failure_does_not_crash ____[0m
+[1m[31m/home/jakers/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/unittest/mock.py[0m:990: in assert_called_once_with
+    [0m[94mraise[39;49;00m [96mAssertionError[39;49;00m(msg)[90m[39;49;00m
+[1m[31mE   AssertionError: Expected 'close_position' to be called once. Called 0 times.[0m
+
+[33mDuring handling of the above exception, another exception occurred:[0m
+[1m[31mC:\Users\jakers\Desktop\risk-manager-v34\tests\integration\test_no_stop_loss_grace_integration.py[0m:689: in test_enforcement_failure_does_not_crash
+    [0m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[04m[91m?[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: Expected 'close_position' to be called once. Called 0 times.[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Background task started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop started
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 NoStopLossGraceRule initialized - Grace period: 2s, Enforcement: close_position, Enabled: True
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 RULE-008: Position opened MNQ/CON.F.US.MNQ.Z25 (size=2), starting 2s grace period for stop-loss
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer started: no_stop_loss_grace_CON.F.US.MNQ.Z25 (duration=2s, expires=23:52:06)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:C:\Users\jakers\Desktop\risk-manager-v34\tests\conftest.py:37 TimerManager stopped
+[31m[1m__________ TestEnvironmentVariableSubstitution.test_env_file_loading ___________[0m
+[1m[31m/mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_config/test_env_substitution.py[0m:172: in test_env_file_loading
+    [0m[94massert[39;49;00m config.project_x_api_key == [33m"[39;49;00m[33mdotenv_key[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'tj5F5k0jDY2p...pNOz8W5n7s=\r' == 'dotenv_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- dotenv_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7s=[39;49;00m[90m[39;49;00m[0m
+[31m[1m___ TestEnvironmentVariableSubstitution.test_env_variables_override_env_file ___[0m
+[1m[31m/mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_config/test_env_substitution.py[0m:191: in test_env_variables_override_env_file
+    [0m[94massert[39;49;00m config.project_x_username == [33m"[39;49;00m[33mdotenv_user[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'jakertrader\r' == 'dotenv_user'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- dotenv_user[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ jakertrader[39;49;00m[90m[39;49;00m[0m
+[31m[1m_______ TestEnvironmentVariableSubstitution.test_env_file_with_comments ________[0m
+[1m[31m/mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_config/test_env_substitution.py[0m:319: in test_env_file_with_comments
+    [0m[94massert[39;49;00m config.project_x_api_key == [33m"[39;49;00m[33mdotenv_key[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'tj5F5k0jDY2p...pNOz8W5n7s=\r' == 'dotenv_key'[0m
+[1m[31mE     [0m
+[1m[31mE     [0m[91m- dotenv_key[39;49;00m[90m[39;49;00m[0m
+[1m[31mE     [92m+ tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7s=[39;49;00m[90m[39;49;00m[0m
+[31m[1m________ TestEnvironmentVariableSubstitution.test_env_file_with_quotes _________[0m
+[1m[31m/mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_config/test_env_substitution.py[0m:335: in test_env_file_with_quotes
+    [0m[94massert[39;49;00m [33m"[39;49;00m[33mkey[39;49;00m[33m"[39;49;00m [95min[39;49;00m config.project_x_api_key[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'key' in 'tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7s=\r'[0m
+[1m[31mE    +  where 'tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7s=\r' = EnvConfig(project_x_api_key='tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7s=\r', project_x_username='jakertrader\r', project_x_api_url='https://api.topstepx.com/api', project_x_websocket_url='wss://api.topstepx.com', max_daily_loss=-1000.0, max_contracts=5, require_stop_loss=True, stop_loss_grace_seconds=60, log_level='INFO', log_file=None, enforcement_latency_target_ms=500, max_events_per_second=1000, anthropic_api_key=None, enable_ai=False, enable_pattern_recognition=False, enable_anomaly_detection=False, discord_webhook_url=None, telegram_bot_token=None, telegram_chat_id=None, environment='development', debug=False).project_x_api_key[0m
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+tests/e2e/test_max_contracts_e2e.py:80
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/e2e/test_max_contracts_e2e.py:80: PytestUnknownMarkWarning: Unknown pytest.mark.e2e - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.e2e
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/integration/test_cooldown_after_loss_integration.py::[1mTestCooldownAfterLossIntegration::test_database_cleanup_on_lockout_clear[0m - assert 1 == 0
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position[0m - AssertionError: assert not True
+[31mFAILED[0m tests/integration/test_no_stop_loss_grace_integration.py::[1mTestNoStopLossGraceIntegration::test_enforcement_failure_does_not_crash[0m - AssertionError: Expected 'close_position' to be called once. Called 0 times.
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_loading[0m - AssertionError: assert 'tj5F5k0jDY2p...pNOz8W5n7s=\r' == 'dotenv_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_variables_override_env_file[0m - AssertionError: assert 'jakertrader\r' == 'dotenv_user'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_with_comments[0m - AssertionError: assert 'tj5F5k0jDY2p...pNOz8W5n7s=\r' == 'dotenv_key'
+[31mFAILED[0m tests/unit/test_config/test_env_substitution.py::[1mTestEnvironmentVariableSubstitution::test_env_file_with_quotes[0m - AssertionError: assert 'key' in 'tj5F5k0jDY2p3EKC2N6K88fgotPEaNyBDpNOz8W5n7...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_position_below_limit_no_enforcement[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_position_exceeds_limit_triggers_enforcement[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_complete_flow_sdk_to_enforcement[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_multiple_position_updates[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_multi_symbol_total_exceeds_limit[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_enforcement_closes_positions_via_sdk[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_system_continues_after_handler_error[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_end_to_end_latency[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_state_remains_consistent_across_events[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31mERROR[0m tests/e2e/test_max_contracts_e2e.py::[1mTestMaxContractsE2E::test_realistic_day_trading_scenario[0m - pydantic_core._pydantic_core.ValidationError: 2 validation errors for RiskC...
+[31m===== [31m[1m7 failed[0m, [32m2 passed[0m, [33m721 deselected[0m, [33m2 warnings[0m, [31m[1m10 errors[0m[31m in 28.92s[0m[31m ======[0m
+
+
+================================================================================
+End of Report
+================================================================================

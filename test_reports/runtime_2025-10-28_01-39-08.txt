@@ -1,0 +1,32 @@
+================================================================================
+Risk Manager V34 - Runtime Check Report
+================================================================================
+Runtime Check: Runtime Smoke Test (DRY-RUN, fail-fast, 8s)
+Timestamp: 2025-10-28 01:39:08
+Status: FAILED
+Exit Code: 2
+Environment:
+  DRY_RUN=1
+  BOOT_TIMEOUT_S=8
+  LOG_LEVEL=DEBUG
+================================================================================
+
+<frozen runpy>:128: RuntimeWarning: 'src.runtime.smoke_test' found in sys.modules after import of package 'src.runtime', but prior to execution of 'src.runtime.smoke_test'; this may result in unpredictable behaviour
+2025-10-28 01:39:00 | INFO     | __main__ | CHECKPOINT 1/8: Smoke test started
+2025-10-28 01:39:00 | INFO     | __main__ | CHECKPOINT 2/8: Boot timeout configured to 8s
+2025-10-28 01:39:00 | INFO     | __main__ | CHECKPOINT 3/8: Starting system boot
+2025-10-28 01:39:00 | INFO     | __main__ | CHECKPOINT 4/8: Waiting for first event or timeout
+2025-10-28 01:39:08 | WARNING  | __main__ | CHECKPOINT 6/8: Timeout - no event received
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Running post-condition checks
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Post-condition check: SDK Connected
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Post-condition check: Event Subscriptions
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Post-condition check: Risk Rules Loaded
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Post-condition check: Database Connected
+2025-10-28 01:39:08 | INFO     | src.runtime.post_conditions | Post-condition checks passed
+2025-10-28 01:39:08 | INFO     | __main__ | CHECKPOINT 7/8: Post-conditions PASSED
+2025-10-28 01:39:08 | ERROR    | __main__ | CHECKPOINT 8/8: Smoke test complete - STALLED
+
+
+================================================================================
+End of Report
+================================================================================

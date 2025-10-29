@@ -434,15 +434,10 @@ class TestDailyRealizedProfitE2E:
         """
         account_id = "PRAC-V2-126244-84184528"
 
-        # Given: Account has realized $1100 profit (exceeds $1000 target)
+        # Given: Account has realized $500 profit from previous trade
         pnl_tracker.add_trade_pnl(account_id, 500.0)
-        pnl_tracker.add_trade_pnl(account_id, 600.0)
 
-        # Verify P&L is above target
-        daily_pnl = pnl_tracker.get_daily_pnl(account_id)
-        assert daily_pnl == 1100.0
-
-        # When: POSITION_CLOSED event fired (final trade that hits target)
+        # When: POSITION_CLOSED event fired with $600 profit (total = $1100, exceeds target)
         position_closed_event = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
             data={
@@ -454,13 +449,13 @@ class TestDailyRealizedProfitE2E:
             }
         )
 
-        # Evaluate rule
+        # Evaluate rule (rule will add $600 to tracker: 500 + 600 = 1100)
         violation = await profit_rule.evaluate(position_closed_event, mock_engine)
 
-        # Then: Violation detected
+        # Then: Violation detected (P&L now = $1100, exceeds $1000 target)
         assert violation is not None
         assert violation["rule"] == "DailyRealizedProfitRule"
-        assert violation["current_profit"] == 1100.0
+        assert violation["current_profit"] == 1100.0  # 500 (previous) + 600 (this event)
         assert violation["target"] == 1000.0
         assert violation["lockout_required"] is True
         assert "Good job" in violation["message"]
@@ -602,14 +597,12 @@ class TestDailyRealizedProfitE2E:
             }
         )
 
-        # Add new P&L
-        pnl_tracker.add_trade_pnl(account_id, 50.0)
-
         # Evaluate rule - should NOT violate (P&L below target)
+        # Rule will add $50 to tracker automatically
         violation = await profit_rule.evaluate(new_trade_event, mock_engine)
         assert violation is None
 
-        # Verify new P&L tracked correctly
+        # Verify new P&L tracked correctly (0 + 50 = 50)
         daily_pnl = pnl_tracker.get_daily_pnl(account_id)
         assert daily_pnl == 50.0
 
@@ -636,9 +629,7 @@ class TestDailyRealizedProfitE2E:
         account_a = "PRAC-V2-111111-11111111"
         account_b = "PRAC-V2-222222-22222222"
 
-        # Given: Account A reaches profit target
-        pnl_tracker.add_trade_pnl(account_a, 1100.0)
-
+        # Given: Account A makes $1100 trade (reaches profit target)
         position_closed_a = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
             data={
@@ -650,12 +641,13 @@ class TestDailyRealizedProfitE2E:
             }
         )
 
+        # Evaluate rule (will add $1100 to tracker automatically)
         violation_a = await profit_rule.evaluate(position_closed_a, mock_engine)
         assert violation_a is not None
 
         await profit_rule.enforce(account_a, violation_a, mock_engine)
 
-        # And: Account B under target
+        # And: Account B has $500 from previous trade (under target)
         pnl_tracker.add_trade_pnl(account_b, 500.0)
 
         # Then: Account A is locked
@@ -664,7 +656,7 @@ class TestDailyRealizedProfitE2E:
         # And: Account B is NOT locked
         assert lockout_manager.is_locked_out(account_b) is False
 
-        # When: Account B makes trade
+        # When: Account B makes $200 trade (total = $700, still under target)
         position_closed_b = RiskEvent(
             event_type=EventType.POSITION_CLOSED,
             data={
@@ -676,7 +668,7 @@ class TestDailyRealizedProfitE2E:
             }
         )
 
-        pnl_tracker.add_trade_pnl(account_b, 200.0)
+        # Evaluate rule (will add $200 to tracker: 500 + 200 = 700)
         violation_b = await profit_rule.evaluate(position_closed_b, mock_engine)
 
         # Then: No violation (still under $1000 target)
@@ -685,9 +677,9 @@ class TestDailyRealizedProfitE2E:
         # And: Account B remains unlocked
         assert lockout_manager.is_locked_out(account_b) is False
 
-        # Verify P&L tracked separately
-        assert pnl_tracker.get_daily_pnl(account_a) == 1100.0
-        assert pnl_tracker.get_daily_pnl(account_b) == 700.0
+        # Verify P&L tracked separately per account
+        assert pnl_tracker.get_daily_pnl(account_a) == 1100.0  # Single $1100 trade
+        assert pnl_tracker.get_daily_pnl(account_b) == 700.0   # $500 + $200
 
     # ========================================================================
     # Test 8: Profit Rule Ignores Half-Turn Trades

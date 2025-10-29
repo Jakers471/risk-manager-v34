@@ -1,0 +1,608 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Unit tests only
+Timestamp: 2025-10-27 17:18:12
+Status: FAILED
+Exit Code: 1
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 95 items
+
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_engine_accepts_trading_integration [32mPASSED[0m[33m [  1%][0m
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_flatten_all_calls_trading_integration [32mPASSED[0m[33m [  2%][0m
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_flatten_all_without_trading_integration [32mPASSED[0m[33m [  3%][0m
+tests/unit/test_core/test_enforcement_wiring.py::TestEnforcementWiring::test_enforcement_from_violation [32mPASSED[0m[33m [  4%][0m
+tests/unit/test_core/test_events.py::TestEventBus::test_create_event_bus [32mPASSED[0m[33m [  5%][0m
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_to_event [32mPASSED[0m[33m [  6%][0m
+tests/unit/test_core/test_events.py::TestEventBus::test_subscribe_multiple_callbacks [32mPASSED[0m[33m [  7%][0m
+tests/unit/test_core/test_events.py::TestEventBus::test_unsubscribe_from_event [32mPASSED[0m[33m [  8%][0m
+tests/unit/test_core/test_events.py::TestRiskEvent::test_create_event [32mPASSED[0m[33m [  9%][0m
+tests/unit/test_core/test_events.py::TestRiskEvent::test_event_has_timestamp [32mPASSED[0m[33m [ 10%][0m
+tests/unit/test_core/test_events.py::TestEventType::test_event_types_exist [32mPASSED[0m[33m [ 11%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_rule_initialization [32mPASSED[0m[33m [ 12%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_rule_initialization_custom_action [32mPASSED[0m[33m [ 13%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_below_limit_passes [32mPASSED[0m[33m [ 14%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_zero_position_passes [32mPASSED[0m[33m [ 15%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_at_limit_passes [32mPASSED[0m[33m [ 16%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_position_exceeds_limit_violates [32mPASSED[0m[33m [ 17%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_large_position_violates [32mPASSED[0m[33m [ 18%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_multi_symbol_total_below_limit [32mPASSED[0m[33m [ 20%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_multi_symbol_total_exceeds_limit [32mPASSED[0m[33m [ 21%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_short_position_below_limit [32mPASSED[0m[33m [ 22%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_short_position_exceeds_limit [32mPASSED[0m[33m [ 23%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_flatten_action_in_violation [32mPASSED[0m[33m [ 24%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_reject_action_in_violation [32mPASSED[0m[33m [ 25%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_only_evaluates_position_events [32mPASSED[0m[33m [ 26%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_evaluates_order_filled_event [32mPASSED[0m[33m [ 27%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_negative_limit_raises_error [32mPASSED[0m[33m [ 28%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_zero_limit [32mPASSED[0m[33m [ 29%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_missing_position_data [32mPASSED[0m[33m [ 30%][0m
+tests/unit/test_rules/test_max_position_rule.py::TestMaxPositionRuleUnit::test_violation_message_clarity [32mPASSED[0m[33m [ 31%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_set_lockout_locks_account [31mFAILED[0m[31m [ 32%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_is_locked_out_returns_true_when_locked [31mFAILED[0m[31m [ 33%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_is_locked_out_returns_false_when_not_locked [32mPASSED[0m[31m [ 34%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_get_lockout_info_returns_details [31mFAILED[0m[31m [ 35%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_get_lockout_info_returns_none_when_not_locked [32mPASSED[0m[31m [ 36%][0m
+tests/unit/test_state/test_lockout_manager.py::TestHardLockoutOperations::test_clear_lockout_removes_lockout [31mFAILED[0m[31m [ 37%][0m
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_set_cooldown_creates_timer [32mPASSED[0m[31m [ 38%][0m
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_auto_expires_after_duration [31mFAILED[0m[31m [ 40%][0m
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_remaining_time_decreases [32mPASSED[0m[31m [ 41%][0m
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_cleared_cancels_timer [31mFAILED[0m[31m [ 42%][0m
+tests/unit/test_state/test_lockout_manager.py::TestCooldownTimers::test_cooldown_integrates_with_timer_manager [32mPASSED[0m[31m [ 43%][0m
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_check_expired_lockouts_runs_every_second [32mPASSED[0m[31m [ 44%][0m
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_expired_lockout_auto_cleared [31mFAILED[0m[31m [ 45%][0m
+tests/unit/test_state/test_lockout_manager.py::TestBackgroundTask::test_background_task_stops_on_shutdown [32mPASSED[0m[31m [ 46%][0m
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_multiple_accounts_locked_independently [31mFAILED[0m[31m [ 47%][0m
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_lockout_affects_only_target_account [31mFAILED[0m[31m [ 48%][0m
+tests/unit/test_state/test_lockout_manager.py::TestMultipleAccounts::test_clear_lockout_affects_only_target_account [31mFAILED[0m[31m [ 49%][0m
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_lockout_saved_to_database [32mPASSED[0m[31m [ 50%][0m
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_lockout_deleted_from_database_on_clear [32mPASSED[0m[31m [ 51%][0m
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_load_lockouts_populates_memory_state [31mFAILED[0m[31m [ 52%][0m
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_expired_lockout_removed_from_database [32mPASSED[0m[31m [ 53%][0m
+tests/unit/test_state/test_lockout_manager.py::TestDatabasePersistence::test_database_schema_correct [32mPASSED[0m[31m [ 54%][0m
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_lockout_until_past_time_immediately_expired [32mPASSED[0m[31m [ 55%][0m
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_lockout_reason_persisted_correctly [31mFAILED[0m[31m [ 56%][0m
+tests/unit/test_state/test_lockout_manager.py::TestEdgeCases::test_double_lockout_overwrites_previous [31mFAILED[0m[31m [ 57%][0m
+tests/unit/test_state/test_lockout_manager.py::TestEventRouterIntegration::test_locked_account_blocks_rule_processing [31mFAILED[0m[31m [ 58%][0m
+tests/unit/test_state/test_lockout_manager.py::TestEventRouterIntegration::test_unlocked_account_allows_rule_processing [32mPASSED[0m[31m [ 60%][0m
+tests/unit/test_state/test_lockout_manager.py::TestLockoutTypes::test_hard_lockout_type_stored_correctly [31mFAILED[0m[31m [ 61%][0m
+tests/unit/test_state/test_lockout_manager.py::TestLockoutTypes::test_cooldown_type_stored_correctly [32mPASSED[0m[31m [ 62%][0m
+tests/unit/test_state/test_lockout_manager.py::TestStartupShutdown::test_lockouts_restored_on_startup [31mFAILED[0m[31m [ 63%][0m
+tests/unit/test_state/test_lockout_manager.py::TestStartupShutdown::test_shutdown_cancels_all_timers [32mPASSED[0m[31m [ 64%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_tracker_initializes [32mPASSED[0m[31m [ 65%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_get_daily_pnl_returns_zero_for_new_account [32mPASSED[0m[31m [ 66%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerBasics::test_add_trade_pnl_updates_daily_total [32mPASSED[0m[31m [ 67%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_pnl_survives_restart [32mPASSED[0m[31m [ 68%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerPersistence::test_multiple_accounts_tracked_independently [32mPASSED[0m[31m [ 69%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl [32mPASSED[0m[31m [ 70%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_different_dates_tracked_separately [32mPASSED[0m[31m [ 71%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_increments [32mPASSED[0m[31m [ 72%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl [32mPASSED[0m[31m [ 73%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_zero_pnl_trades [32mPASSED[0m[31m [ 74%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_handles_large_pnl_values [32mPASSED[0m[31m [ 75%][0m
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerEdgeCases::test_get_all_account_pnls [32mPASSED[0m[31m [ 76%][0m
+tests/unit/test_state/test_timer_manager.py::test_start_timer_creates_timer [32mPASSED[0m[31m [ 77%][0m
+tests/unit/test_state/test_timer_manager.py::test_get_remaining_time_decreases [32mPASSED[0m[31m [ 78%][0m
+tests/unit/test_state/test_timer_manager.py::test_cancel_timer_removes_timer [31mFAILED[0m[31m [ 80%][0m
+tests/unit/test_state/test_timer_manager.py::test_expired_timer_executes_callback [32mPASSED[0m[31m [ 81%][0m
+tests/unit/test_state/test_timer_manager.py::test_expired_timer_auto_removed [32mPASSED[0m[31m [ 82%][0m
+tests/unit/test_state/test_timer_manager.py::test_multiple_timers_run_simultaneously [32mPASSED[0m[31m [ 83%][0m
+tests/unit/test_state/test_timer_manager.py::test_timers_expire_independently [32mPASSED[0m[31m [ 84%][0m
+tests/unit/test_state/test_timer_manager.py::test_cancel_specific_timer_preserves_others [31mFAILED[0m[31m [ 85%][0m
+tests/unit/test_state/test_timer_manager.py::test_callback_receives_correct_context [32mPASSED[0m[31m [ 86%][0m
+tests/unit/test_state/test_timer_manager.py::test_callback_exception_doesnt_crash_manager [32mPASSED[0m[31m [ 87%][0m
+tests/unit/test_state/test_timer_manager.py::test_callback_executes_exactly_once [32mPASSED[0m[31m [ 88%][0m
+tests/unit/test_state/test_timer_manager.py::test_async_callback_supported [32mPASSED[0m[31m [ 89%][0m
+tests/unit/test_state/test_timer_manager.py::test_zero_duration_timer_executes_immediately [32mPASSED[0m[31m [ 90%][0m
+tests/unit/test_state/test_timer_manager.py::test_negative_duration_raises_error [31mFAILED[0m[31m [ 91%][0m
+tests/unit/test_state/test_timer_manager.py::test_timer_precision_within_tolerance [32mPASSED[0m[31m [ 92%][0m
+tests/unit/test_state/test_timer_manager.py::test_check_timers_runs_every_second [32mPASSED[0m[31m [ 93%][0m
+tests/unit/test_state/test_timer_manager.py::test_check_timers_stops_on_shutdown [32mPASSED[0m[31m [ 94%][0m
+tests/unit/test_state/test_timer_manager.py::test_get_remaining_time_nonexistent_timer_returns_zero [32mPASSED[0m[31m [ 95%][0m
+tests/unit/test_state/test_timer_manager.py::test_cancel_nonexistent_timer_no_error [32mPASSED[0m[31m [ 96%][0m
+tests/unit/test_state/test_timer_manager.py::test_duplicate_timer_name_overwrites_previous [32mPASSED[0m[31m [ 97%][0m
+tests/unit/test_state/test_timer_manager.py::test_has_timer_returns_false_for_nonexistent [32mPASSED[0m[31m [ 98%][0m
+tests/unit/test_state/test_timer_manager.py::test_start_timer_without_callback_raises_error [32mPASSED[0m[31m [100%][0m
+
+=================================== FAILURES ===================================
+[31m[1m___________ TestHardLockoutOperations.test_set_lockout_locks_account ___________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:82: in test_set_lockout_locks_account
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account_id) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05f1a7b0>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmp3ffg9syp.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:04.022741+00:00: Daily loss limit exceeded
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Daily loss limit exceeded
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____ TestHardLockoutOperations.test_is_locked_out_returns_true_when_locked _____[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:99: in test_is_locked_out_returns_true_when_locked
+    [0m[94massert[39;49;00m result [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpdsr_0ui9.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:08.370349+00:00: Test reason
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test reason
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_______ TestHardLockoutOperations.test_get_lockout_info_returns_details ________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:132: in test_get_lockout_info_returns_details
+    [0m[94massert[39;49;00m info [95mis[39;49;00m [95mnot[39;49;00m [94mNone[39;49;00m[90m[39;49;00m
+[1m[31mE   assert None is not None[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmph0lz19tu.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:08.715821+00:00: Daily loss limit exceeded
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Daily loss limit exceeded
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_________ TestHardLockoutOperations.test_clear_lockout_removes_lockout _________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:163: in test_clear_lockout_removes_lockout
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account_id) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05f61b50>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpmxn2ys8y.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:09.054732+00:00: Test reason
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test reason
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_________ TestCooldownTimers.test_cooldown_auto_expires_after_duration _________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:223: in test_cooldown_auto_expires_after_duration
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account_id) [95mis[39;49;00m [94mFalse[39;49;00m[90m[39;49;00m
+[1m[31mE   assert True is False[0m
+[1m[31mE    +  where True = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05f74c00>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmphxaz3q8h.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Timer Manager unavailable, using background task fallback: TestCooldownTimers.test_cooldown_auto_expires_after_duration.<locals>.mock_start_timer() got an unexpected keyword argument 'duration'
+
+[32mINFO    [0m root:conftest.py:37 Account 123 cooldown for 1800s: Test
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____________ TestCooldownTimers.test_cooldown_cleared_cancels_timer ____________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:260: in test_cooldown_cleared_cancels_timer
+    [0m[94mawait[39;49;00m lockout_manager.clear_lockout(account_id)[90m[39;49;00m
+[1m[31mE   TypeError: object NoneType can't be used in 'await' expression[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpa9n04v71.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Timer started for account 123 cooldown
+
+[32mINFO    [0m root:conftest.py:37 Account 123 cooldown for 1800s: Test
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_____________ TestBackgroundTask.test_expired_lockout_auto_cleared _____________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:340: in test_expired_lockout_auto_cleared
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account_id) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05dfba10>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpxiaakc42.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T17:17:02.978528+00:00: Test
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_______ TestMultipleAccounts.test_multiple_accounts_locked_independently _______[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:398: in test_multiple_accounts_locked_independently
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account1) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05ca4fc0>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpas7i8sxm.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T18:17:13.884899+00:00: Reason 1
+
+[32mINFO    [0m root:conftest.py:37 Account 456 locked until 2025-10-27T19:17:13.884904+00:00: Reason 2
+
+[32mINFO    [0m root:conftest.py:37 Account 789 locked until 2025-10-27T20:17:13.884906+00:00: Reason 3
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Reason 1
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m________ TestMultipleAccounts.test_lockout_affects_only_target_account _________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:426: in test_lockout_affects_only_target_account
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(locked_account) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05f26450>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpnvnif394.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:14.105119+00:00: Test reason
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test reason
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_____ TestMultipleAccounts.test_clear_lockout_affects_only_target_account ______[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:449: in test_clear_lockout_affects_only_target_account
+    [0m[94massert[39;49;00m lockout_manager.is_locked_out(account1) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05f27350>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpve7_tzmo.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:14.323707+00:00: Reason 1
+
+[32mINFO    [0m root:conftest.py:37 Account 456 locked until 2025-10-27T19:17:14.323707+00:00: Reason 2
+
+[32mINFO    [0m root:conftest.py:37 Account 789 locked until 2025-10-27T19:17:14.323707+00:00: Reason 3
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 456: Reason 2
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Reason 1
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m______ TestDatabasePersistence.test_load_lockouts_populates_memory_state _______[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:540: in test_load_lockouts_populates_memory_state
+    [0m[94massert[39;49;00m manager.is_locked_out(account_id) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05e5f430>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpg_uzen6b.db
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____________ TestEdgeCases.test_lockout_reason_persisted_correctly _____________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:629: in test_lockout_reason_persisted_correctly
+    [0m[94massert[39;49;00m info[[33m"[39;49;00m[33mreason[39;49;00m[33m"[39;49;00m] == reason[90m[39;49;00m
+           ^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   TypeError: 'NoneType' object is not subscriptable[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpbevxlrhs.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:15.495086+00:00: Daily loss limit exceeded
+Max loss: $500
+Current loss: $550
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Daily loss limit exceeded
+Max loss: $500
+Current loss: $550
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____________ TestEdgeCases.test_double_lockout_overwrites_previous _____________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:648: in test_double_lockout_overwrites_previous
+    [0m[94massert[39;49;00m info[[33m"[39;49;00m[33mreason[39;49;00m[33m"[39;49;00m] == [33m"[39;49;00m[33mReason 2[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+           ^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   TypeError: 'NoneType' object is not subscriptable[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpq8gnkh6e.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T18:17:15.696370+00:00: Reason 1
+
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T20:17:15.696375+00:00: Reason 2
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Reason 2
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____ TestEventRouterIntegration.test_locked_account_blocks_rule_processing _____[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:675: in test_locked_account_blocks_rule_processing
+    [0m[94massert[39;49;00m should_process_rules [95mis[39;49;00m [94mFalse[39;49;00m[90m[39;49;00m
+[1m[31mE   assert True is False[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmp_oigxm0u.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:15.915571+00:00: Test
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m___________ TestLockoutTypes.test_hard_lockout_type_stored_correctly ___________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:716: in test_hard_lockout_type_stored_correctly
+    [0m[94massert[39;49;00m info[[33m"[39;49;00m[33mtype[39;49;00m[33m"[39;49;00m] == [33m"[39;49;00m[33mhard_lockout[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+           ^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   TypeError: 'NoneType' object is not subscriptable[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmpsqn2ciqk.db
+
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Account 123 locked until 2025-10-27T19:17:16.249836+00:00: Test
+
+[32mINFO    [0m root:conftest.py:37 Lockout cleared for account 123: Test
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m____________ TestStartupShutdown.test_lockouts_restored_on_startup _____________[0m
+[1m[31mtests/unit/test_state/test_lockout_manager.py[0m:769: in test_lockouts_restored_on_startup
+    [0m[94massert[39;49;00m manager.is_locked_out(account_id) [95mis[39;49;00m [94mTrue[39;49;00m[90m[39;49;00m
+[1m[31mE   assert False is True[0m
+[1m[31mE    +  where False = is_locked_out(123)[0m
+[1m[31mE    +    where is_locked_out = <risk_manager.state.lockout_manager.LockoutManager object at 0x701b05d1c150>.is_locked_out[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 Applying schema migration: v1 (initial schema)
+
+[32mINFO    [0m root:conftest.py:37 Schema v1 applied successfully
+
+[32mINFO    [0m root:conftest.py:37 Database initialized at /tmp/tmp07i7t2dm.db
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Loaded 0 lockouts from database
+
+[32mINFO    [0m root:conftest.py:37 Lockout Manager initialized
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Database closed
+[31m[1m_______________________ test_cancel_timer_removes_timer ________________________[0m
+[1m[31mtests/unit/test_state/test_timer_manager.py[0m:126: in test_cancel_timer_removes_timer
+    [0m[94massert[39;49;00m [95mnot[39;49;00m timer_manager.has_timer([33m"[39;49;00m[33mcancelable_timer[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('cancelable_timer')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x701b05f83890>.has_timer[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Timer started: cancelable_timer (duration=10s, expires=17:17:30)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m_________________ test_cancel_specific_timer_preserves_others __________________[0m
+[1m[31mtests/unit/test_state/test_timer_manager.py[0m:271: in test_cancel_specific_timer_preserves_others
+    [0m[94massert[39;49;00m [95mnot[39;49;00m timer_manager.has_timer([33m"[39;49;00m[33mcancel_b[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE   AssertionError: assert not True[0m
+[1m[31mE    +  where True = has_timer('cancel_b')[0m
+[1m[31mE    +    where has_timer = <risk_manager.state.timer_manager.TimerManager object at 0x701b05f77ce0>.has_timer[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m root:conftest.py:37 Timer started: keep_a (duration=5s, expires=17:17:40)
+
+[32mINFO    [0m root:conftest.py:37 Timer started: cancel_b (duration=5s, expires=17:17:40)
+
+[32mINFO    [0m root:conftest.py:37 Timer started: keep_c (duration=5s, expires=17:17:40)
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[31m[1m_____________________ test_negative_duration_raises_error ______________________[0m
+[1m[31mtests/unit/test_state/test_timer_manager.py[0m:445: in test_negative_duration_raises_error
+    [0m[94mawait[39;49;00m timer_manager.start_timer([90m[39;49;00m
+[1m[31msrc/risk_manager/state/timer_manager.py[0m:106: in start_timer
+    [0m[94mraise[39;49;00m [96mValueError[39;49;00m([33mf[39;49;00m[33m"[39;49;00m[33mTimer duration must be >= 0, got [39;49;00m[33m{[39;49;00mduration[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE   ValueError: Timer duration must be >= 0, got -5[0m
+
+[33mDuring handling of the above exception, another exception occurred:[0m
+[1m[31mtests/unit/test_state/test_timer_manager.py[0m:444: in test_negative_duration_raises_error
+    [0m[94mwith[39;49;00m pytest.raises([96mValueError[39;49;00m, match=[33m"[39;49;00m[33mduration must be non-negative|duration cannot be negative[39;49;00m[33m"[39;49;00m):[90m[39;49;00m
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[90m[39;49;00m
+[1m[31mE   AssertionError: Regex pattern did not match.[0m
+[1m[31mE    Regex: 'duration must be non-negative|duration cannot be negative'[0m
+[1m[31mE    Input: 'Timer duration must be >= 0, got -5'[0m
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m root:conftest.py:37 TimerManager initialized
+
+[32mINFO    [0m root:conftest.py:37 Background task started
+
+[32mINFO    [0m root:conftest.py:37 TimerManager started
+
+[32mINFO    [0m root:conftest.py:37 Timer loop started
+---------------------------- Captured log teardown -----------------------------
+[32mINFO    [0m root:conftest.py:37 Timer loop cancelled
+
+[32mINFO    [0m root:conftest.py:37 Timer loop stopped
+
+[32mINFO    [0m root:conftest.py:37 TimerManager stopped
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+tests/unit/test_state/test_lockout_manager.py: 31 warnings
+tests/unit/test_state/test_pnl_tracker.py: 12 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/database.py:82: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    (1, datetime.utcnow().isoformat()),
+
+tests/unit/test_state/test_pnl_tracker.py: 23 warnings
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:63: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerReset::test_reset_clears_daily_pnl
+tests/unit/test_state/test_pnl_tracker.py::TestPnLTrackerTradeCount::test_trade_count_resets_with_pnl
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/src/risk_manager/state/pnl_tracker.py:194: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+tests/unit/test_state/test_timer_manager.py::test_cancel_timer_removes_timer
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_state/test_timer_manager.py:123: RuntimeWarning: coroutine 'TimerManager.cancel_timer' was never awaited
+    timer_manager.cancel_timer("cancelable_timer")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/test_state/test_timer_manager.py::test_cancel_specific_timer_preserves_others
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_state/test_timer_manager.py:267: RuntimeWarning: coroutine 'TimerManager.cancel_timer' was never awaited
+    timer_manager.cancel_timer("cancel_b")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/test_state/test_timer_manager.py::test_cancel_nonexistent_timer_no_error
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/tests/unit/test_state/test_timer_manager.py:580: RuntimeWarning: coroutine 'TimerManager.cancel_timer' was never awaited
+    timer_manager.cancel_timer("nonexistent_timer")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestHardLockoutOperations::test_set_lockout_locks_account[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestHardLockoutOperations::test_is_locked_out_returns_true_when_locked[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestHardLockoutOperations::test_get_lockout_info_returns_details[0m - assert None is not None
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestHardLockoutOperations::test_clear_lockout_removes_lockout[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestCooldownTimers::test_cooldown_auto_expires_after_duration[0m - assert True is False
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestCooldownTimers::test_cooldown_cleared_cancels_timer[0m - TypeError: object NoneType can't be used in 'await' expression
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestBackgroundTask::test_expired_lockout_auto_cleared[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestMultipleAccounts::test_multiple_accounts_locked_independently[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestMultipleAccounts::test_lockout_affects_only_target_account[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestMultipleAccounts::test_clear_lockout_affects_only_target_account[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestDatabasePersistence::test_load_lockouts_populates_memory_state[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestEdgeCases::test_lockout_reason_persisted_correctly[0m - TypeError: 'NoneType' object is not subscriptable
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestEdgeCases::test_double_lockout_overwrites_previous[0m - TypeError: 'NoneType' object is not subscriptable
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestEventRouterIntegration::test_locked_account_blocks_rule_processing[0m - assert True is False
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestLockoutTypes::test_hard_lockout_type_stored_correctly[0m - TypeError: 'NoneType' object is not subscriptable
+[31mFAILED[0m tests/unit/test_state/test_lockout_manager.py::[1mTestStartupShutdown::test_lockouts_restored_on_startup[0m - assert False is True
+[31mFAILED[0m tests/unit/test_state/test_timer_manager.py::[1mtest_cancel_timer_removes_timer[0m - AssertionError: assert not True
+[31mFAILED[0m tests/unit/test_state/test_timer_manager.py::[1mtest_cancel_specific_timer_preserves_others[0m - AssertionError: assert not True
+[31mFAILED[0m tests/unit/test_state/test_timer_manager.py::[1mtest_negative_duration_raises_error[0m - AssertionError: Regex pattern did not match.
+[31m============ [31m[1m19 failed[0m, [32m76 passed[0m, [33m72 warnings[0m[31m in 71.38s (0:01:11)[0m[31m =============[0m
+
+
+================================================================================
+End of Report
+================================================================================

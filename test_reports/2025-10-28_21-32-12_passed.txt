@@ -1,0 +1,58 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: All Rule Smoke Tests (27 tests)
+Timestamp: 2025-10-28 21:32:12
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 27 items
+
+tests/smoke/test_pnl_loss_rules_smoke.py::TestPnLLossRulesSmoke::test_rule_003_daily_realized_loss_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [  3%][0m
+tests/smoke/test_pnl_loss_rules_smoke.py::TestPnLLossRulesSmoke::test_rule_013_daily_realized_profit_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [  7%][0m
+tests/smoke/test_pnl_loss_rules_smoke.py::TestPnLLossRulesSmoke::test_rule_007_cooldown_after_loss_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [ 11%][0m
+tests/smoke/test_pnl_loss_rules_smoke.py::TestPnLLossRulesSmoke::test_rule_008_stop_loss_enforcement_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [ 14%][0m
+tests/smoke/test_pnl_loss_rules_smoke.py::TestPnLLossRulesSmoke::test_rule_008_stop_loss_placed_cancels_timer <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [ 18%][0m
+tests/smoke/test_pnl_loss_rules_smoke.py::test_smoke_summary <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_pnl_loss_rules_smoke.py [32mPASSED[0m[33m [ 22%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_001_max_contracts_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 25%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_002_max_contracts_per_instrument_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 29%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_004_daily_unrealized_loss_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 33%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_rule_005_max_unrealized_profit_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 37%][0m
+tests/smoke/test_position_rules_smoke.py::TestPositionRulesSmoke::test_multi_rule_smoke_all_position_rules <- C:\Users\jakers\Desktop\risk-manager-v34\tests\smoke\test_position_rules_smoke.py [32mPASSED[0m[33m [ 40%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_006_trade_frequency_per_minute_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 44%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_006_trade_frequency_per_hour_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 48%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_009_session_block_outside_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 51%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_009_weekend_block_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 55%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_010_auth_loss_guard_disconnected_alert <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 59%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_010_auth_failure_alert <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 62%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_010_connection_restored_clears_state <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 66%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_011_symbol_blocks_exact_match_fires <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 70%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_011_symbol_blocks_case_insensitive <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 74%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_011_symbol_blocks_wildcard_match <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 77%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_011_symbol_blocks_allows_non_blocked <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 81%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_012_trade_management_auto_stop_loss <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 85%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_012_trade_management_bracket_order <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 88%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_012_trade_management_trailing_stop <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 92%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestFreqSessionMiscRulesSmoke::test_rule_012_trade_management_short_position <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [ 96%][0m
+tests/unit/test_rules/test_freq_session_misc_smoke.py::TestAllFreqSessionMiscSmoke::test_all_rules_smoke_suite <- C:\Users\jakers\Desktop\risk-manager-v34\tests\unit\test_rules\test_freq_session_misc_smoke.py [32mPASSED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m======================== [32m27 passed[0m, [33m[1m1 warning[0m[33m in 19.47s[0m[33m ========================[0m
+
+
+================================================================================
+End of Report
+================================================================================

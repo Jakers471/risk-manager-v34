@@ -1,0 +1,68 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: E2E tests only
+Timestamp: 2025-10-28 03:28:51
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 37 items
+
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_authentication_success <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [  2%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_authentication_failure <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [  5%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_connection_loss_recovery <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [  8%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_multi_account_authentication <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [ 10%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_connection_state_consistency <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [ 13%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_authentication_retrieves_account_info <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [ 16%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_concurrent_authentication_attempts <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [ 18%][0m
+tests/e2e/test_authentication_e2e.py::TestAuthenticationE2E::test_authentication_event_data_completeness <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_authentication_e2e.py [32mPASSED[0m[33m [ 21%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_position_opened_event_flow <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 24%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_position_updated_event_flow <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 27%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_order_filled_event_flow <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 29%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_pnl_update_event_flow <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 32%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_multi_symbol_event_flow <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 35%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_event_pipeline_stress <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 37%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_event_pipeline_error_handling <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 40%][0m
+tests/e2e/test_event_pipeline_e2e.py::TestEventPipelineE2E::test_complete_position_lifecycle <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_event_pipeline_e2e.py [32mPASSED[0m[33m [ 43%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_position_below_limit_no_enforcement <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 45%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_position_exceeds_limit_triggers_enforcement <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 48%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_complete_flow_sdk_to_enforcement <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 51%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_multiple_position_updates <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 54%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_multi_symbol_total_exceeds_limit <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 56%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_enforcement_closes_positions_via_sdk <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 59%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_system_continues_after_handler_error <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 62%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_end_to_end_latency <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 64%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_state_remains_consistent_across_events <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 67%][0m
+tests/e2e/test_max_contracts_e2e.py::TestMaxContractsE2E::test_realistic_day_trading_scenario <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_max_contracts_e2e.py [32mPASSED[0m[33m [ 70%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_position_limit_plus_loss_limit <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 72%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_cooldown_plus_session_hours <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 75%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_unrealized_loss_triggers_realized_loss_lockout <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 78%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_state_consistency_across_multiple_rules <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 81%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_multiple_rules_priority_and_sequencing <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 83%][0m
+tests/e2e/test_multi_rule_interactions_e2e.py::TestMultiRuleInteractionsE2E::test_cleanup_resets_all_state <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_multi_rule_interactions_e2e.py [32mPASSED[0m[33m [ 86%][0m
+tests/e2e/test_performance_e2e.py::TestPerformanceE2E::test_event_processing_latency <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_performance_e2e.py [32mPASSED[0m[33m [ 89%][0m
+tests/e2e/test_performance_e2e.py::TestPerformanceE2E::test_enforcement_execution_latency <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_performance_e2e.py [32mPASSED[0m[33m [ 91%][0m
+tests/e2e/test_performance_e2e.py::TestPerformanceE2E::test_high_frequency_event_handling <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_performance_e2e.py [32mPASSED[0m[33m [ 94%][0m
+tests/e2e/test_performance_e2e.py::TestPerformanceE2E::test_concurrent_rule_evaluation <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_performance_e2e.py [33mSKIPPED[0m[33m [ 97%][0m
+tests/e2e/test_performance_e2e.py::TestPerformanceE2E::test_memory_usage_under_load <- C:\Users\jakers\Desktop\risk-manager-v34\tests\e2e\test_performance_e2e.py [33mSKIPPED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m================== [32m35 passed[0m, [33m[1m2 skipped[0m, [33m[1m1 warning[0m[33m in 21.77s[0m[33m ===================[0m
+
+
+================================================================================
+End of Report
+================================================================================

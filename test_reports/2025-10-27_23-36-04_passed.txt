@@ -1,0 +1,44 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Test file: test_trade_management_integration.py
+Timestamp: 2025-10-27 23:36:04
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 13 items
+
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_stop_loss_placement_es_long [32mPASSED[0m[33m [  7%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_stop_loss_placement_mnq_short [32mPASSED[0m[33m [ 15%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_auto_take_profit_placement [32mPASSED[0m[33m [ 23%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_bracket_order_creation [32mPASSED[0m[33m [ 30%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_trailing_stop_adjustment_on_profit [32mPASSED[0m[33m [ 38%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_trailing_stop_not_adjusted_on_loss [32mPASSED[0m[33m [ 46%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_multi_symbol_independent_management [32mPASSED[0m[33m [ 53%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_position_closed_orders_cleanup [32mPASSED[0m[33m [ 61%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_event_bus_routes_to_rule [32mPASSED[0m[33m [ 69%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_stop_loss_disabled_only_take_profit [32mPASSED[0m[33m [ 76%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_take_profit_disabled_only_stop_loss [32mPASSED[0m[33m [ 84%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_complete_order_placement_flow [32mPASSED[0m[33m [ 92%][0m
+tests/integration/test_trade_management_integration.py::TestTradeManagementIntegration::test_event_processing_performance [32mPASSED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m======================== [32m13 passed[0m, [33m[1m1 warning[0m[33m in 0.68s[0m[33m =========================[0m
+
+
+================================================================================
+End of Report
+================================================================================
