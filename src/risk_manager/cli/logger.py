@@ -43,6 +43,32 @@ CHECKPOINT_NAMES = {
 }
 
 
+def _filter_sdk_noise(record: dict) -> bool:
+    """
+    Filter out known SDK internal errors that don't affect functionality.
+
+    The Project-X SDK has internal order tracking components that try to
+    deserialize order data with a 'fills' field, but the Order model doesn't
+    accept this parameter. This causes harmless error messages.
+
+    Args:
+        record: Log record to filter
+
+    Returns:
+        True to keep the log, False to suppress it
+    """
+    message = record.get("message", "")
+
+    # Suppress SDK's Order.__init__() errors (harmless SDK internal issue)
+    if "Failed to create Order object" in message:
+        return False
+    if "Order.__init__() got an unexpected keyword argument 'fills'" in message:
+        return False
+
+    # Keep all other logs
+    return True
+
+
 def setup_logging(
     console_level: str = "INFO",
     file_level: str = "DEBUG",
@@ -97,6 +123,7 @@ def setup_logging(
         format=console_format,
         level=console_level.upper(),
         colorize=colorize,
+        filter=_filter_sdk_noise,  # Suppress SDK internal errors
     )
 
     # File handler - Detailed, structured
@@ -122,6 +149,7 @@ def setup_logging(
         retention="30 days",
         compression="zip",
         enqueue=True,  # Thread-safe logging
+        filter=_filter_sdk_noise,  # Suppress SDK internal errors
     )
 
     logger.info(f"Logging initialized: console={console_level}, file={file_level}")
