@@ -59,6 +59,23 @@ from risk_manager.config.models import RiskConfig
 from risk_manager.core.events import EventBus, EventType, RiskEvent
 
 
+# Tick economics for common futures instruments
+# Format: {symbol: {"size": tick_size, "tick_value": tick_value_in_dollars}}
+TICK_VALUES = {
+    "NQ":  {"size": 0.25, "tick_value": 5.00},    # NASDAQ-100 E-mini
+    "MNQ": {"size": 0.25, "tick_value": 0.50},    # Micro NASDAQ-100 E-mini
+    "ES":  {"size": 0.25, "tick_value": 12.50},   # S&P 500 E-mini
+    "MES": {"size": 0.25, "tick_value": 1.25},    # Micro S&P 500 E-mini
+    "YM":  {"size": 1.00, "tick_value": 5.00},    # Dow E-mini
+    "MYM": {"size": 1.00, "tick_value": 0.50},    # Micro Dow E-mini
+    "RTY": {"size": 0.10, "tick_value": 5.00},    # Russell 2000 E-mini
+    "M2K": {"size": 0.10, "tick_value": 0.50},    # Micro Russell 2000 E-mini
+}
+
+# Symbol aliases (some brokers use different names)
+ALIASES = {"ENQ": "NQ"}
+
+
 class TradingIntegration:
     """
     Integration with Project-X-Py trading SDK.
@@ -1254,9 +1271,15 @@ class TradingIntegration:
                         logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
 
                     # Calculate P&L: (exit - entry) * size * tick_value
-                    # MNQ tick value: $5 per contract per tick (0.25 points)
-                    tick_value = 5.0  # TODO: Make this configurable per symbol
-                    tick_size = 0.25
+                    # Get instrument-specific tick economics
+                    symbol = self._extract_symbol_from_contract(contract_id)
+                    # Check for aliases first (e.g., ENQ -> NQ)
+                    symbol = ALIASES.get(symbol, symbol)
+                    # Get tick values, default to NQ if unknown
+                    tick_info = TICK_VALUES.get(symbol, {"size": 0.25, "tick_value": 5.0})
+                    tick_value = tick_info["tick_value"]
+                    tick_size = tick_info["size"]
+                    logger.debug(f"Using tick economics for {symbol}: size={tick_size}, value=${tick_value}")
 
                     if side == 'long':
                         # Long: profit when price goes up
