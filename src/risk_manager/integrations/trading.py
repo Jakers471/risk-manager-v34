@@ -1209,8 +1209,8 @@ class TradingIntegration:
 
             # Bridge to risk event bus
             event_type_map = {
-                "OPENED": EventType.POSITION_UPDATED,
-                "CLOSED": EventType.POSITION_UPDATED,
+                "OPENED": EventType.POSITION_OPENED,
+                "CLOSED": EventType.POSITION_CLOSED,  # Fixed: was POSITION_UPDATED
                 "UPDATED": EventType.POSITION_UPDATED,
             }
 
@@ -1223,6 +1223,9 @@ class TradingIntegration:
                 contract_id, avg_price, pos_type
             )
 
+            # Extract realized P&L for CLOSED positions
+            realized_pnl = data.get('profitAndLoss') if action_name == "CLOSED" else None
+
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
                 data={
@@ -1232,6 +1235,7 @@ class TradingIntegration:
                     "side": "long" if size > 0 else "short" if size < 0 else "flat",
                     "average_price": avg_price,
                     "unrealized_pnl": unrealized_pnl,
+                    "profitAndLoss": realized_pnl,  # Add realized P&L for closed positions
                     "action": action_name.lower(),
                     "fill_type": fill_type,  # "stop_loss", "take_profit", "manual", or None
                     "is_stop_loss": fill_type == "stop_loss",

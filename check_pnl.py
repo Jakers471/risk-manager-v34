@@ -6,7 +6,7 @@ from datetime import date
 from pathlib import Path
 
 # Connect to database
-db_path = Path("data/risk_manager.db")
+db_path = Path("data/risk_state.db")
 if not db_path.exists():
     print(f"❌ Database not found: {db_path}")
     exit(1)
