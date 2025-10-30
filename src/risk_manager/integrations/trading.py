@@ -1210,7 +1210,7 @@ class TradingIntegration:
                 if take_profit:
                     logger.info(f"  🎯 Take Profit: ${take_profit['take_profit_price']:,.2f}")
                 else:
-                    logger.debug("  No take profit")
+                    logger.info("  ℹ️  No take profit order")
 
             # Bridge to risk event bus
             event_type_map = {
