@@ -1226,6 +1226,14 @@ class TradingIntegration:
             # Extract realized P&L for CLOSED positions
             realized_pnl = data.get('profitAndLoss') if action_name == "CLOSED" else None
 
+            # DEBUG: Show what SDK data we have for CLOSED positions
+            if action_name == "CLOSED":
+                logger.info(f"🔍 POSITION_CLOSED DEBUG:")
+                logger.info(f"   SDK data keys: {list(data.keys())}")
+                logger.info(f"   profitAndLoss from SDK: {data.get('profitAndLoss')}")
+                logger.info(f"   realized_pnl extracted: {realized_pnl}")
+                logger.info(f"   size: {size}, avg_price: {avg_price}")
+
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
                 data={

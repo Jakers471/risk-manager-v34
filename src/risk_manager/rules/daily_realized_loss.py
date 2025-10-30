@@ -126,7 +126,14 @@ class DailyRealizedLossRule(RiskRule):
         6. Compare P&L to limit
         7. Return violation if P&L <= limit
         """
+        # DEBUG: Show what event we received
+        logger.debug(f"🔍 DailyRealizedLossRule.evaluate() called")
+        logger.debug(f"   Event type: {event.event_type}")
+        logger.debug(f"   Event data keys: {list(event.data.keys())}")
+        logger.debug(f"   Enabled: {self.enabled}")
+
         if not self.enabled:
+            logger.debug("   ❌ Rule disabled, skipping")
             return None
 
         # Only evaluate on P&L-related events
@@ -135,24 +142,31 @@ class DailyRealizedLossRule(RiskRule):
             EventType.PNL_UPDATED,
             EventType.TRADE_EXECUTED,
         ]:
+            logger.debug(f"   ❌ Event type {event.event_type} not in trigger list, skipping")
             return None
+
+        logger.info(f"   ✅ Event type matches! Processing {event.event_type}")
 
         # Extract account ID
         account_id = event.data.get("account_id")
+        logger.debug(f"   account_id from event: {account_id}")
         if not account_id:
-            logger.debug(f"Event missing account_id: {event.data}")
+            logger.warning(f"   ❌ Event missing account_id! Event data: {event.data}")
             return None
 
         # Skip if account is already locked out
         if self.lockout_manager.is_locked_out(account_id):
-            logger.debug(f"Account {account_id} already locked, skipping evaluation")
+            logger.debug(f"   ❌ Account {account_id} already locked, skipping evaluation")
             return None
 
         # Ignore half-turn trades (opening positions with no realized P&L)
         profit_and_loss = event.data.get("profitAndLoss")
+        logger.info(f"   profitAndLoss from event data: {profit_and_loss}")
         if profit_and_loss is None:
-            logger.debug("Ignoring half-turn trade (no realized P&L)")
+            logger.warning(f"   ❌ No profitAndLoss in event data (half-turn trade or missing field)")
             return None
+
+        logger.info(f"   ✅ Have profitAndLoss: ${profit_and_loss:+.2f}, updating tracker...")
 
         # Update P&L tracker with this trade
         try:
