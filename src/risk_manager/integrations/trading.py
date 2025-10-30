@@ -983,6 +983,7 @@ class TradingIntegration:
             risk_event = RiskEvent(
                 event_type=EventType.ORDER_FILLED,
                 data={
+                    "account_id": order.accountId,  # ← CRITICAL: Rules need account_id
                     "symbol": symbol,
                     "order_id": order.id,
                     "side": self._get_side_name(order.side),
@@ -1405,7 +1406,9 @@ class TradingIntegration:
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
                 data={
+                    "account_id": self.client.account_info.id if self.client else None,  # ← CRITICAL: Rules need account_id
                     "symbol": symbol,
+                    "contractId": contract_id,  # ← CRITICAL: Rules need contractId (for enforcement)
                     "contract_id": contract_id,
                     "size": size,
                     "side": "long" if size > 0 else "short" if size < 0 else "flat",
@@ -1911,7 +1914,9 @@ class TradingIntegration:
                         await self.event_bus.publish(RiskEvent(
                             event_type=EventType.UNREALIZED_PNL_UPDATE,
                             data={
+                                'account_id': self.client.account_info.id if self.client else None,  # ← CRITICAL: Rules need account_id
                                 'contract_id': contract_id,
+                                'contractId': contract_id,  # ← CRITICAL: Rules need contractId (for enforcement)
                                 'symbol': symbol,
                                 'unrealized_pnl': float(unrealized_pnl),
                             },

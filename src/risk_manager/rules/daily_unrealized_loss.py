@@ -1,20 +1,27 @@
 """
-RULE-004: Daily Unrealized Loss (Stop Loss Per Position)
+RULE-004: Daily Unrealized Loss (Account-Wide Floating Loss Limit)
 
-Purpose: Close losing positions when unrealized loss hits limit
+Purpose: Monitor total unrealized loss across ALL open positions
 Category: Trade-by-Trade (Category 1)
-Trigger: POSITION_UPDATED + real-time market data
-Enforcement: Close ONLY that losing position (no lockout)
+Trigger: UNREALIZED_PNL_UPDATE events (when P&L changes $10+)
+Enforcement: Flatten all positions when total unrealized loss exceeds limit (no lockout)
 
-This rule implements stop-loss behavior - when a position's unrealized
-loss reaches the limit, close that position to prevent further losses.
-Trader can continue trading immediately (no lockout).
+This rule monitors the combined floating loss across all open positions
+and triggers when the total unrealized loss hits the limit. Uses the
+UnrealizedPnLCalculator infrastructure for real-time P&L tracking.
+
+Example:
+    - Limit: -$750
+    - Position 1: MNQ Long, unrealized P&L: -$400
+    - Position 2: ES Long, unrealized P&L: -$350
+    - Total unrealized P&L: -$750 → TRIGGER (flatten all)
+    - Trader can continue trading after positions closed (no lockout)
 
 Configuration:
-    - loss_limit: Maximum unrealized loss per position (negative, e.g., -300.0 for -$300)
-    - tick_values: Dollar value per tick for each symbol
-    - tick_sizes: Minimum price increment for each symbol
-    - action: "close_position" (close that position only)
+    - loss_limit: Maximum total unrealized loss (negative, e.g., -750.0 for -$750)
+    - tick_values: Dollar value per tick for each symbol (used by calculator)
+    - tick_sizes: Minimum price increment for each symbol (used by calculator)
+    - action: "close_position" or "flatten" (close all positions)
 """
 
 from typing import TYPE_CHECKING, Any, Dict, Optional
@@ -85,128 +92,53 @@ class DailyUnrealizedLossRule(RiskRule):
         self, event: RiskEvent, engine: "RiskEngine"
     ) -> Optional[Dict[str, Any]]:
         """
-        Evaluate if unrealized loss limit is hit for any position.
+        Evaluate if total unrealized loss limit is exceeded across all positions.
+
+        This rule monitors the total floating loss across ALL open positions
+        and triggers when the combined unrealized loss hits the limit. Uses
+        the UnrealizedPnLCalculator infrastructure from Priority 1.
 
         Args:
             event: The risk event to evaluate
             engine: The risk engine for accessing state
 
         Returns:
-            Dictionary with violation details if loss limit hit, None otherwise
+            Dictionary with violation details if total loss limit hit, None otherwise
         """
         if not self.enabled:
             return None
 
-        # Only evaluate on position events
+        # Only evaluate on relevant events
         if event.event_type not in [
+            EventType.UNREALIZED_PNL_UPDATE,
             EventType.POSITION_OPENED,
-            EventType.POSITION_UPDATED,
+            EventType.POSITION_CLOSED,
         ]:
             return None
 
-        # Get symbol from event data
-        symbol = event.data.get("symbol")
-        if not symbol:
+        # Get total unrealized P&L across all positions from TradingIntegration
+        # This uses the UnrealizedPnLCalculator that tracks real-time quotes
+        if not hasattr(engine, 'trading_integration') or not engine.trading_integration:
             return None
 
-        # Get position for this symbol
-        position = engine.current_positions.get(symbol)
-        if not position:
+        total_unrealized_pnl = engine.trading_integration.get_total_unrealized_pnl()
+
+        if total_unrealized_pnl is None:
             return None
 
-        # Get current market price
-        current_price = engine.market_prices.get(symbol)
-        if current_price is None:
-            # Can't calculate unrealized P&L without market price
-            return None
-
-        # Calculate unrealized P&L for this position
-        unrealized_pnl = self._calculate_unrealized_pnl(
-            symbol=symbol,
-            position=position,
-            current_price=current_price,
-        )
-
-        # Check if loss limit is hit (unrealized_pnl <= loss_limit, both negative)
-        if unrealized_pnl <= self.loss_limit:
+        # Check if loss exceeds limit (limit is negative, e.g., -750.0)
+        if total_unrealized_pnl <= self.loss_limit:
             return {
                 "rule": "DailyUnrealizedLossRule",
                 "message": (
-                    f"Loss limit hit for {symbol}: "
-                    f"${unrealized_pnl:.2f} <= ${self.loss_limit:.2f} (stop loss)"
+                    f"Daily unrealized loss limit exceeded: "
+                    f"${total_unrealized_pnl:.2f} ≤ ${self.loss_limit:.2f}"
                 ),
-                "symbol": symbol,
-                "contractId": position.get("contractId"),
-                "unrealized_pnl": unrealized_pnl,
-                "loss_limit": self.loss_limit,
+                "severity": "CRITICAL",
+                "current_pnl": total_unrealized_pnl,
+                "limit": self.loss_limit,
                 "action": self.action,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
 
         return None
-
-    def _calculate_unrealized_pnl(
-        self,
-        symbol: str,
-        position: Dict[str, Any],
-        current_price: float,
-    ) -> float:
-        """
-        Calculate unrealized P&L for a position.
-
-        Formula:
-            P&L = (current_price - entry_price) / tick_size * size * tick_value
-
-        For short positions, the formula is inverted:
-            P&L = (entry_price - current_price) / tick_size * abs(size) * tick_value
-
-        Args:
-            symbol: Symbol identifier (e.g., "ES", "MNQ")
-            position: Position dictionary with avgPrice, size
-            current_price: Current market price
-
-        Returns:
-            Unrealized P&L in dollars (positive = profit, negative = loss)
-        """
-        # Get position details
-        entry_price = position.get("avgPrice", 0.0)
-        size = position.get("size", 0)
-
-        if size == 0:
-            return 0.0
-
-        # Get tick value and size for this symbol (FAIL FAST - no silent defaults)
-        # NOTE: We use the rule's own tick_values/tick_sizes for flexibility
-        # but validate they exist rather than using silent defaults
-        if symbol not in self.tick_values:
-            raise UnitsError(
-                f"Unknown symbol: {symbol}. "
-                f"Tick economics must be configured for all traded symbols. "
-                f"Known symbols: {list(self.tick_values.keys())}"
-            )
-
-        tick_value = self.tick_values[symbol]
-        tick_size = self.tick_sizes.get(symbol, 0.25)  # tick_size is less critical
-
-        if tick_value == 0.0 or tick_size == 0.0:
-            raise UnitsError(
-                f"Invalid tick economics for {symbol}: "
-                f"tick_value={tick_value}, tick_size={tick_size}. "
-                f"Values must be > 0."
-            )
-
-        # Calculate price difference
-        if size > 0:
-            # Long position: profit when price goes up
-            price_diff = current_price - entry_price
-        else:
-            # Short position: profit when price goes down
-            price_diff = entry_price - current_price
-
-        # Convert to ticks
-        ticks = price_diff / tick_size
-
-        # Calculate P&L
-        unrealized_pnl = ticks * abs(size) * tick_value
-
-        return unrealized_pnl

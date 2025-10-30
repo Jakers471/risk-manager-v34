@@ -445,13 +445,69 @@ class RiskManager:
             rules_loaded += 1
             logger.info(f"✅ Loaded: AuthLossGuardRule")
 
-        # Rules that require tick economics data are skipped
+        # RULE-004: Daily Unrealized Loss
+        if self.config.rules.daily_unrealized_loss.enabled:
+            from risk_manager.integrations.trading import TICK_VALUES, ALIASES
+
+            # Build tick dicts from TICK_VALUES (includes aliases)
+            tick_values = {}
+            tick_sizes = {}
+
+            for symbol, info in TICK_VALUES.items():
+                tick_values[symbol] = info["tick_value"]
+                tick_sizes[symbol] = info["size"]
+
+            # Add aliases
+            for alias, target in ALIASES.items():
+                if target in TICK_VALUES:
+                    tick_values[alias] = TICK_VALUES[target]["tick_value"]
+                    tick_sizes[alias] = TICK_VALUES[target]["size"]
+
+            rule = DailyUnrealizedLossRule(
+                loss_limit=self.config.rules.daily_unrealized_loss.limit,
+                tick_values=tick_values,
+                tick_sizes=tick_sizes,
+                action="close_position",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: DailyUnrealizedLossRule (limit=${rule.loss_limit})")
+
+        # RULE-005: Max Unrealized Profit
+        if self.config.rules.max_unrealized_profit.enabled:
+            from risk_manager.integrations.trading import TICK_VALUES, ALIASES
+
+            # Build tick dicts from TICK_VALUES (includes aliases)
+            tick_values = {}
+            tick_sizes = {}
+
+            for symbol, info in TICK_VALUES.items():
+                tick_values[symbol] = info["tick_value"]
+                tick_sizes[symbol] = info["size"]
+
+            # Add aliases
+            for alias, target in ALIASES.items():
+                if target in TICK_VALUES:
+                    tick_values[alias] = TICK_VALUES[target]["tick_value"]
+                    tick_sizes[alias] = TICK_VALUES[target]["size"]
+
+            rule = MaxUnrealizedProfitRule(
+                target=self.config.rules.max_unrealized_profit.target,
+                tick_values=tick_values,
+                tick_sizes=tick_sizes,
+                action="close_position",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: MaxUnrealizedProfitRule (target=${rule.target})")
+
+        # Check if any rules were skipped
         skipped_count = enabled_count - rules_loaded
 
         if skipped_count > 0:
-            logger.warning(f"⚠️ {skipped_count} rules skipped (require tick economics data)")
-            logger.warning("   Rules DailyUnrealizedLoss, MaxUnrealizedProfit, TradeManagement need tick_value")
-            logger.warning("   Add these manually with tick data or implement tick economics integration")
+            logger.warning(f"⚠️ {skipped_count} rules skipped (require additional configuration)")
+            logger.warning("   TradeManagement rule requires bracket order configuration")
+            logger.warning("   Timer-based rules require timers_config.yaml")
         else:
             logger.success(f"🎉 All {rules_loaded} enabled rules loaded successfully!")
 
@@ -482,6 +538,7 @@ class RiskManager:
         # Subscribe to events for processing
         self.event_bus.subscribe(EventType.ORDER_FILLED, self._handle_fill)
         self.event_bus.subscribe(EventType.POSITION_UPDATED, self._handle_position_update)
+        self.event_bus.subscribe(EventType.UNREALIZED_PNL_UPDATE, self._handle_unrealized_pnl)
 
         logger.success("✅ Risk Manager ACTIVE - Protecting your capital!")
 
@@ -519,6 +576,10 @@ class RiskManager:
 
     async def _handle_position_update(self, event: RiskEvent) -> None:
         """Handle position update event."""
+        await self.engine.evaluate_rules(event)
+
+    async def _handle_unrealized_pnl(self, event: RiskEvent) -> None:
+        """Handle unrealized P&L update event."""
         await self.engine.evaluate_rules(event)
 
     def add_rule(self, rule: Any) -> None:

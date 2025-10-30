@@ -1,20 +1,27 @@
 """
-RULE-005: Max Unrealized Profit (Take Profit)
+RULE-005: Max Unrealized Profit (Per-Position Take Profit)
 
-Purpose: Close winning positions when unrealized profit hits target
+Purpose: Close individual positions when unrealized profit hits target
 Category: Trade-by-Trade (Category 1)
-Trigger: POSITION_UPDATED + real-time market data
-Enforcement: Close ONLY that winning position (no lockout)
+Trigger: UNREALIZED_PNL_UPDATE events (when P&L changes $10+)
+Enforcement: Close ONLY the winning position(s) that hit target (no lockout)
 
-This rule implements profit-taking behavior - when a position's unrealized
-profit reaches the target, close that position to lock in gains. Trader can
-continue trading immediately (no lockout).
+This rule monitors each open position individually for profit targets.
+When any position's unrealized profit reaches the target, it closes that
+specific position to lock in gains. Uses the UnrealizedPnLCalculator
+infrastructure for real-time per-position P&L tracking.
+
+Example:
+    - Target: $500
+    - Position 1: MNQ Long, unrealized P&L: $450 (no action)
+    - Position 2: ES Long, unrealized P&L: $550 → TRIGGER (close ES only)
+    - Trader can continue trading after position closed (no lockout)
 
 Configuration:
-    - target: Profit target in dollars (e.g., 1000.0 for $1000)
-    - tick_values: Dollar value per tick for each symbol
-    - tick_sizes: Minimum price increment for each symbol
-    - action: "close_position" (close that position only)
+    - target: Profit target per position (positive, e.g., 500.0 for $500)
+    - tick_values: Dollar value per tick for each symbol (used by calculator)
+    - tick_sizes: Minimum price increment for each symbol (used by calculator)
+    - action: "close_position" (close winning positions individually)
 """
 
 from typing import TYPE_CHECKING, Any, Dict, Optional
@@ -84,128 +91,61 @@ class MaxUnrealizedProfitRule(RiskRule):
         self, event: RiskEvent, engine: "RiskEngine"
     ) -> Optional[Dict[str, Any]]:
         """
-        Evaluate if unrealized profit target is hit for any position.
+        Evaluate if any position's unrealized profit exceeds target.
+
+        This rule monitors individual positions for profit targets. When a
+        position's unrealized profit hits the target, it triggers to close
+        that specific position and lock in gains. Uses the UnrealizedPnLCalculator
+        infrastructure from Priority 1.
 
         Args:
             event: The risk event to evaluate
             engine: The risk engine for accessing state
 
         Returns:
-            Dictionary with violation details if profit target hit, None otherwise
+            Dictionary with violation details if any position hits profit target, None otherwise
         """
         if not self.enabled:
             return None
 
-        # Only evaluate on position events
+        # Only evaluate on relevant events
         if event.event_type not in [
+            EventType.UNREALIZED_PNL_UPDATE,
             EventType.POSITION_OPENED,
-            EventType.POSITION_UPDATED,
         ]:
             return None
 
-        # Get symbol from event data
-        symbol = event.data.get("symbol")
-        if not symbol:
+        # Get trading integration for accessing position P&L
+        if not hasattr(engine, 'trading_integration') or not engine.trading_integration:
             return None
 
-        # Get position for this symbol
-        position = engine.current_positions.get(symbol)
-        if not position:
-            return None
+        # Check each open position's unrealized P&L
+        positions_at_target = []
 
-        # Get current market price
-        current_price = engine.market_prices.get(symbol)
-        if current_price is None:
-            # Can't calculate unrealized P&L without market price
-            return None
+        open_positions = engine.trading_integration.get_open_positions()
+        for contract_id, position_data in open_positions.items():
+            unrealized_pnl = engine.trading_integration.get_position_unrealized_pnl(contract_id)
 
-        # Calculate unrealized P&L for this position
-        unrealized_pnl = self._calculate_unrealized_pnl(
-            symbol=symbol,
-            position=position,
-            current_price=current_price,
-        )
+            if unrealized_pnl is None:
+                continue
 
-        # Check if profit target is hit
-        if unrealized_pnl >= self.target:
+            # Check if profit exceeds target (target is positive, e.g., 500.0)
+            if unrealized_pnl >= self.target:
+                positions_at_target.append({
+                    'contract_id': contract_id,
+                    'symbol': position_data['symbol'],
+                    'unrealized_pnl': unrealized_pnl,
+                    'target': self.target
+                })
+
+        if positions_at_target:
             return {
-                "rule": "MaxUnrealizedProfitRule",
-                "message": (
-                    f"Profit target hit for {symbol}: "
-                    f"${unrealized_pnl:.2f} >= ${self.target:.2f} (take profit)"
-                ),
-                "symbol": symbol,
-                "contractId": position.get("contractId"),
-                "unrealized_pnl": unrealized_pnl,
-                "target": self.target,
-                "action": self.action,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                'rule': 'MaxUnrealizedProfitRule',
+                'severity': 'MEDIUM',
+                'message': f'{len(positions_at_target)} position(s) hit profit target: ${self.target:.2f}',
+                'action': self.action,  # 'close_position', 'reduce_to_limit', or 'alert'
+                'positions': positions_at_target,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
             }
 
         return None
-
-    def _calculate_unrealized_pnl(
-        self,
-        symbol: str,
-        position: Dict[str, Any],
-        current_price: float,
-    ) -> float:
-        """
-        Calculate unrealized P&L for a position.
-
-        Formula:
-            P&L = (current_price - entry_price) / tick_size * size * tick_value
-
-        For short positions, the formula is inverted:
-            P&L = (entry_price - current_price) / tick_size * abs(size) * tick_value
-
-        Args:
-            symbol: Symbol identifier (e.g., "ES", "MNQ")
-            position: Position dictionary with avgPrice, size
-            current_price: Current market price
-
-        Returns:
-            Unrealized P&L in dollars (positive = profit, negative = loss)
-        """
-        # Get position details
-        entry_price = position.get("avgPrice", 0.0)
-        size = position.get("size", 0)
-
-        if size == 0:
-            return 0.0
-
-        # Get tick value and size for this symbol (FAIL FAST - no silent defaults)
-        # NOTE: We use the rule's own tick_values/tick_sizes for flexibility
-        # but validate they exist rather than using silent defaults
-        if symbol not in self.tick_values:
-            raise UnitsError(
-                f"Unknown symbol: {symbol}. "
-                f"Tick economics must be configured for all traded symbols. "
-                f"Known symbols: {list(self.tick_values.keys())}"
-            )
-
-        tick_value = self.tick_values[symbol]
-        tick_size = self.tick_sizes.get(symbol, 0.25)  # tick_size is less critical
-
-        if tick_value == 0.0 or tick_size == 0.0:
-            raise UnitsError(
-                f"Invalid tick economics for {symbol}: "
-                f"tick_value={tick_value}, tick_size={tick_size}. "
-                f"Values must be > 0."
-            )
-
-        # Calculate price difference
-        if size > 0:
-            # Long position: profit when price goes up
-            price_diff = current_price - entry_price
-        else:
-            # Short position: profit when price goes down
-            price_diff = entry_price - current_price
-
-        # Convert to ticks
-        ticks = price_diff / tick_size
-
-        # Calculate P&L
-        unrealized_pnl = ticks * abs(size) * tick_value
-
-        return unrealized_pnl

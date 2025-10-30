@@ -140,9 +140,10 @@ class DailyRealizedProfitRule(RiskRule):
 
         # Only evaluate on P&L-related events
         if event.event_type not in [
-            EventType.POSITION_CLOSED,
-            EventType.PNL_UPDATED,
-            EventType.TRADE_EXECUTED,
+            EventType.ORDER_FILLED,      # ← PRIMARY: SDK publishes this on trade fills
+            EventType.POSITION_CLOSED,   # ← Position closed events
+            EventType.PNL_UPDATED,       # ← Direct P&L updates
+            EventType.TRADE_EXECUTED,    # ← For test compatibility
         ]:
             return None
 

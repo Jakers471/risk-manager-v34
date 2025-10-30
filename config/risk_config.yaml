@@ -53,13 +53,13 @@ rules:
   # RULE-004: Daily Unrealized Loss (Per Position)
   daily_unrealized_loss:
     enabled: true
-    limit: -750                    # Max $750 floating loss per position
+    limit: -20                    # Max $750 floating loss per position
     check_interval_seconds: 10     # Check every 10 seconds
 
   # RULE-005: Max Unrealized Profit (Profit Target Per Position)
   max_unrealized_profit:
     enabled: true
-    target: 500.0                  # Take profit at $500 per position
+    target: 20                  # Take profit at $500 per position
     check_interval_seconds: 5      # Check every 5 seconds
 
   # RULE-008: Stop-Loss Enforcement
