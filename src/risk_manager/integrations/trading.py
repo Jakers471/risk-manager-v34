@@ -277,10 +277,10 @@ class TradingIntegration:
             Stop loss data dict or None if no stop found
         """
         symbol = self._extract_symbol_from_contract(contract_id)
-        logger.debug(f"Checking for stop loss on {symbol}")
+        logger.info(f"🔍 Querying SDK for stop loss on {symbol} (contract: {contract_id})")
 
         if not self.suite:
-            logger.warning("No suite available for stop loss query")
+            logger.error("❌ No suite available for stop loss query!")
             return None
 
         # SDK introspection (DEBUG level only)
@@ -290,12 +290,12 @@ class TradingIntegration:
         try:
             # Get the instrument manager for this symbol
             if symbol not in self.suite:
-                logger.debug(f"Symbol {symbol} not in suite")
+                logger.error(f"❌ Symbol {symbol} not in suite! Available: {list(self.suite.keys())}")
                 return None
 
             instrument = self.suite[symbol]
             if not hasattr(instrument, 'orders'):
-                logger.error(f"Instrument has no orders attribute")
+                logger.error(f"❌ Instrument {symbol} has no orders attribute!")
                 return None
 
             # SDK method introspection (DEBUG level only)
@@ -405,9 +405,9 @@ class TradingIntegration:
             return None
 
         except Exception as e:
-            logger.error(f"Error querying SDK for stops: {e}")
+            logger.error(f"❌ Error querying SDK for stops: {e}")
             import traceback
-            logger.debug(traceback.format_exc())
+            logger.error(traceback.format_exc())  # Show traceback at ERROR level so we can see it!
             return None
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
