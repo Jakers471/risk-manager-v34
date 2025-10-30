@@ -149,6 +149,90 @@ for order in working_orders:
 
 ---
 
+## 🐛 Problem #3: Second Protective Order Not Detected Until Moved
+
+### Symptom
+```
+Sequence:
+1. Entry fills → Detected immediately ✅
+2. Place first order (stop OR take profit) → Detected immediately ✅
+3. Place second order (whichever isn't placed yet) → NOT detected ❌
+4. Move second order in broker UI → Suddenly detected ✅
+```
+
+**User Description**: "IF I GET FILLED ON AN ENTRY, EVENT RECEIVED RIGHT AWAY. IF I THEN PLACE STOP/TAKE PROFIT, THAT GETS RECEIVED RIGHT AWAY. THEN IF I GO TO PLACE THE TAKE PROFIT OR STOP, WHICHEVER WASN'T ALREADY CREATED, IT DOESN'T GET THE EVENT UNTIL I MOVE IT!"
+
+### Root Cause: Event Deduplication Blocking Queries
+
+**Discovery**: The broker SDK fires 3x identical POSITION_UPDATED events (one per instrument subscription). We use deduplication to prevent processing the same event 3 times.
+
+**The Problem**:
+1. First protective order placement → Position changes (now has protection) → POSITION_UPDATED event fires → Query runs → Order detected ✅
+2. Second protective order placement → Position data DOESN'T change (still size=1, entry=$26178.75, P&L same) → Event IS fired but data is identical → Deduplication check blocks query from running ❌
+3. Moving the order → ORDER_MODIFIED event → Cache invalidated → Next POSITION_UPDATED → Query runs with empty cache → Order detected ✅
+
+**Code Location**: Lines 1154-1158 (OLD VERSION):
+```python
+# Check for duplicate (prevents 3x events from 3 instruments)
+dedup_key = f"{contract_id}_{action_name}"
+if self._is_duplicate_event(f"position_{action_name.lower()}", dedup_key):
+    return  # ❌ EXIT HERE - no query ran!
+```
+
+**Why It Happened**: Protective order queries ran AFTER the deduplication check. If the event was marked as duplicate, the method returned early, and queries never executed.
+
+### Fix: Query BEFORE Deduplication
+
+**Solution**: Move protective order checking to run BEFORE the deduplication check, so queries execute on EVERY POSITION_UPDATED event (even duplicates).
+
+**New Code** (Lines 1125-1158):
+```python
+# CRITICAL: Check protective orders BEFORE dedup
+# Second order placements don't trigger unique events!
+# Must query on EVERY event to catch them
+if action_name in ["OPENED", "UPDATED"]:
+    logger.debug(f"🔍 Checking protective orders on {contract_id} (BEFORE dedup)...")
+
+    # Always invalidate cache and query fresh
+    if contract_id in self._active_stop_losses:
+        del self._active_stop_losses[contract_id]
+    if contract_id in self._active_take_profits:
+        del self._active_take_profits[contract_id]
+
+    # Query with position data from event
+    stop_loss_early = await self.get_stop_loss_for_position(
+        contract_id, avg_price, pos_type
+    )
+    take_profit_early = await self.get_take_profit_for_position(
+        contract_id, avg_price, pos_type
+    )
+
+    # Log findings
+    if stop_loss_early:
+        logger.info(f"  🛡️  Stop Loss: ${stop_loss_early['stop_price']:.2f} (ID: {stop_loss_early['order_id']})")
+    else:
+        logger.warning(f"  ⚠️  NO STOP LOSS")
+
+    if take_profit_early:
+        logger.info(f"  🎯 Take Profit: ${take_profit_early['take_profit_price']:.2f} (ID: {take_profit_early['order_id']})")
+
+# Check for duplicate (prevents 3x events from 3 instruments)
+# Use contract_id + action for deduplication key
+dedup_key = f"{contract_id}_{action_name}"
+if self._is_duplicate_event(f"position_{action_name.lower()}", dedup_key):
+    return  # Exit after protective order check
+```
+
+**Key Changes**:
+1. ✅ Queries run FIRST (lines 1128-1153)
+2. ✅ Deduplication check runs SECOND (lines 1154-1158)
+3. ✅ Cache always invalidated before queries
+4. ✅ Even duplicate events trigger queries
+
+**File**: `src/risk_manager/integrations/trading.py` lines 1125-1158
+
+---
+
 ## 🔍 Added Debugging: Position API Introspection
 
 ### Problem
@@ -227,35 +311,60 @@ Shows when cache is invalidated:
 
 ## 🧪 Testing
 
-### Manual Test Scenario
+### Manual Test Scenario (CRITICAL: Tests All 3 Fixes)
 
+**Test 1: Entry + First Protective Order**
 1. **Open position**:
    ```
    Buy 1 MNQ @ $26200
    ```
+   - ✅ Should log: "POSITION OPENED"
 
-2. **Create stop loss in broker UI**:
+2. **Create stop loss in broker UI** (first protective order):
    ```
    Sell Stop @ $26175 (25 points below entry)
    ```
-   - ✅ Should log: "FOUND stop loss @ $26175.00"
+   - ✅ Should log: "🛡️ Stop Loss: $26175.00" within 6-10 seconds
+   - Tests: Problem #1 (cache) and Problem #2 (semantic analysis)
 
-3. **Create take profit in broker UI**:
+**Test 2: Second Protective Order** (CRITICAL - Tests Problem #3)
+3. **Create take profit in broker UI** (second protective order):
    ```
    Sell Limit @ $26250 (50 points above entry)
    ```
-   - ✅ Should log: "FOUND take profit @ $26250.00"
-   - ❌ Should NOT log: "FOUND stop loss @ $26250.00"
+   - ✅ Should log: "🎯 Take Profit: $26250.00" within 6-10 seconds
+   - ❌ Should NOT require moving the order first! (Problem #3 fix)
+   - ✅ Should correctly identify as "take_profit" not "entry" (Problem #2 fix)
 
-4. **Modify stop loss in broker UI**:
+**Test 3: SHORT Position Semantic Analysis** (Tests Problem #2)
+4. **Open SHORT position**:
+   ```
+   Sell Short 1 MNQ @ $26178
+   ```
+
+5. **Create stop loss ABOVE entry**:
+   ```
+   Buy Stop @ $26194 (16 points above entry)
+   ```
+   - ✅ Should log: "🛡️ Stop Loss: $26194.00"
+
+6. **Create take profit BELOW entry**:
+   ```
+   Buy Limit @ $26149 (29 points below entry)
+   ```
+   - ✅ Should log: "🎯 Take Profit: $26149.00"
+   - ❌ Should NOT log as "entry" (Problem #2 fix validated)
+
+**Test 4: Cache Invalidation** (Tests Problem #1)
+7. **Modify stop loss in broker UI**:
    ```
    Move stop from $26175 → $26180
    ```
-   - ✅ Should log: "Invalidated stop loss cache"
+   - ✅ Should log: "🔄 Invalidated stop loss cache" (if ORDER_MODIFIED fires)
    - ✅ Next position update should show: "$26180.00" (new price)
    - ❌ Should NOT show: "$26175.00" (stale price)
 
-5. **Wait for position update events**:
+8. **Wait for natural position update events**:
    - Every few seconds as P&L changes
    - ✅ Should show both stop and target
    - ✅ Should show current prices (not stale)
@@ -302,27 +411,46 @@ Shows when cache is invalidated:
 
 ### `src/risk_manager/integrations/trading.py`
 
-1. **Lines 361-418**: New `_determine_order_intent()` method
-   - Semantic analysis based on price context
-   - Returns "stop_loss" | "take_profit" | "entry" | "unknown"
+**Problem #1 Fixes (Cache Staleness)**:
+1. **Lines 1046-1059**: Cache invalidation in `_on_order_modified()`
+   - Invalidates BOTH stop loss AND take profit cache
+   - Logs when cache is cleared
+   - Next query will fetch fresh data
 
-2. **Lines 192-215**: Updated `get_take_profit_for_position()` to async
-   - Now queries SDK if cache empty (mirrors stop loss pattern)
+2. **Lines 1131-1135**: Cache invalidation on EVERY position update
+   - Forces fresh queries even without ORDER_MODIFIED events
+   - Ensures UI modifications are eventually detected
 
-3. **Lines 298-362**: Updated `_query_sdk_for_stop_loss()`
-   - Added position introspection
-   - Uses `get_all_positions()` instead of `get_position()`
-   - Applies semantic analysis to each order
-   - Caches both stop loss AND take profit separately
+**Problem #2 Fixes (Semantic Misidentification)**:
+3. **Lines 458-520**: Rewritten `_determine_order_intent()` method
+   - NOW uses `position_type` (1=LONG, 2=SHORT) instead of `position_size` sign
+   - Correctly identifies SHORT position take profits below entry
+   - STOP orders (3, 4, 5) → Always "stop_loss" for existing positions
+   - LIMIT orders (1) → Analyzed semantically based on price + position type
 
-4. **Lines 885-897**: Added cache invalidation in `_on_order_modified()`
-   - Deletes stale cache entries
-   - Logs old → new prices
+4. **Lines 170-199**: Updated method signatures for `position_type`
+   - `get_stop_loss_for_position()` now accepts `position_type: int`
+   - `get_take_profit_for_position()` now accepts `position_type: int`
+   - All query methods pass `position_type` to semantic analysis
 
-5. **Lines 1102-1115**: Updated position event handler
-   - Queries both stop loss AND take profit
-   - Shows both separately in logs
-   - All calls properly awaited
+5. **Lines 253-362**: Updated `_query_sdk_for_stop_loss()`
+   - Accepts `position_type` parameter
+   - Gets `position.type` from broker (1=LONG, 2=SHORT)
+   - Passes correct type to `_determine_order_intent()`
+   - Logs position direction for debugging
+
+**Problem #3 Fixes (Second Order Detection)**:
+6. **Lines 1125-1158**: CRITICAL - Moved queries BEFORE deduplication
+   - Protective order checking now runs FIRST
+   - Cache invalidation before queries
+   - Queries execute on EVERY event (even duplicates)
+   - Deduplication check runs AFTER queries
+   - Solves "second order not detected until moved" issue
+
+7. **Lines 1177-1182**: Updated position event handler calls
+   - Passes `pos_type` instead of `pos_size` to query methods
+   - Shows both stop loss AND take profit separately
+   - All async calls properly awaited
 
 ---
 
