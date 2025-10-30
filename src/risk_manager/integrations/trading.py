@@ -69,6 +69,8 @@ from risk_manager.integrations.tick_economics import (
     ALIASES,
 )
 from risk_manager.integrations.unrealized_pnl import UnrealizedPnLCalculator
+from risk_manager.integrations.sdk.protective_orders import ProtectiveOrderCache
+from risk_manager.integrations.sdk.market_data import MarketDataHandler
 
 
 class TradingIntegration:
@@ -108,23 +110,27 @@ class TradingIntegration:
         self._recent_fills: dict[str, dict[str, Any]] = {}
         self._recent_fills_ttl = 2.0  # seconds - window to correlate fills with position updates
 
-        # Active stop loss cache (tracks WORKING stop orders before they fill)
-        # Format: {contract_id: {"order_id": int, "stop_price": float, "side": str, "quantity": int, "timestamp": float}}
-        # This allows us to query "What's the stop loss for this position?" BEFORE it gets hit
-        self._active_stop_losses: dict[str, dict[str, Any]] = {}
-
-        # Active take profit cache (tracks WORKING limit orders before they fill)
-        self._active_take_profits: dict[str, dict[str, Any]] = {}
+        # Protective order cache (stop loss and take profit)
+        # NEW: Delegated to ProtectiveOrderCache module
+        self._protective_cache = ProtectiveOrderCache()
 
         # Open positions tracking for P&L calculation
         # Format: {contract_id: {"entry_price": float, "size": int, "side": "long"|"short"}}
         self._open_positions: dict[str, dict[str, Any]] = {}
 
         # Unrealized P&L calculator (for floating P&L from quote updates)
+        # MUST be created BEFORE MarketDataHandler (which depends on it)
         self.pnl_calculator = UnrealizedPnLCalculator()
 
-        # Status bar update task
-        self._status_bar_task = None
+        # Market data handler (quote updates, price polling, status bar)
+        # NEW: Delegated to MarketDataHandler module
+        self._market_data = MarketDataHandler(
+            pnl_calculator=self.pnl_calculator,
+            event_bus=event_bus,
+            instruments=instruments
+        )
+
+        # Status bar update task is now managed by MarketDataHandler
 
         logger.info(f"Trading integration initialized for: {instruments}")
 
@@ -210,13 +216,8 @@ class TradingIntegration:
             Stop loss data dict or None if no active stop loss
             Dict format: {"order_id": int, "stop_price": float, "side": str, "quantity": int, "timestamp": float}
         """
-        # Check cache first (fast path)
-        cached = self._active_stop_losses.get(contract_id)
-        if cached:
-            return cached
-
-        # Cache miss - query SDK (handles broker-UI stops that don't emit ORDER_PLACED)
-        return await self._query_sdk_for_stop_loss(
+        # Delegate to protective order cache
+        return await self._protective_cache.get_stop_loss(
             contract_id, position_entry_price, position_type
         )
 
@@ -241,18 +242,10 @@ class TradingIntegration:
             Take profit data dict or None if no active take profit
             Dict format: {"order_id": int, "take_profit_price": float, "side": str, "quantity": int, "timestamp": float}
         """
-        # Check cache first (fast path)
-        cached = self._active_take_profits.get(contract_id)
-        if cached:
-            return cached
-
-        # Cache miss - query SDK (semantic analysis will populate take profit cache too)
-        await self._query_sdk_for_stop_loss(
+        # Delegate to protective order cache
+        return await self._protective_cache.get_take_profit(
             contract_id, position_entry_price, position_type
         )
-
-        # Return take profit from cache (populated by query if found)
-        return self._active_take_profits.get(contract_id)
 
     def get_all_active_stop_losses(self) -> dict[str, dict[str, Any]]:
         """
@@ -261,7 +254,8 @@ class TradingIntegration:
         Returns:
             Dict mapping contract_id to stop loss data
         """
-        return self._active_stop_losses.copy()
+        # Delegate to protective order cache
+        return self._protective_cache.get_all_stop_losses()
 
     def get_all_active_take_profits(self) -> dict[str, dict[str, Any]]:
         """
@@ -270,163 +264,8 @@ class TradingIntegration:
         Returns:
             Dict mapping contract_id to take profit data
         """
-        return self._active_take_profits.copy()
-
-    async def _query_sdk_for_stop_loss(
-        self,
-        contract_id: str,
-        position_entry_price: float = None,
-        position_type: int = None,
-    ) -> dict[str, Any] | None:
-        """
-        Query SDK directly for stop loss orders (bypasses cache).
-
-        This is called when cache is empty. Handles broker-UI stops that
-        don't emit ORDER_PLACED events.
-
-        This is NOT polling - only called on-demand when position events fire.
-
-        Args:
-            contract_id: Contract ID to query
-            position_entry_price: Optional position entry price (avoids querying)
-            position_type: Optional position type (1=LONG, 2=SHORT, avoids querying)
-
-        Returns:
-            Stop loss data dict or None if no stop found
-        """
-        symbol = self._extract_symbol_from_contract(contract_id)
-        logger.debug(f"🔍 Querying SDK for stop loss on {symbol} (contract: {contract_id})")
-
-        if not self.suite:
-            logger.error("❌ No suite available for stop loss query!")
-            return None
-
-        # SDK introspection (DEBUG level only)
-        logger.debug(f"Suite type: {type(self.suite)}")
-        logger.debug(f"Suite attributes: {[a for a in dir(self.suite) if not a.startswith('_')][:20]}")
-
-        try:
-            # Get the instrument manager for this symbol
-            if symbol not in self.suite:
-                logger.error(f"❌ Symbol {symbol} not in suite! Available: {list(self.suite.keys())}")
-                return None
-
-            instrument = self.suite[symbol]
-            if not hasattr(instrument, 'orders'):
-                logger.error(f"❌ Instrument {symbol} has no orders attribute!")
-                return None
-
-            # SDK method introspection (DEBUG level only)
-            orders_obj = instrument.orders
-            logger.debug(f"Orders object type: {type(orders_obj)}")
-            order_methods = [m for m in dir(orders_obj) if not m.startswith('_') and callable(getattr(orders_obj, m))]
-            logger.debug(f"Available order methods: {order_methods}")
-
-            # Query orders
-            working_orders = await instrument.orders.get_position_orders(contract_id)
-            logger.debug(f"get_position_orders returned {len(working_orders)} orders")
-
-            # If empty, try search_open_orders - queries broker API for ALL orders
-            if len(working_orders) == 0 and hasattr(orders_obj, 'search_open_orders'):
-                logger.debug("Trying search_open_orders (broker API query)...")
-                all_orders = await orders_obj.search_open_orders()
-                logger.debug(f"search_open_orders returned {len(all_orders)} orders")
-
-                # Filter for this contract
-                working_orders = [o for o in all_orders if o.contractId == contract_id]
-                logger.debug(f"Filtered to {len(working_orders)} orders for {contract_id}")
-
-            # Get position data for semantic analysis
-            if position_entry_price is None or position_type is None:
-                logger.debug("Position data not provided, fetching from SDK...")
-
-                try:
-                    all_positions = await instrument.positions.get_all_positions()
-                    logger.debug(f"get_all_positions returned {len(all_positions)} positions")
-
-                    position = None
-                    for pos in all_positions:
-                        logger.debug(f"Checking position: {pos.contractId}")
-                        if pos.contractId == contract_id:
-                            position = pos
-                            logger.debug("Found matching position")
-                            break
-
-                    if not position:
-                        logger.warning(f"No position found for {contract_id}")
-                        logger.debug(f"Available positions: {[p.contractId for p in all_positions]}")
-                        return None
-
-                    position_entry_price = position.avgPrice
-                    position_type = position.type  # 1=LONG, 2=SHORT
-
-                except Exception as pos_error:
-                    logger.error(f"Error fetching position: {pos_error}")
-                    import traceback
-                    logger.debug(traceback.format_exc())
-                    return None
-            else:
-                logger.debug("Using provided position data (avoids hanging get_all_positions)")
-
-            # Log position details
-            pos_direction = "LONG" if position_type == 1 else "SHORT" if position_type == 2 else "UNKNOWN"
-            logger.debug(f"Position: {pos_direction} @ ${position_entry_price:.2f}")
-
-            # Analyze orders using semantic layer
-            stop_loss_data = None
-            take_profit_data = None
-
-            for order in working_orders:
-                if order.contractId == contract_id:
-                    # Determine trigger price
-                    trigger_price = order.stopPrice if order.stopPrice else order.limitPrice
-
-                    logger.debug(f"Order #{order.id}: type={order.type_str}, trigger=${trigger_price}")
-
-                    # Use semantic analysis to determine intent
-                    intent = self._determine_order_intent(order, position_entry_price, position_type)
-                    logger.debug(f"Semantic intent: {intent}")
-
-                    if intent == "stop_loss":
-                        # Found stop loss!
-                        stop_loss_data = {
-                            "order_id": order.id,
-                            "stop_price": trigger_price,
-                            "side": self._get_side_name(order.side),
-                            "quantity": order.size,
-                            "timestamp": time.time(),
-                        }
-                        # Cache it
-                        self._active_stop_losses[contract_id] = stop_loss_data
-                        logger.debug(f"Found stop loss: ${trigger_price:,.2f}")
-
-                    elif intent == "take_profit":
-                        # Found take profit!
-                        take_profit_data = {
-                            "order_id": order.id,
-                            "take_profit_price": trigger_price,
-                            "side": self._get_side_name(order.side),
-                            "quantity": order.size,
-                            "timestamp": time.time(),
-                        }
-                        # Cache it
-                        self._active_take_profits[contract_id] = take_profit_data
-                        logger.debug(f"Found take profit: ${trigger_price:,.2f}")
-
-            # Return stop loss (if found)
-            if stop_loss_data:
-                logger.debug(f"Query result: Found stop loss @ ${stop_loss_data['stop_price']:,.2f}")
-                return stop_loss_data
-
-            # No stop found
-            logger.debug("Query result: No stop loss found")
-            return None
-
-        except Exception as e:
-            logger.error(f"❌ Error querying SDK for stops: {e}")
-            import traceback
-            logger.error(traceback.format_exc())  # Show traceback at ERROR level so we can see it!
-            return None
+        # Delegate to protective order cache
+        return self._protective_cache.get_all_take_profits()
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
         """
@@ -470,69 +309,6 @@ class TradingIntegration:
         logger.warning(f"Using fallback symbol '{fallback}' for contract {contract_id}")
         return fallback
 
-    def _determine_order_intent(
-        self, order, position_entry_price: float, position_type: int
-    ) -> str:
-        """
-        Determine order intent using simplified logic.
-
-        For positions that exist, STOP orders are protective (stop loss),
-        LIMIT orders are profit targets (take profit).
-
-        Args:
-            order: Order object from SDK
-            position_entry_price: Position's average entry price
-            position_type: Position type (1=LONG, 2=SHORT)
-
-        Returns:
-            "stop_loss" | "take_profit" | "entry" | "unknown"
-        """
-        if not order or position_entry_price is None:
-            return "unknown"
-
-        # SIMPLIFIED RULE: For existing positions:
-        # - STOP orders (type 3, 4, 5) = Stop Loss (protective)
-        # - LIMIT orders (type 1) = Take Profit (target)
-        # - MARKET orders (type 2) = Manual exit/entry
-
-        if order.type in [3, 4, 5]:  # STOP_LIMIT, STOP, TRAILING_STOP
-            # STOP orders on existing positions are stop losses
-            return "stop_loss"
-
-        elif order.type == 1:  # LIMIT
-            # LIMIT orders on existing positions are take profits
-            # (assuming they're closing orders, not entries)
-            trigger_price = order.limitPrice
-
-            if trigger_price is None:
-                return "unknown"
-
-            # Use position TYPE (1=LONG, 2=SHORT), not size sign
-            is_long_position = (position_type == 1)
-            is_short_position = (position_type == 2)
-
-            # Verify this is actually a profit target
-            if is_long_position:
-                # LONG: Take profit ABOVE entry, entry BELOW
-                if trigger_price > position_entry_price:
-                    return "take_profit"
-                else:
-                    return "entry"  # Limit buy below entry = entry order
-            elif is_short_position:
-                # SHORT: Take profit BELOW entry, entry ABOVE
-                if trigger_price < position_entry_price:
-                    return "take_profit"
-                else:
-                    return "entry"  # Limit sell above entry = entry order
-            else:
-                return "unknown"
-
-        elif order.type == 2:  # MARKET
-            # Market orders could be manual exit or entry
-            return "unknown"
-
-        else:
-            return "unknown"
 
     async def connect(self) -> None:
         """
@@ -586,6 +362,19 @@ class TradingIntegration:
 
             logger.success("✅ Connected to ProjectX (HTTP + WebSocket + TradingSuite)")
 
+            # Wire up protective order cache with SDK access
+            self._protective_cache.set_suite(self.suite)
+            self._protective_cache.set_helpers(
+                self._extract_symbol_from_contract,
+                self._get_side_name
+            )
+            logger.debug("Wired ProtectiveOrderCache to SDK suite")
+
+            # Wire up market data handler with SDK access
+            self._market_data.set_client(self.client)
+            self._market_data.set_suite(self.suite)
+            logger.debug("Wired MarketDataHandler to SDK client and suite")
+
         except Exception as e:
             logger.error(f"Failed to connect to trading platform: {e}")
             raise
@@ -605,13 +394,9 @@ class TradingIntegration:
                 pass
             logger.debug("Order polling task stopped")
 
-        if self._status_bar_task:
-            self._status_bar_task.cancel()
-            try:
-                await self._status_bar_task
-            except asyncio.CancelledError:
-                pass
-            logger.debug("Status bar task stopped")
+        # Stop status bar (delegated to MarketDataHandler)
+        await self._market_data.stop_status_bar()
+        logger.debug("Status bar task stopped (MarketDataHandler)")
 
         # Disconnect in reverse order
         if self.suite:
@@ -688,21 +473,21 @@ class TradingIntegration:
             # Try multiple event types since realtime_data manager doesn't exist
             logger.info("📊 Registering market data event handlers...")
 
-            # QUOTE_UPDATE (primary)
-            await self.suite.on(SDKEventType.QUOTE_UPDATE, self._on_quote_update)
-            logger.info("✅ Registered: QUOTE_UPDATE")
+            # QUOTE_UPDATE (primary) - Delegated to MarketDataHandler
+            await self.suite.on(SDKEventType.QUOTE_UPDATE, self._market_data.handle_quote_update)
+            logger.info("✅ Registered: QUOTE_UPDATE (MarketDataHandler)")
 
-            # DATA_UPDATE (alternative - might contain price data)
-            await self.suite.on(SDKEventType.DATA_UPDATE, self._on_data_update)
-            logger.info("✅ Registered: DATA_UPDATE")
+            # DATA_UPDATE (alternative - might contain price data) - Delegated to MarketDataHandler
+            await self.suite.on(SDKEventType.DATA_UPDATE, self._market_data.handle_data_update)
+            logger.info("✅ Registered: DATA_UPDATE (MarketDataHandler)")
 
-            # TRADE_TICK (alternative - trade executions with prices)
-            await self.suite.on(SDKEventType.TRADE_TICK, self._on_trade_tick)
-            logger.info("✅ Registered: TRADE_TICK")
+            # TRADE_TICK (alternative - trade executions with prices) - Delegated to MarketDataHandler
+            await self.suite.on(SDKEventType.TRADE_TICK, self._market_data.handle_trade_tick)
+            logger.info("✅ Registered: TRADE_TICK (MarketDataHandler)")
 
-            # NEW_BAR (from timeframes - contains OHLC data including close price)
-            await self.suite.on(SDKEventType.NEW_BAR, self._on_new_bar)
-            logger.info("✅ Registered: NEW_BAR (1min, 5min timeframes)")
+            # NEW_BAR (from timeframes - contains OHLC data including close price) - Delegated to MarketDataHandler
+            await self.suite.on(SDKEventType.NEW_BAR, self._market_data.handle_new_bar)
+            logger.info("✅ Registered: NEW_BAR (1min, 5min timeframes - MarketDataHandler)")
 
             # Check instrument structure and initial prices
             logger.info("Checking instruments for price data...")
@@ -748,9 +533,9 @@ class TradingIntegration:
             self._order_poll_task = asyncio.create_task(self._poll_orders())
             logger.info("🔄 Started order polling task (5s interval)")
 
-            # Start status bar update task (for real-time P&L display)
-            self._status_bar_task = asyncio.create_task(self._update_pnl_status_bar())
-            logger.info("📊 Started unrealized P&L status bar (0.5s refresh)")
+            # Start status bar update task (for real-time P&L display) - Delegated to MarketDataHandler
+            await self._market_data.start_status_bar()
+            logger.info("📊 Started unrealized P&L status bar (0.5s refresh - MarketDataHandler)")
             logger.info("=" * 80)
 
         except Exception as e:
@@ -809,30 +594,9 @@ class TradingIntegration:
                     logger.info(f"🔍 NEW ORDER (polling): {symbol} {order.type_str} {self._get_side_name(order.side)} {order.size}")
                     logger.debug(f"Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
-                    # Check if it's a protective stop and cache it
-                    if self._is_stop_loss(order):
-                        # Cache it (if not already cached)
-                        if order.contractId not in self._active_stop_losses:
-                            self._active_stop_losses[order.contractId] = {
-                                "order_id": order.id,
-                                "stop_price": order.stopPrice,
-                                "side": self._get_side_name(order.side),
-                                "quantity": order.size,
-                                "timestamp": time.time(),
-                            }
-                            logger.info(f"  🛡️  Stop Loss cached: ${order.stopPrice:,.2f}")
-
-                    # Check if it's a take profit and cache it
-                    if self._is_take_profit(order):
-                        if order.contractId not in self._active_take_profits:
-                            self._active_take_profits[order.contractId] = {
-                                "order_id": order.id,
-                                "limit_price": order.limitPrice,
-                                "side": self._get_side_name(order.side),
-                                "quantity": order.size,
-                                "timestamp": time.time(),
-                            }
-                            logger.info(f"  🎯 Take Profit cached: ${order.limitPrice:,.2f}")
+                    # Check if it's a protective order and cache it
+                    # Use cache module's update method
+                    self._protective_cache.update_from_order_placed(order)
 
             except Exception as e:
                 logger.warning(f"Error polling orders: {e}")
@@ -874,27 +638,8 @@ class TradingIntegration:
             # Order details at DEBUG level only
             logger.debug(f"Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
-            # Cache active stop losses (so we can query them before they fill)
-            if self._is_stop_loss(order):
-                self._active_stop_losses[order.contractId] = {
-                    "order_id": order.id,
-                    "stop_price": order.stopPrice,
-                    "side": self._get_side_name(order.side),
-                    "quantity": order.size,
-                    "timestamp": time.time(),
-                }
-                logger.debug(f"Cached stop loss: {order.contractId} → SL @ ${order.stopPrice:,.2f}")
-
-            # Cache active take profits
-            if self._is_take_profit(order):
-                self._active_take_profits[order.contractId] = {
-                    "order_id": order.id,
-                    "limit_price": order.limitPrice,
-                    "side": self._get_side_name(order.side),
-                    "quantity": order.size,
-                    "timestamp": time.time(),
-                }
-                logger.debug(f"Cached take profit: {order.contractId} → TP @ ${order.limitPrice:,.2f}")
+            # Cache active protective orders (delegated to cache module)
+            self._protective_cache.update_from_order_placed(order)
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -971,13 +716,11 @@ class TradingIntegration:
             logger.debug(f"Recorded {fill_type} fill | _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
 
             # Remove from active caches (order is now filled)
-            if is_sl and order.contractId in self._active_stop_losses:
-                del self._active_stop_losses[order.contractId]
-                logger.debug("Removed stop loss from cache (filled)")
+            if is_sl:
+                self._protective_cache.remove_stop_loss(order.contractId)
 
-            if is_tp and order.contractId in self._active_take_profits:
-                del self._active_take_profits[order.contractId]
-                logger.debug("Removed take profit from cache (filled)")
+            if is_tp:
+                self._protective_cache.remove_take_profit(order.contractId)
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -1058,15 +801,9 @@ class TradingIntegration:
             self._known_orders.discard(order.id)
 
             # Remove from active caches (order is now cancelled)
-            if order.contractId in self._active_stop_losses:
-                if self._active_stop_losses[order.contractId]["order_id"] == order.id:
-                    del self._active_stop_losses[order.contractId]
-                    logger.info(f"  └─ 🛡️ Removed stop loss from cache (cancelled)")
-
-            if order.contractId in self._active_take_profits:
-                if self._active_take_profits[order.contractId]["order_id"] == order.id:
-                    del self._active_take_profits[order.contractId]
-                    logger.info(f"  └─ 🎯 Removed take profit from cache (cancelled)")
+            # Note: Cache removal is idempotent (safe to call even if not in cache)
+            self._protective_cache.remove_stop_loss(order.contractId)
+            self._protective_cache.remove_take_profit(order.contractId)
 
         except Exception as e:
             logger.error(f"Error handling ORDER_CANCELLED: {e}")
@@ -1131,13 +868,7 @@ class TradingIntegration:
             contract_id = order.contractId
 
             logger.debug(f"Invalidating protective order cache for {contract_id}")
-
-            if contract_id in self._active_stop_losses:
-                del self._active_stop_losses[contract_id]
-
-            if contract_id in self._active_take_profits:
-                del self._active_take_profits[contract_id]
-
+            self._protective_cache.invalidate(contract_id)
             logger.debug("Cache cleared - next POSITION_UPDATED will query fresh data")
 
         except Exception as e:
@@ -1211,10 +942,7 @@ class TradingIntegration:
                 logger.debug(f"Checking protective orders (pre-dedup)")
 
                 # Always invalidate cache and query fresh
-                if contract_id in self._active_stop_losses:
-                    del self._active_stop_losses[contract_id]
-                if contract_id in self._active_take_profits:
-                    del self._active_take_profits[contract_id]
+                self._protective_cache.invalidate(contract_id)
 
                 # Query with position data from event
                 stop_loss_early = await self.get_stop_loss_for_position(
@@ -1268,13 +996,8 @@ class TradingIntegration:
 
                 # ALWAYS invalidate cache on position updates
                 # This forces a fresh query EVERY time, catching new orders
-                if contract_id in self._active_stop_losses:
-                    logger.debug("Invalidating stop loss cache")
-                    del self._active_stop_losses[contract_id]
-
-                if contract_id in self._active_take_profits:
-                    logger.debug("Invalidating take profit cache")
-                    del self._active_take_profits[contract_id]
+                logger.debug("Invalidating protective order cache")
+                self._protective_cache.invalidate(contract_id)
 
                 # Pass position data from event to avoid hanging get_all_positions() call
                 # pos_type: 1=LONG, 2=SHORT
@@ -1838,193 +1561,6 @@ class TradingIntegration:
         except Exception as e:
             logger.error(f"Error handling account update: {e}")
 
-    async def _on_quote_update(self, event: Any) -> None:
-        """
-        Handle market quote update from SignalR.
-
-        Quote updates provide real-time bid/ask prices needed for:
-        - Unrealized PnL calculations
-        - RULE-004 (Daily Unrealized Loss)
-        - RULE-005 (Max Unrealized Profit)
-        - Position monitoring
-
-        NOTE: This fires MULTIPLE TIMES PER SECOND. Logging is DEBUG only.
-
-        Data structure (from SDK v3.5.9):
-        event.data = {
-            'symbol': 'F.US.MNQ',  # Full contract format
-            'last_price': 0.0,      # Often zero
-            'bid': 26271.00,        # Valid
-            'ask': 26271.75         # Valid
-        }
-        """
-        try:
-            # Extract quote data from event
-            if not hasattr(event, 'data'):
-                logger.debug(f"Quote event has no data attribute: {type(event)}")
-                logger.debug(f"Event attributes: {dir(event)}")
-                return
-
-            quote_data = event.data
-
-            # Validate quote_data is a dict
-            if not isinstance(quote_data, dict):
-                logger.debug(f"Quote data is not a dict: {type(quote_data)}, value: {quote_data}")
-                return
-
-            # Extract quote details with safe defaults
-            full_symbol = quote_data.get('symbol', 'UNKNOWN')
-            bid = float(quote_data.get('bid', 0.0) or 0.0)
-            ask = float(quote_data.get('ask', 0.0) or 0.0)
-            last_price = float(quote_data.get('last_price', 0.0) or 0.0)
-
-            # Strip "F.US." prefix to get just "MNQ", "ES", etc.
-            # F.US.MNQ → MNQ
-            if isinstance(full_symbol, str):
-                symbol = full_symbol.replace('F.US.', '') if 'F.US.' in full_symbol else full_symbol
-            else:
-                logger.debug(f"Symbol is not a string: {type(full_symbol)}, value: {full_symbol}")
-                return
-
-            # Use last_price if available, otherwise use bid/ask midpoint
-            if last_price and last_price > 0:
-                market_price = last_price
-            elif bid > 0 and ask > 0:
-                market_price = (bid + ask) / 2.0
-            else:
-                # No valid price data
-                logger.debug(f"No valid price for {symbol}: last={last_price}, bid={bid}, ask={ask}")
-                return
-
-            # DEBUG logging only - quote updates are too frequent for INFO
-            logger.debug(f"Quote: {symbol} @ ${market_price:.2f} (bid: ${bid:.2f}, ask: ${ask:.2f})")
-
-            # Update unrealized P&L calculator (silent)
-            self.pnl_calculator.update_quote(symbol, market_price)
-
-            # Check if any position has significant P&L change
-            # Only emit UNREALIZED_PNL_UPDATE if P&L changed by $10+
-            positions_to_check = self.pnl_calculator.get_positions_by_symbol(symbol)
-            for contract_id in positions_to_check:
-                if self.pnl_calculator.has_significant_pnl_change(contract_id, threshold=10.0):
-                    # Get updated P&L
-                    unrealized_pnl = self.pnl_calculator.calculate_unrealized_pnl(contract_id)
-                    if unrealized_pnl is not None:
-                        # Emit unrealized P&L update event
-                        await self.event_bus.publish(RiskEvent(
-                            event_type=EventType.UNREALIZED_PNL_UPDATE,
-                            data={
-                                'account_id': self.client.account_info.id if self.client else None,  # ← CRITICAL: Rules need account_id
-                                'contract_id': contract_id,
-                                'contractId': contract_id,  # ← CRITICAL: Rules need contractId (for enforcement)
-                                'symbol': symbol,
-                                'unrealized_pnl': float(unrealized_pnl),
-                            },
-                            source="trading_sdk"
-                        ))
-                        logger.info(f"💹 Unrealized P&L update: {symbol} ${float(unrealized_pnl):+.2f}")
-
-            # Also publish MARKET_DATA_UPDATED for backward compatibility
-            risk_event = RiskEvent(
-                event_type=EventType.MARKET_DATA_UPDATED,
-                data={
-                    "symbol": symbol,
-                    "price": market_price,
-                    "bid": bid,
-                    "ask": ask,
-                    "last": last_price,
-                    "timestamp": quote_data.get('timestamp'),
-                },
-                source="trading_sdk",
-            )
-
-            await self.event_bus.publish(risk_event)
-
-        except Exception as e:
-            logger.error(f"Error handling quote update: {e}")
-            logger.exception(e)
-
-    async def _on_data_update(self, data: Any) -> None:
-        """
-        Handle DATA_UPDATE event (alternative market data source).
-
-        This might contain price/quote data if QUOTE_UPDATE doesn't work.
-        """
-        try:
-            logger.debug(f"_on_data_update called: data type={type(data)}")
-            logger.debug(f"DATA_UPDATE content: {data}")
-
-            # Try to extract price information
-            # Data structure is unknown, so we'll log it and adapt
-            if hasattr(data, '__dict__'):
-                logger.debug(f"DATA_UPDATE attributes: {data.__dict__}")
-
-        except Exception as e:
-            logger.error(f"Error handling data update: {e}")
-
-    async def _on_trade_tick(self, data: Any) -> None:
-        """
-        Handle TRADE_TICK event (trade executions with prices).
-
-        Might provide market price information from actual trades.
-        """
-        try:
-            logger.debug(f"_on_trade_tick called: data type={type(data)}")
-            logger.debug(f"TRADE_TICK content: {data}")
-
-            # Try to extract price information
-            if hasattr(data, '__dict__'):
-                logger.debug(f"TRADE_TICK attributes: {data.__dict__}")
-            elif isinstance(data, dict):
-                symbol = data.get('symbol')
-                price = data.get('price') or data.get('last') or data.get('tradePrice')
-                if symbol and price:
-                    logger.debug(f"Trade tick: {symbol} @ ${price:.2f}")
-                    # Update P&L calculator
-                    self.pnl_calculator.update_quote(symbol, price)
-
-        except Exception as e:
-            logger.error(f"Error handling trade tick: {e}")
-
-    async def _on_new_bar(self, data: Any) -> None:
-        """
-        Handle NEW_BAR event (from 1min/5min timeframes).
-
-        Bars contain OHLC data - we can use close price for P&L calculations.
-        This fires every 1 minute and 5 minutes based on our timeframes.
-        """
-        try:
-            logger.debug(f"_on_new_bar called: data type={type(data)}")
-
-            # Extract bar data (structure varies by SDK version)
-            if hasattr(data, 'data'):
-                bar_data = data.data
-            elif isinstance(data, dict):
-                bar_data = data
-            else:
-                bar_data = data
-
-            # Try to extract symbol and close price
-            symbol = None
-            close_price = None
-
-            if hasattr(bar_data, '__dict__'):
-                attrs = bar_data.__dict__
-                symbol = attrs.get('symbol')
-                close_price = attrs.get('close') or attrs.get('closePrice')
-                logger.debug(f"NEW_BAR attributes: {list(attrs.keys())}")
-            elif isinstance(bar_data, dict):
-                symbol = bar_data.get('symbol')
-                close_price = bar_data.get('close') or bar_data.get('closePrice')
-
-            if symbol and close_price:
-                logger.debug(f"Bar complete: {symbol} close @ ${close_price:.2f}")
-                # Update P&L calculator with bar close price
-                self.pnl_calculator.update_quote(symbol, close_price)
-
-        except Exception as e:
-            logger.error(f"Error handling new bar: {e}")
-
     async def flatten_position(self, symbol: str) -> None:
         """Flatten a specific position."""
         if not self.suite:
@@ -2062,67 +1598,6 @@ class TradingIntegration:
 
         for symbol in self.instruments:
             await self.flatten_position(symbol)
-
-    async def _update_pnl_status_bar(self) -> None:
-        """
-        Background task that updates the unrealized P&L status bar.
-
-        Updates every 0.5 seconds with current unrealized P&L.
-        Uses carriage return (\\r) to overwrite the same line.
-
-        When other logs print, they interrupt the status bar (new line),
-        but the status bar resumes on the next update. Since position/rule
-        logs are infrequent, this creates a clean display.
-
-        ALSO POLLS PRICES: Since quote events don't fire, we poll
-        instrument.last_price every 0.5s to update the calculator.
-        """
-        logger.debug("Status bar update task started")
-        poll_count = 0
-        prices_found = False
-
-        while self.running:
-            try:
-                # Poll prices from instruments (since quote events don't fire)
-                if self.suite:
-                    for symbol in self.instruments:
-                        try:
-                            instrument = self.suite.get(symbol)
-                            if instrument and hasattr(instrument, 'last_price'):
-                                price = instrument.last_price
-                                if price and price > 0:
-                                    # Update calculator with polled price
-                                    self.pnl_calculator.update_quote(symbol, price)
-                                    logger.debug(f"Polled price: {symbol} @ ${price:.2f}")
-                                    if not prices_found:
-                                        prices_found = True
-                                        logger.info(f"💹 Price polling active: {symbol} @ ${price:.2f}")
-                                else:
-                                    # Log when prices are None/0 (but only occasionally)
-                                    if poll_count % 10 == 0:  # Every 5 seconds
-                                        logger.debug(f"Polled {symbol}: last_price is None/0")
-                        except Exception as e:
-                            logger.debug(f"Error polling price for {symbol}: {e}")
-
-                poll_count += 1
-
-                # Calculate total unrealized P&L
-                total_pnl = self.pnl_calculator.calculate_total_unrealized_pnl()
-
-                # Print status bar (overwrites same line)
-                # \r = carriage return, end='' prevents newline, flush=True ensures immediate print
-                print(f"\r📊 Unrealized P&L: ${float(total_pnl):+.2f}  ", end="", flush=True)
-
-                # Wait 0.5 seconds before next update
-                await asyncio.sleep(0.5)
-
-            except asyncio.CancelledError:
-                logger.debug("Status bar task cancelled")
-                print()  # Print newline to move cursor to next line
-                break
-            except Exception as e:
-                logger.debug(f"Error in status bar update: {e}")
-                await asyncio.sleep(1.0)  # Back off on error
 
     def get_total_unrealized_pnl(self) -> float:
         """
