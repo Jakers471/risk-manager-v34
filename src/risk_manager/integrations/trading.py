@@ -290,6 +290,9 @@ class TradingIntegration:
         logger.warning(f"Using fallback symbol '{fallback}' for contract {contract_id}")
         return fallback
 
+    def _get_side_name(self, side: int) -> str:
+        """Convert side int to name (0=BUY, 1=SELL)."""
+        return "BUY" if side == 0 else "SELL"
 
     async def connect(self) -> None:
         """
