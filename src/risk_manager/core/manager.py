@@ -537,6 +537,8 @@ class RiskManager:
 
         # Subscribe to events for processing
         self.event_bus.subscribe(EventType.ORDER_FILLED, self._handle_fill)
+        self.event_bus.subscribe(EventType.POSITION_OPENED, self._handle_position_update)
+        self.event_bus.subscribe(EventType.POSITION_CLOSED, self._handle_position_update)
         self.event_bus.subscribe(EventType.POSITION_UPDATED, self._handle_position_update)
         self.event_bus.subscribe(EventType.UNREALIZED_PNL_UPDATE, self._handle_unrealized_pnl)
 

@@ -295,7 +295,7 @@ class TradingIntegration:
             Stop loss data dict or None if no stop found
         """
         symbol = self._extract_symbol_from_contract(contract_id)
-        logger.info(f"🔍 Querying SDK for stop loss on {symbol} (contract: {contract_id})")
+        logger.debug(f"🔍 Querying SDK for stop loss on {symbol} (contract: {contract_id})")
 
         if not self.suite:
             logger.error("❌ No suite available for stop loss query!")

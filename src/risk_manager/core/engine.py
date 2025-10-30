@@ -90,12 +90,12 @@ class RiskEngine:
                 if violation:
                     # Extract context for logging
                     context = self._format_violation_context(violation)
-                    logger.warning(f"❌ Rule: {rule_name} → FAIL{context}")
+                    logger.opt(colors=True).warning(f"<red>❌ Rule: {rule_name} → FAIL{context}</red>")
                     rule_results.append(("FAIL", rule_name, context))
                 else:
                     # Get context for PASS (if available)
                     context = self._get_rule_pass_context(rule, event)
-                    logger.info(f"✅ Rule: {rule_name} → PASS{context}")
+                    logger.opt(colors=True).info(f"<green>✅ Rule: {rule_name} → PASS{context}</green>")
                     rule_results.append(("PASS", rule_name, context))
 
                 if violation:
@@ -255,7 +255,7 @@ class RiskEngine:
         rule_name = rule.__class__.__name__.replace('Rule', '')
         message = violation.get("message", "No details provided")
 
-        logger.critical(f"🚨 VIOLATION: {rule_name} - {message}")
+        logger.opt(colors=True).critical(f"<red><bold>🚨 VIOLATION: {rule_name} - {message}</bold></red>")
 
         await self.event_bus.publish(
             RiskEvent(
@@ -274,7 +274,7 @@ class RiskEngine:
 
         if action == "flatten":
             # Checkpoint 8: Enforcement triggered (flatten)
-            logger.critical(f"🛑 ENFORCING: Closing all positions ({rule_name})")
+            logger.opt(colors=True).critical(f"<red><bold>🛑 ENFORCING: Closing all positions ({rule_name})</bold></red>")
             sdk_logger.warning(f"⚠️ Enforcement triggered: FLATTEN ALL - Rule: {rule_name}")
             await self.flatten_all_positions()
         elif action == "close_position":
@@ -284,9 +284,9 @@ class RiskEngine:
             symbol = violation.get("symbol")
 
             if not contract_id or not symbol:
-                logger.error(
-                    f"❌ Cannot close position: Missing required fields! "
-                    f"contractId={contract_id}, symbol={symbol}, rule={rule_name}"
+                logger.opt(colors=True).error(
+                    f"<red>❌ Cannot close position: Missing required fields! "
+                    f"contractId={contract_id}, symbol={symbol}, rule={rule_name}</red>"
                 )
                 sdk_logger.error(f"⚠️ Enforcement FAILED: Missing contract_id or symbol - Rule: {rule_name}")
                 raise ValueError(
@@ -294,17 +294,17 @@ class RiskEngine:
                     f"Rule: {rule_name}, violation: {violation}"
                 )
 
-            logger.critical(f"🛑 ENFORCING: Closing position {symbol} ({rule_name})")
+            logger.opt(colors=True).critical(f"<red><bold>🛑 ENFORCING: Closing position {symbol} ({rule_name})</bold></red>")
             sdk_logger.warning(f"⚠️ Enforcement triggered: CLOSE POSITION - Rule: {rule_name}")
             await self.close_position(contract_id, symbol)
         elif action == "pause":
             # Checkpoint 8: Enforcement triggered (pause)
-            logger.critical(f"🛑 ENFORCING: Pausing trading ({rule_name})")
+            logger.opt(colors=True).critical(f"<red><bold>🛑 ENFORCING: Pausing trading ({rule_name})</bold></red>")
             sdk_logger.warning(f"⚠️ Enforcement triggered: PAUSE TRADING - Rule: {rule_name}")
             await self.pause_trading()
         elif action == "alert":
             # Checkpoint 8: Enforcement triggered (alert)
-            logger.warning(f"⚠️  ALERT: {message} ({rule_name})")
+            logger.opt(colors=True).warning(f"<yellow>⚠️  ALERT: {message} ({rule_name})</yellow>")
             sdk_logger.info(f"⚠️ Enforcement triggered: ALERT - Rule: {rule_name}")
             await self.send_alert(violation)
 

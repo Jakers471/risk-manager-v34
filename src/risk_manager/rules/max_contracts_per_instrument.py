@@ -99,21 +99,24 @@ class MaxContractsPerInstrumentRule(RiskRule):
             limit = self.limits[symbol]
 
             if current_size > limit:
-                logger.warning(
-                    f"⚠️ RULE-002 BREACH: {symbol} position size {current_size} "
-                    f"exceeds limit {limit}"
+                logger.opt(colors=True).warning(
+                    f"<red>⚠️ RULE-002 BREACH: {symbol} position size {current_size} "
+                    f"exceeds limit {limit}</red>"
                 )
 
-                # Store enforcement context
-                self.context = {
+                # Return violation dict (engine expects dict, not bool)
+                return {
+                    "rule": "MaxContractsPerInstrumentRule",
+                    "message": f"{symbol} position size {current_size} exceeds limit {limit}",
                     "symbol": symbol,
+                    "contractId": contract_id,  # ← CRITICAL for enforcement
                     "contract_id": contract_id,
                     "current_size": current_size,
                     "limit": limit,
+                    "action": "reduce_position" if self.enforcement == "reduce_to_limit" else "close_position",
+                    "severity": "CRITICAL",
                     "enforcement": self.enforcement,
                 }
-
-                return True
 
         else:
             # Unknown symbol handling
@@ -138,21 +141,24 @@ class MaxContractsPerInstrumentRule(RiskRule):
         if self.unknown_symbol_action == "block":
             # Block all positions in unknown symbols
             if current_size > 0:
-                logger.warning(
-                    f"⚠️ RULE-002 BREACH: {symbol} not in configured limits, "
-                    f"blocking position (size={current_size})"
+                logger.opt(colors=True).warning(
+                    f"<red>⚠️ RULE-002 BREACH: {symbol} not in configured limits, "
+                    f"blocking position (size={current_size})</red>"
                 )
 
-                self.context = {
+                return {
+                    "rule": "MaxContractsPerInstrumentRule",
+                    "message": f"{symbol} not in configured limits, blocking position (size={current_size})",
                     "symbol": symbol,
+                    "contractId": contract_id,
                     "contract_id": contract_id,
                     "current_size": current_size,
                     "limit": 0,
+                    "action": "close_position",
+                    "severity": "CRITICAL",
                     "enforcement": "close_all",
                     "reason": "unknown_symbol_blocked",
                 }
-
-                return True
 
         elif self.unknown_symbol_action == "allow_unlimited":
             # Allow any size in unknown symbols
@@ -161,21 +167,24 @@ class MaxContractsPerInstrumentRule(RiskRule):
         elif self.unknown_symbol_limit is not None:
             # Allow up to specified limit
             if current_size > self.unknown_symbol_limit:
-                logger.warning(
-                    f"⚠️ RULE-002 BREACH: {symbol} not in configured limits, "
-                    f"size {current_size} exceeds default limit {self.unknown_symbol_limit}"
+                logger.opt(colors=True).warning(
+                    f"<red>⚠️ RULE-002 BREACH: {symbol} not in configured limits, "
+                    f"size {current_size} exceeds default limit {self.unknown_symbol_limit}</red>"
                 )
 
-                self.context = {
+                return {
+                    "rule": "MaxContractsPerInstrumentRule",
+                    "message": f"{symbol} not in configured limits, size {current_size} exceeds default limit {self.unknown_symbol_limit}",
                     "symbol": symbol,
+                    "contractId": contract_id,
                     "contract_id": contract_id,
                     "current_size": current_size,
                     "limit": self.unknown_symbol_limit,
+                    "action": "reduce_position" if self.enforcement == "reduce_to_limit" else "close_position",
+                    "severity": "CRITICAL",
                     "enforcement": self.enforcement,
                     "reason": "unknown_symbol_over_default_limit",
                 }
-
-                return True
 
         return False
 

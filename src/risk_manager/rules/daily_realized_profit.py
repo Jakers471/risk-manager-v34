@@ -5,7 +5,7 @@ Purpose: Enforce hard daily realized profit target to prevent giving back profit
 Category: Hard Lockout (Category 3)
 Priority: Medium
 
-Trigger: TRADE_EXECUTED, POSITION_CLOSED, PNL_UPDATED events
+Trigger: POSITION_CLOSED (has calculated realized P&L from trading integration)
 Enforcement: Close all positions + Cancel all orders + Hard lockout until reset
 
 Configuration:
@@ -138,11 +138,12 @@ class DailyRealizedProfitRule(RiskRule):
         if not self.enabled:
             return None
 
-        # Only evaluate on P&L-related events
+        # Only evaluate on events with realized P&L
+        # CRITICAL: POSITION_CLOSED is the PRIMARY trigger!
+        # Trading integration calculates realized P&L and adds it to POSITION_CLOSED events
+        # ORDER_FILLED events do NOT have profitAndLoss (half-turn trades)
         if event.event_type not in [
-            EventType.ORDER_FILLED,      # ← PRIMARY: SDK publishes this on trade fills
-            EventType.POSITION_CLOSED,   # ← Position closed events
-            EventType.PNL_UPDATED,       # ← Direct P&L updates
+            EventType.POSITION_CLOSED,   # ← PRIMARY: Has calculated realized P&L from trading integration
             EventType.TRADE_EXECUTED,    # ← For test compatibility
         ]:
             return None
