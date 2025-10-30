@@ -101,7 +101,7 @@ rules:
   # RULE-003: Daily Realized Loss
   daily_realized_loss:
     enabled: true
-    limit: -500                    # Max daily loss: $500
+    limit: -5                    # Max daily loss: $500
     reset_time: "17:00"            # Reset at 5 PM CT
     timezone: "America/Chicago"
 

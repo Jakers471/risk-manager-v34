@@ -157,6 +157,12 @@ class DailyRealizedLossRule(RiskRule):
         # Update P&L tracker with this trade
         try:
             daily_pnl = self.pnl_tracker.add_trade_pnl(str(account_id), profit_and_loss)
+
+            # Log current P&L vs limit (helps with testing and monitoring)
+            logger.info(
+                f"💰 Daily P&L: ${daily_pnl:+,.2f} / ${self.limit:,.2f} limit "
+                f"(this trade: ${profit_and_loss:+,.2f})"
+            )
         except Exception as e:
             logger.error(f"Error updating daily P&L: {e}", exc_info=True)
             return None
