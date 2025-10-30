@@ -53,16 +53,16 @@ class ConfigLoader:
     def __init__(
         self,
         config_dir: str | Path = "config",
-        env_file: str | Path = ".env"
+        env_file: str | Path | None = ".env"
     ):
         """Initialize configuration loader.
 
         Args:
             config_dir: Directory containing YAML config files
-            env_file: Path to .env file for variable substitution
+            env_file: Path to .env file for variable substitution (None to disable)
         """
         self.config_dir = Path(config_dir)
-        self.env_file = Path(env_file)
+        self.env_file = Path(env_file) if env_file is not None else None
 
         # Ensure config directory exists
         if not self.config_dir.exists():

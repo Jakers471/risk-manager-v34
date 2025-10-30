@@ -301,7 +301,7 @@ python run_dev.py
 - [x] Pushed to GitHub
 - [x] CACHE_AND_SEMANTIC_FIX.md updated
 - [x] Handoff document created
-- [ ] Integration tests (next priority)
+- [x] Integration tests created (`test_protective_order_detection.py` - 6 tests, all passing)
 
 ---
 

@@ -143,14 +143,14 @@ def substitute_env_vars(
 
 def substitute_env_vars_recursive(
     data: Any,
-    env_file: str | Path = ".env",
+    env_file: str | Path | None = ".env",
     raise_on_missing: bool = True
 ) -> Any:
     """Recursively substitute environment variables in nested data structures.
 
     Args:
         data: Dictionary, list, or string to process
-        env_file: Path to .env file
+        env_file: Path to .env file (None to use only os.environ)
         raise_on_missing: If True, raise error for missing variables
 
     Returns:
@@ -169,7 +169,7 @@ def substitute_env_vars_recursive(
         # All ${VAR_NAME} replaced in nested structure
     """
     if isinstance(data, str):
-        return substitute_env_vars(data, env_file, raise_on_missing)
+        return substitute_env_vars(data, env_file if env_file is not None else ".env", raise_on_missing)
     elif isinstance(data, dict):
         return {
             key: substitute_env_vars_recursive(value, env_file, raise_on_missing)

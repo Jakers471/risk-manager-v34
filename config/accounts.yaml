@@ -22,15 +22,15 @@ topstepx:
 # ==============================================================================
 accounts:
   # Account 1: Practice Account
-  - id: "PRAC-V2-XXXXXX"              # Replace with actual account ID
+  - id: "PRAC-V2-126244-84184528"      # Your TopstepX practice account
     name: "Practice Account"
-    account_type: "practice"           # "practice" or "live"
-    description: "Default practice account"
+    account_type: "practice"            # "practice" or "live"
+    description: "TopstepX practice account for testing"
     enabled: true
 
     # Configuration options (both null = use default risk_config.yaml)
-    risk_config_file: null             # Use default config
-    config_overrides: null             # No overrides
+    risk_config_file: null              # Use default config
+    config_overrides: null              # No overrides
 
 # ==============================================================================
 # NOTES

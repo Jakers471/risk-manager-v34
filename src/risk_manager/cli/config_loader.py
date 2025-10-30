@@ -148,9 +148,9 @@ def load_runtime_config(
     console.print("[bold]1. Loading credentials[/bold]")
     try:
         credentials = get_credentials(env_file=env_file)
-        console.print(f"   ✓ Credentials loaded for user: {credentials._redact(credentials.username)}")
+        console.print(f"   OK: Credentials loaded for user: {credentials._redact(credentials.username)}")
     except CredentialError as e:
-        console.print(f"[red]   ✗ Credential loading failed[/red]")
+        console.print(f"[red]   FAIL: Credential loading failed[/red]")
         raise RuntimeConfigError(f"Credential loading failed:\n{e}")
 
     console.print()
@@ -162,7 +162,7 @@ def load_runtime_config(
     try:
         loader = ConfigLoader(config_dir=risk_config_path.parent, env_file=env_file)
         risk_config = loader.load_risk_config(file_name=risk_config_path.name)
-        console.print(f"   ✓ Risk configuration loaded")
+        console.print(f"   OK: Risk configuration loaded")
 
         # Count enabled rules
         enabled_count = sum(
@@ -171,10 +171,10 @@ def load_runtime_config(
             and hasattr(getattr(risk_config.rules, rule_name), "enabled")
             and getattr(risk_config.rules, rule_name).enabled
         )
-        console.print(f"   ✓ Enabled rules: {enabled_count}")
+        console.print(f"   OK: Enabled rules: {enabled_count}")
 
     except ConfigurationError as e:
-        console.print(f"[red]   ✗ Risk configuration loading failed[/red]")
+        console.print(f"[red]   FAIL: Risk configuration loading failed[/red]")
         raise RuntimeConfigError(f"Risk configuration error:\n{e}")
 
     console.print()
@@ -186,10 +186,10 @@ def load_runtime_config(
     try:
         loader = ConfigLoader(config_dir=accounts_config_path.parent, env_file=env_file)
         accounts_config = loader.load_accounts_config(file_name=accounts_config_path.name)
-        console.print(f"   ✓ Accounts configuration loaded")
+        console.print(f"   OK: Accounts configuration loaded")
 
     except ConfigurationError as e:
-        console.print(f"[red]   ✗ Accounts configuration loading failed[/red]")
+        console.print(f"[red]   FAIL: Accounts configuration loading failed[/red]")
         raise RuntimeConfigError(f"Accounts configuration error:\n{e}")
 
     console.print()
@@ -203,14 +203,27 @@ def load_runtime_config(
             account_id=account_id,
             interactive=interactive
         )
-        console.print(f"   ✓ Selected account: {selected_account_id}")
+        console.print(f"   OK: Selected account: {selected_account_id}")
 
     except Exception as e:
-        console.print(f"[red]   ✗ Account selection failed[/red]")
+        console.print(f"[red]   FAIL: Account selection failed[/red]")
         raise RuntimeConfigError(f"Account selection error:\n{e}")
 
     console.print()
-    console.print("[green]✓ Runtime configuration loaded successfully![/green]")
+
+    # 5. Deep validation of critical paths
+    console.print("[bold]5. Validating configuration structure[/bold]")
+
+    try:
+        _validate_config_structure(risk_config, accounts_config)
+        console.print(f"   OK: Configuration structure validated")
+
+    except Exception as e:
+        console.print(f"[red]   FAIL: Configuration structure validation failed[/red]")
+        raise RuntimeConfigError(f"Configuration structure error:\n{e}")
+
+    console.print()
+    console.print("[green]OK: Runtime configuration loaded successfully![/green]")
     console.print()
 
     # Create RuntimeConfig object
@@ -359,6 +372,93 @@ def _get_available_accounts(accounts_config: AccountsConfig) -> list[dict]:
             })
 
     return available
+
+
+def _validate_config_structure(risk_config: RiskConfig, accounts_config: AccountsConfig) -> None:
+    """Validate critical configuration structure paths.
+
+    This catches structural issues early before they cause runtime errors.
+
+    Args:
+        risk_config: RiskConfig instance to validate
+        accounts_config: AccountsConfig instance to validate
+
+    Raises:
+        RuntimeConfigError: If any critical path is missing or invalid
+
+    Validates:
+    - risk_config.general exists and has instruments, timezone, logging
+    - risk_config.rules exists and has all expected rules
+    - Each rule has 'enabled' field
+    - accounts_config.topstepx exists and has credentials
+    """
+    errors = []
+
+    # Validate risk_config.general
+    if not hasattr(risk_config, 'general') or risk_config.general is None:
+        errors.append("risk_config.general is missing")
+    else:
+        if not hasattr(risk_config.general, 'instruments'):
+            errors.append("risk_config.general.instruments is missing")
+        elif not isinstance(risk_config.general.instruments, list):
+            errors.append(f"risk_config.general.instruments should be list, got {type(risk_config.general.instruments)}")
+        elif len(risk_config.general.instruments) == 0:
+            errors.append("risk_config.general.instruments is empty")
+
+        if not hasattr(risk_config.general, 'timezone'):
+            errors.append("risk_config.general.timezone is missing")
+
+        if not hasattr(risk_config.general, 'logging'):
+            errors.append("risk_config.general.logging is missing")
+
+    # Validate risk_config.rules
+    if not hasattr(risk_config, 'rules') or risk_config.rules is None:
+        errors.append("risk_config.rules is missing")
+    else:
+        # Check critical rules exist
+        critical_rules = [
+            'max_contracts',
+            'max_contracts_per_instrument',
+            'daily_unrealized_loss',
+            'max_unrealized_profit',
+            'daily_realized_loss',
+            'daily_realized_profit',
+            'trade_frequency_limit',
+            'cooldown_after_loss',
+            'session_block_outside',
+            'auth_loss_guard',
+            'no_stop_loss_grace',
+            'symbol_blocks',
+            'trade_management'
+        ]
+
+        for rule_name in critical_rules:
+            if not hasattr(risk_config.rules, rule_name):
+                errors.append(f"risk_config.rules.{rule_name} is missing")
+            else:
+                rule = getattr(risk_config.rules, rule_name)
+                if not hasattr(rule, 'enabled'):
+                    errors.append(f"risk_config.rules.{rule_name}.enabled is missing")
+
+    # Validate accounts_config.topstepx
+    if not hasattr(accounts_config, 'topstepx') or accounts_config.topstepx is None:
+        errors.append("accounts_config.topstepx is missing")
+    else:
+        if not hasattr(accounts_config.topstepx, 'username'):
+            errors.append("accounts_config.topstepx.username is missing")
+        if not hasattr(accounts_config.topstepx, 'api_key'):
+            errors.append("accounts_config.topstepx.api_key is missing")
+        if not hasattr(accounts_config.topstepx, 'api_url'):
+            errors.append("accounts_config.topstepx.api_url is missing")
+
+    # If any errors, raise with helpful message
+    if errors:
+        raise RuntimeConfigError(
+            "Configuration structure validation failed:\n" +
+            "\n".join(f"  - {e}" for e in errors) +
+            "\n\nFix: Check that config files match the expected structure.\n"
+            "See docs/current/CONFIG_FORMATS.md for examples."
+        )
 
 
 def validate_runtime_config(config: RuntimeConfig) -> bool:
