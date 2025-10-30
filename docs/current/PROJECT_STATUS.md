@@ -1,9 +1,9 @@
 # Risk Manager V34 - Project Status
 
-**Last Updated**: 2025-10-29 Early Morning (SDK Noise Filter + Clean Logs)
-**Current Phase**: PRODUCTION READY 🎉 | ALL TESTS PASSING ✅ | LIVE EVENTS WORKING ✅ | CLEAN LOGS ✅
+**Last Updated**: 2025-10-29 Evening (P&L Calculation + Protective Orders Fixed)
+**Current Phase**: PRODUCTION READY 🎉 | P&L TRACKING WORKING ✅ | PROTECTIVE ORDERS WORKING ✅ | DIAGNOSTICS ADDED ✅
 **Test Status**: **1,334 tests passing** | **62 skipped** | **0 failures**
-**Overall Progress**: **~98% Complete** | **Core System ✅** | **Admin CLI ✅** | **Development Runtime ✅** | **Event Logging ✅** | **Live Events ✅** | **Clean Logs ✅**
+**Overall Progress**: **~98% Complete** | **Core System ✅** | **P&L Calculation ✅** | **Stop Loss Detection ✅** | **Trade Verification Tools ✅**
 
 ---
 
@@ -28,7 +28,232 @@
 
 ## 🎉 Major Accomplishments
 
-### 🏆 LATEST: SDK Noise Filter Added - Clean Logs (2025-10-29 Early Morning)
+### 🏆 LATEST: P&L Calculation + Protective Orders Fixed (2025-10-29 Evening)
+
+**Duration**: 2 hours
+**Issue**: P&L showing $0.00, stop loss detection not visible, no way to verify accuracy
+**Solution**: ✅ **Fixed 3 critical bugs + added verification tools**
+
+#### Problems Identified
+
+**Problem 1: Missing `_open_positions` Initialization**
+```
+AttributeError: 'TradingIntegration' object has no attribute '_open_positions'
+```
+- Previous AI implemented P&L tracking in commit 79aff85
+- Added usage of `self._open_positions` but forgot to initialize it
+- System crashed on first position close event
+
+**Problem 2: Wrong Exit Price Source**
+```
+Entry: $26,385.00 @ 1 (long)
+Exit: $26,385.00        ← WRONG! Same as entry
+Price diff: +0.00 = +0.0 ticks
+Realized P&L: $+0.00    ← WRONG!
+```
+- POSITION_CLOSED event contains position's `averagePrice` (entry price)
+- Exit price comes from ORDER_FILLED event (milliseconds earlier)
+- Code was using `avg_price` for both entry and exit → always $0 P&L
+
+**Problem 3: Invisible Query Failures**
+```
+WARNING | ⚠️  NO STOP LOSS
+```
+- Stop loss detection was failing silently
+- DEBUG logs hidden when running at INFO level
+- try/except caught errors and returned None with no context
+- Users couldn't see WHY queries failed without --log-level DEBUG
+
+#### Solutions Implemented
+
+**Fix 1: Initialize `_open_positions` Dictionary** (Commit 484b137)
+
+**File**: `src/risk_manager/integrations/trading.py` (line 109)
+```python
+# Open positions tracking for P&L calculation
+# Format: {contract_id: {"entry_price": float, "size": int, "side": "long"|"short"}}
+self._open_positions: dict[str, dict[str, Any]] = {}
+```
+
+**Fix 2: Store and Use Exit Price from ORDER_FILLED** (Commit 484b137)
+
+**Files Modified**: `src/risk_manager/integrations/trading.py`
+
+1. **Store fill price in _recent_fills** (line 887):
+```python
+self._recent_fills[order.contractId] = {
+    "type": fill_type,
+    "timestamp": time.time(),
+    "side": self._get_side_name(order.side),
+    "order_id": order.id,
+    "fill_price": order.filledPrice,  # ← NEW: Store exit price!
+}
+```
+
+2. **Use fill price for P&L calculation** (lines 1242-1254):
+```python
+# Get exit price from recent fill, not from position event!
+# POSITION_CLOSED gives us avg_price (entry), not exit price
+exit_price = avg_price  # Fallback
+if contract_id in self._recent_fills:
+    fill_data = self._recent_fills[contract_id]
+    if fill_data.get('fill_price'):
+        exit_price = fill_data['fill_price']
+        logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
+```
+
+3. **Calculate P&L with correct prices** (lines 1261-1270):
+```python
+if side == 'long':
+    price_diff = exit_price - entry_price  # ← Fixed: was using avg_price
+else:
+    price_diff = entry_price - exit_price  # ← Fixed: was using avg_price
+
+ticks = price_diff / tick_size
+realized_pnl = ticks * tick_value * abs(entry_size)
+```
+
+**Fix 3: ERROR-Level Diagnostics for Query Failures** (Commit b687a70)
+
+**File**: `src/risk_manager/integrations/trading.py`
+
+Changed log levels so failures are visible at INFO level:
+```python
+# Query start (was DEBUG, now INFO)
+logger.info(f"🔍 Querying SDK for stop loss on {symbol} (contract: {contract_id})")
+
+# Failures (were DEBUG/WARNING, now ERROR with context)
+logger.error("❌ No suite available for stop loss query!")
+logger.error(f"❌ Symbol {symbol} not in suite! Available: {list(self.suite.keys())}")
+logger.error(f"❌ Instrument {symbol} has no orders attribute!")
+
+# Exception traceback (was DEBUG, now ERROR)
+logger.error(traceback.format_exc())  # Show full traceback at ERROR level
+```
+
+#### New Features Added
+
+**Feature 1: Trade History Verification** (Commit 538883d)
+
+**New Files**:
+- `src/risk_manager/integrations/trade_history.py` - Query broker's actual trade records
+- `verify_pnl.py` - Compare our P&L calculations vs broker's records
+
+**Usage**:
+```bash
+python verify_pnl.py
+```
+
+**Output**:
+```
+================================================================================
+BROKER TRADE HISTORY (Last 24 Hours)
+================================================================================
+  Trade #12345: BUY 1 @ $26,389.25 | P&L: N/A (half-turn) | 2025-10-29T22:36:00Z
+  Trade #12346: SELL 1 @ $26,391.25 | P&L: $+4.00 | 2025-10-29T22:36:54Z
+================================================================================
+TOTAL REALIZED P&L: $+4.00
+================================================================================
+```
+
+**Feature 2: Stop Loss Diagnostic Tool** (Commit 0d25a51)
+
+**New File**: `diagnose_stops.py` - Manual SDK query tool
+
+**Usage**:
+```bash
+python diagnose_stops.py
+```
+
+**What It Shows**:
+- All positions found by SDK
+- All orders found (via both query methods)
+- Semantic analysis of each order (stop loss vs take profit vs entry)
+- Contract ID matching diagnostics
+- Helps debug "NO STOP LOSS" warnings
+
+**Example Output**:
+```
+Checking MNQ...
+📊 Positions: 1
+  Position: CON.F.US.MNQ.Z25 | Type: 1 (LONG) | Size: 1 | Avg Price: $26,385.00
+
+  Method 1: get_position_orders('CON.F.US.MNQ.Z25')
+  └─ Found 2 orders
+     Order #12345: STOP | Status: 1 | Stop: $26,380.00
+     Order #12346: LIMIT | Status: 1 | Limit: $26,395.00
+
+  Semantic Analysis:
+  Order #12345:
+    Type: 4 (STOP)
+    Trigger: $26,380.00
+    ✅ STOP ORDER → Stop Loss
+
+  Order #12346:
+    Type: 1 (LIMIT)
+    Trigger: $26,395.00
+    ✅ LIMIT ABOVE entry → Take Profit
+```
+
+#### Current Status
+
+**✅ Working Features**:
+- P&L calculation tracks entry price on position open
+- Gets exit price from ORDER_FILLED event (not POSITION_CLOSED)
+- Calculates: `(exit - entry) / tick_size * tick_value * contracts`
+- Shows realized P&L on position close
+- Stop loss detection via SDK query (POSITION OPENED/UPDATED)
+- Take profit detection via semantic analysis
+- ERROR logs show exactly why queries fail
+- Trade history verification against broker records
+- Manual diagnostic tool for debugging
+
+**⚠️ Known Issue: Hardcoded Tick Values**
+
+Current code (line 1258):
+```python
+tick_value = 5.0  # TODO: Make this configurable per symbol
+tick_size = 0.25
+```
+
+This is **correct for MNQ** but **wrong for other instruments**:
+| Instrument | Tick Size | Tick Value | Example P&L (8 ticks) |
+|------------|-----------|------------|----------------------|
+| MNQ (Mini NASDAQ) | 0.25 | $5.00 | 8 × $5 = **$40** ✅ |
+| ENQ (Micro NASDAQ) | 0.25 | $0.50 | 8 × $0.50 = **$4** ❌ Shows $40 |
+| ES (Mini S&P) | 0.25 | $12.50 | 8 × $12.50 = **$100** ❌ Shows $40 |
+| MES (Micro S&P) | 0.25 | $1.25 | 8 × $1.25 = **$10** ❌ Shows $40 |
+
+**Impact**:
+- P&L calculations **correct for MNQ only**
+- Other instruments show **incorrect P&L amounts**
+- Direction (profit/loss) is still correct
+- Trade history verification script shows actual broker P&L for comparison
+
+**Next Session Should Fix**:
+- Make tick_value and tick_size configurable per instrument
+- Either add to config YAML or query from SDK
+- Update P&L calculation to use instrument-specific values
+
+#### Impact
+
+- ✅ P&L tracking fully functional (with tick value limitation)
+- ✅ Stop loss/take profit detection working
+- ✅ Query failures now visible and diagnosable
+- ✅ Trade history verification available
+- ✅ Diagnostic tools for debugging
+- ✅ 4 commits pushed to GitHub
+
+#### Git Commits
+
+1. **484b137** - 🐛 Fix P&L calculation: Use exit price from ORDER_FILLED, not POSITION_CLOSED
+2. **538883d** - ✨ Add trade history verification and improve protective order logging
+3. **b687a70** - 🐛 Fix invisible stop loss query failures - Add ERROR level diagnostics
+4. **0d25a51** - 🔧 Add diagnostic script for stop loss detection debugging
+
+---
+
+### 🏆 SDK Noise Filter Added - Clean Logs (2025-10-29 Early Morning)
 
 **Duration**: 15 minutes
 **Issue**: SDK internal error messages appearing in logs
