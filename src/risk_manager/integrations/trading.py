@@ -272,91 +272,83 @@ class TradingIntegration:
         Returns:
             Stop loss data dict or None if no stop found
         """
-        logger.info(f"🔍 SDK QUERY: Checking for stops on {contract_id}...")
+        symbol = self._extract_symbol_from_contract(contract_id)
+        logger.debug(f"Checking for stop loss on {symbol}")
 
         if not self.suite:
-            logger.warning(f"   ❌ No suite available")
+            logger.warning("No suite available for stop loss query")
             return None
 
-        # Debug: Show what attributes suite has
-        logger.info(f"   Suite type: {type(self.suite)}")
-        logger.info(f"   Suite attributes: {[a for a in dir(self.suite) if not a.startswith('_')][:20]}")
-
-        # TradingSuite is dict-like with instrument managers
-        # We need to query orders from the client or iterate instruments
+        # SDK introspection (DEBUG level only)
+        logger.debug(f"Suite type: {type(self.suite)}")
+        logger.debug(f"Suite attributes: {[a for a in dir(self.suite) if not a.startswith('_')][:20]}")
 
         try:
-            # Get symbol from contract_id to find the right instrument
-            symbol = self._extract_symbol_from_contract(contract_id)
-            logger.info(f"   Symbol: {symbol}")
-
             # Get the instrument manager for this symbol
             if symbol not in self.suite:
-                logger.warning(f"   ❌ Symbol {symbol} not in suite")
+                logger.debug(f"Symbol {symbol} not in suite")
                 return None
 
             instrument = self.suite[symbol]
             if not hasattr(instrument, 'orders'):
-                logger.error(f"   ❌ Instrument has no orders attribute")
+                logger.error(f"Instrument has no orders attribute")
                 return None
 
-            # Debug: Show all available methods on orders
+            # SDK method introspection (DEBUG level only)
             orders_obj = instrument.orders
-            logger.info(f"   Orders object type: {type(orders_obj)}")
+            logger.debug(f"Orders object type: {type(orders_obj)}")
             order_methods = [m for m in dir(orders_obj) if not m.startswith('_') and callable(getattr(orders_obj, m))]
-            logger.info(f"   Available order methods: {order_methods}")
+            logger.debug(f"Available order methods: {order_methods}")
 
-            # Try get_position_orders first
+            # Query orders
             working_orders = await instrument.orders.get_position_orders(contract_id)
-            logger.info(f"   ✅ get_position_orders returned {len(working_orders)} orders for {contract_id}")
+            logger.debug(f"get_position_orders returned {len(working_orders)} orders")
 
             # If empty, try search_open_orders - queries broker API for ALL orders
             if len(working_orders) == 0 and hasattr(orders_obj, 'search_open_orders'):
-                logger.info(f"   Trying search_open_orders (queries broker API)...")
+                logger.debug("Trying search_open_orders (broker API query)...")
                 all_orders = await orders_obj.search_open_orders()
-                logger.info(f"   search_open_orders returned {len(all_orders)} orders from broker")
+                logger.debug(f"search_open_orders returned {len(all_orders)} orders")
 
                 # Filter for this contract
                 working_orders = [o for o in all_orders if o.contractId == contract_id]
-                logger.info(f"   Filtered to {len(working_orders)} orders for {contract_id}")
+                logger.debug(f"Filtered to {len(working_orders)} orders for {contract_id}")
 
             # Get position data for semantic analysis
             if position_entry_price is None or position_type is None:
-                logger.info(f"   Position data not provided, fetching from SDK...")
+                logger.debug("Position data not provided, fetching from SDK...")
 
                 try:
-                    # Get all positions and find the one for this contract
-                    logger.info(f"   Calling get_all_positions()...")
                     all_positions = await instrument.positions.get_all_positions()
-                    logger.info(f"   ✅ get_all_positions returned {len(all_positions)} positions")
+                    logger.debug(f"get_all_positions returned {len(all_positions)} positions")
 
                     position = None
                     for pos in all_positions:
-                        logger.info(f"   Checking position: {pos.contractId}")
+                        logger.debug(f"Checking position: {pos.contractId}")
                         if pos.contractId == contract_id:
                             position = pos
-                            logger.info(f"   ✅ Found matching position!")
+                            logger.debug("Found matching position")
                             break
 
                     if not position:
-                        logger.warning(f"   ❌ No position found for {contract_id}")
-                        logger.info(f"   Available positions: {[p.contractId for p in all_positions]}")
+                        logger.warning(f"No position found for {contract_id}")
+                        logger.debug(f"Available positions: {[p.contractId for p in all_positions]}")
                         return None
 
                     position_entry_price = position.avgPrice
                     position_type = position.type  # 1=LONG, 2=SHORT
 
                 except Exception as pos_error:
-                    logger.error(f"   ❌ Error fetching position: {pos_error}")
+                    logger.error(f"Error fetching position: {pos_error}")
                     import traceback
-                    logger.error(traceback.format_exc())
+                    logger.debug(traceback.format_exc())
                     return None
             else:
-                logger.info(f"   Using provided position data (avoids hanging get_all_positions)")
+                logger.debug("Using provided position data (avoids hanging get_all_positions)")
 
             # Log position details
             pos_direction = "LONG" if position_type == 1 else "SHORT" if position_type == 2 else "UNKNOWN"
-            logger.info(f"   Position: entry=${position_entry_price:.2f}, type={position_type} ({pos_direction})")
+            logger.debug(f"Position: {pos_direction} @ ${position_entry_price:.2f}")
 
             # Analyze orders using semantic layer
             stop_loss_data = None
@@ -367,11 +359,11 @@ class TradingIntegration:
                     # Determine trigger price
                     trigger_price = order.stopPrice if order.stopPrice else order.limitPrice
 
-                    logger.info(f"   Order #{order.id}: type={order.type} ({order.type_str}), trigger=${trigger_price}, side={order.side}")
+                    logger.debug(f"Order #{order.id}: type={order.type_str}, trigger=${trigger_price}")
 
                     # Use semantic analysis to determine intent
                     intent = self._determine_order_intent(order, position_entry_price, position_type)
-                    logger.info(f"     └─ Semantic intent: {intent}")
+                    logger.debug(f"Semantic intent: {intent}")
 
                     if intent == "stop_loss":
                         # Found stop loss!
@@ -384,7 +376,7 @@ class TradingIntegration:
                         }
                         # Cache it
                         self._active_stop_losses[contract_id] = stop_loss_data
-                        logger.info(f"   ✅ FOUND stop loss @ ${trigger_price:.2f}")
+                        logger.info(f"Found stop loss: ${trigger_price:,.2f}")
 
                     elif intent == "take_profit":
                         # Found take profit!
@@ -397,20 +389,21 @@ class TradingIntegration:
                         }
                         # Cache it
                         self._active_take_profits[contract_id] = take_profit_data
-                        logger.info(f"   ✅ FOUND take profit @ ${trigger_price:.2f}")
+                        logger.info(f"Found take profit: ${trigger_price:,.2f}")
 
             # Return stop loss (if found)
             if stop_loss_data:
+                logger.debug(f"Query result: Found stop loss @ ${stop_loss_data['stop_price']:,.2f}")
                 return stop_loss_data
 
             # No stop found
-            logger.warning(f"   ❌ No stop loss orders found for {contract_id}")
+            logger.debug("Query result: No stop loss found")
             return None
 
         except Exception as e:
-            logger.error(f"❌ Error querying SDK for stops: {e}")
+            logger.error(f"Error querying SDK for stops: {e}")
             import traceback
-            logger.error(traceback.format_exc())
+            logger.debug(traceback.format_exc())
             return None
 
     def _extract_symbol_from_contract(self, contract_id: str) -> str:
@@ -685,14 +678,14 @@ class TradingIntegration:
         Some platforms don't emit events when protective stops are placed,
         so we need to poll the order list to detect them.
         """
-        logger.info("🔄 Order polling task started")
+        logger.debug("Order polling task started")
 
         while self.running:
             try:
                 await asyncio.sleep(5)  # Poll every 5 seconds
 
                 if not self.suite:
-                    logger.debug("⚠️  Suite not available yet")
+                    logger.debug("Suite not available yet")
                     continue
 
                 # Get all working orders from all instruments
@@ -713,7 +706,7 @@ class TradingIntegration:
                         logger.debug(f"Error getting orders for {symbol}: {e}")
                         continue
 
-                logger.debug(f"🔍 Polling: Found {len(orders)} working orders")
+                logger.debug(f"Polling found {len(orders)} working orders")
 
                 for order in orders:
                     order_id = order.id
@@ -725,15 +718,13 @@ class TradingIntegration:
                     # Mark as seen
                     self._known_orders.add(order_id)
 
-                    # Log ALL new orders (not just stops)
+                    # Log new orders at INFO level (concise)
                     symbol = self._extract_symbol_from_contract(order.contractId)
-                    logger.info(f"🔍 DETECTED NEW ORDER (via polling)")
-                    logger.info(f"   {symbol} | Type: {order.type_str} | Side: {self._get_side_name(order.side)} | Qty: {order.size}")
-                    logger.info(f"   Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+                    logger.info(f"🔍 NEW ORDER (polling): {symbol} {order.type_str} {self._get_side_name(order.side)} {order.size}")
+                    logger.debug(f"Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
                     # Check if it's a protective stop and cache it
                     if self._is_stop_loss(order):
-                        logger.info(f"   ⚠️  THIS IS A STOP LOSS! 🛡️")
                         # Cache it (if not already cached)
                         if order.contractId not in self._active_stop_losses:
                             self._active_stop_losses[order.contractId] = {
@@ -743,7 +734,7 @@ class TradingIntegration:
                                 "quantity": order.size,
                                 "timestamp": time.time(),
                             }
-                            logger.info(f"   └─ 🛡️ Cached stop loss: {order.contractId} → SL @ ${order.stopPrice}")
+                            logger.info(f"  🛡️  Stop Loss cached: ${order.stopPrice:,.2f}")
 
                     # Check if it's a take profit and cache it
                     if self._is_take_profit(order):
@@ -755,14 +746,14 @@ class TradingIntegration:
                                 "quantity": order.size,
                                 "timestamp": time.time(),
                             }
-                            logger.info(f"   └─ 🎯 Cached take profit: {order.contractId} → TP @ ${order.limitPrice}")
+                            logger.info(f"  🎯 Take Profit cached: ${order.limitPrice:,.2f}")
 
             except Exception as e:
-                logger.warning(f"❌ Error polling orders: {e}")
+                logger.warning(f"Error polling orders: {e}")
                 import traceback
                 logger.debug(traceback.format_exc())
 
-        logger.info("🔄 Order polling task stopped")
+        logger.debug("Order polling task stopped")
 
     # ============================================================================
     # SDK EventBus Callbacks (suite.on)
@@ -793,8 +784,9 @@ class TradingIntegration:
             order_desc = self._get_order_placement_display(order)
 
             logger.info(f"📋 ORDER PLACED - {symbol} | {order_desc}")
-            # Show order details (INFO level temporarily for debugging)
-            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+            # Order details at DEBUG level only
+            logger.debug(f"Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
             # Cache active stop losses (so we can query them before they fill)
             if self._is_stop_loss(order):
@@ -805,7 +797,7 @@ class TradingIntegration:
                     "quantity": order.size,
                     "timestamp": time.time(),
                 }
-                logger.info(f"  └─ 🛡️ Cached stop loss: {order.contractId} → SL @ ${order.stopPrice}")
+                logger.debug(f"Cached stop loss: {order.contractId} → SL @ ${order.stopPrice:,.2f}")
 
             # Cache active take profits
             if self._is_take_profit(order):
@@ -816,7 +808,7 @@ class TradingIntegration:
                     "quantity": order.size,
                     "timestamp": time.time(),
                 }
-                logger.info(f"  └─ 🎯 Cached take profit: {order.contractId} → TP @ ${order.limitPrice}")
+                logger.debug(f"Cached take profit: {order.contractId} → TP @ ${order.limitPrice:,.2f}")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -866,12 +858,14 @@ class TradingIntegration:
             # Use different emoji for stop loss vs take profit vs manual
             emoji = self._get_order_emoji(order)
 
+            # Concise fill message with formatted price
             logger.info(
-                f"{emoji} ORDER FILLED - {symbol} | {order_type} | {self._get_side_name(order.side)} | "
-                f"Qty: {order.fillVolume} @ ${order.filledPrice:.2f}"
+                f"{emoji} ORDER FILLED - {symbol} {self._get_side_name(order.side)} "
+                f"{order.fillVolume} @ ${order.filledPrice:,.2f}"
             )
-            # Show order details (INFO level temporarily for debugging)
-            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+            # Order details at DEBUG level only
+            logger.debug(f"Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
             # Remove from known orders (it's filled now)
             self._known_orders.discard(order.id)
@@ -887,17 +881,16 @@ class TradingIntegration:
                 "side": self._get_side_name(order.side),
                 "order_id": order.id,
             }
-            logger.info(f"📝 Recorded {fill_type} fill for {order.contractId} | Order type={order.type}, stopPrice={order.stopPrice}")
-            logger.debug(f"   _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
+            logger.debug(f"Recorded {fill_type} fill | _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
 
             # Remove from active caches (order is now filled)
             if is_sl and order.contractId in self._active_stop_losses:
                 del self._active_stop_losses[order.contractId]
-                logger.info(f"  └─ 🛡️ Removed stop loss from cache (filled)")
+                logger.debug("Removed stop loss from cache (filled)")
 
             if is_tp and order.contractId in self._active_take_profits:
                 del self._active_take_profits[order.contractId]
-                logger.info(f"  └─ 🎯 Removed take profit from cache (filled)")
+                logger.debug("Removed take profit from cache (filled)")
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -1021,8 +1014,8 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
-            # Debug: Show full payload (INFO level temporarily for debugging)
-            logger.info(f"📦 ORDER_MODIFIED Payload: {data}")
+            # Debug: Show full payload at DEBUG level
+            logger.debug(f"📦 ORDER_MODIFIED Payload: {data}")
 
             order = data.get('order') if isinstance(data, dict) else None
 
@@ -1040,15 +1033,16 @@ class TradingIntegration:
             order_desc = self._get_order_placement_display(order)
 
             logger.info(f"📝 ORDER MODIFIED - {symbol} | {order_desc}")
-            # Show order details (INFO level temporarily for debugging)
-            logger.info(f"  └─ Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
+
+            # Order details at DEBUG level only
+            logger.debug(f"Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
             # CRITICAL: Invalidate ALL cache for this position when ANY order is modified
             # This catches new orders that were placed but not detected yet!
             # Also detects price changes from broker-UI modifications
             contract_id = order.contractId
 
-            logger.info(f"  └─ 🔄 Invalidating ALL protective order cache for {contract_id}")
+            logger.debug(f"Invalidating protective order cache for {contract_id}")
 
             if contract_id in self._active_stop_losses:
                 del self._active_stop_losses[contract_id]
@@ -1056,7 +1050,7 @@ class TradingIntegration:
             if contract_id in self._active_take_profits:
                 del self._active_take_profits[contract_id]
 
-            logger.info(f"  └─ ✅ Cache cleared - next POSITION_UPDATED will query fresh data")
+            logger.debug("Cache cleared - next POSITION_UPDATED will query fresh data")
 
         except Exception as e:
             logger.error(f"Error handling ORDER_MODIFIED: {e}")
@@ -1068,8 +1062,8 @@ class TradingIntegration:
         try:
             data = event.data if hasattr(event, 'data') else {}
 
-            # Debug: Show full payload (INFO level temporarily for debugging)
-            logger.info(f"📦 ORDER_EXPIRED Payload: {data}")
+            # Debug: Show full payload at DEBUG level
+            logger.debug(f"📦 ORDER_EXPIRED Payload: {data}")
 
             order = data.get('order') if isinstance(data, dict) else None
 
@@ -1126,7 +1120,7 @@ class TradingIntegration:
             # Second order placements don't trigger unique events!
             # Must query on EVERY event to catch them
             if action_name in ["OPENED", "UPDATED"]:
-                logger.debug(f"🔍 Checking protective orders on {contract_id} (BEFORE dedup)...")
+                logger.debug(f"Checking protective orders (pre-dedup)")
 
                 # Always invalidate cache and query fresh
                 if contract_id in self._active_stop_losses:
@@ -1142,14 +1136,8 @@ class TradingIntegration:
                     contract_id, avg_price, pos_type
                 )
 
-                # Log findings
-                if stop_loss_early:
-                    logger.info(f"  🛡️  Stop Loss: ${stop_loss_early['stop_price']:.2f} (ID: {stop_loss_early['order_id']})")
-                else:
-                    logger.warning(f"  ⚠️  NO STOP LOSS")
-
-                if take_profit_early:
-                    logger.info(f"  🎯 Take Profit: ${take_profit_early['take_profit_price']:.2f} (ID: {take_profit_early['order_id']})")
+                # Log findings (DEBUG level for early check)
+                logger.debug(f"Pre-dedup query: SL={bool(stop_loss_early)}, TP={bool(take_profit_early)}")
 
             # Check for duplicate (prevents 3x events from 3 instruments)
             # Use contract_id + action for deduplication key
@@ -1175,30 +1163,29 @@ class TradingIntegration:
             position_label = f"📊 POSITION {action_name}"
             if fill_type == "stop_loss":
                 position_label = f"🛑 POSITION {action_name} (STOP LOSS)"
-                logger.info(f"   ⚡ Correlated with stop loss fill!")
             elif fill_type == "take_profit":
                 position_label = f"🎯 POSITION {action_name} (TAKE PROFIT)"
-                logger.info(f"   ⚡ Correlated with take profit fill!")
 
+            # Concise position message with formatted numbers
             logger.info(
-                f"{position_label} - {symbol} | {self._get_position_type_name(pos_type)} | "
-                f"Size: {size} | Price: ${avg_price:.2f} | Unrealized P&L: ${unrealized_pnl:.2f}"
+                f"{position_label} - {symbol} {self._get_position_type_name(pos_type)} "
+                f"{size} @ ${avg_price:,.2f} | P&L: ${unrealized_pnl:,.2f}"
             )
 
             # Show active stop loss/take profit for this position (if any)
             # CRITICAL: Always check on EVERY event, even if deduped for logging
             # This ensures we catch new orders that don't trigger unique events
             if action_name in ["OPENED", "UPDATED"]:
-                logger.debug(f"🔍 Checking for stop loss and take profit on {contract_id}...")
+                logger.debug("Checking protective orders (post-dedup)")
 
                 # ALWAYS invalidate cache on position updates
                 # This forces a fresh query EVERY time, catching new orders
                 if contract_id in self._active_stop_losses:
-                    logger.debug(f"   Invalidating stop loss cache for fresh query...")
+                    logger.debug("Invalidating stop loss cache")
                     del self._active_stop_losses[contract_id]
 
                 if contract_id in self._active_take_profits:
-                    logger.debug(f"   Invalidating take profit cache for fresh query...")
+                    logger.debug("Invalidating take profit cache")
                     del self._active_take_profits[contract_id]
 
                 # Pass position data from event to avoid hanging get_all_positions() call
@@ -1211,14 +1198,14 @@ class TradingIntegration:
                 )
 
                 if stop_loss:
-                    logger.info(f"  └─ 🛡️  Active Stop Loss: ${stop_loss['stop_price']:.2f} (Order ID: {stop_loss['order_id']})")
+                    logger.info(f"  🛡️  Stop Loss: ${stop_loss['stop_price']:,.2f}")
                 else:
-                    logger.warning(f"  └─ ⚠️  NO STOP LOSS for this position!")
+                    logger.warning(f"  ⚠️  NO STOP LOSS")
 
                 if take_profit:
-                    logger.info(f"  └─ 🎯 Active Take Profit: ${take_profit['take_profit_price']:.2f} (Order ID: {take_profit['order_id']})")
+                    logger.info(f"  🎯 Take Profit: ${take_profit['take_profit_price']:,.2f}")
                 else:
-                    logger.debug(f"  └─ No take profit for this position")
+                    logger.debug("  No take profit")
 
             # Bridge to risk event bus
             event_type_map = {
