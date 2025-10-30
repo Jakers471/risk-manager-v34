@@ -179,36 +179,24 @@ class RiskEngine:
         """
         rule_name = rule.__class__.__name__
 
-        # DailyRealizedLoss - show current P&L vs limit
+        # DailyRealizedLoss - show limit
         if "DailyRealizedLoss" in rule_name:
-            if hasattr(rule, "pnl_tracker") and hasattr(rule, "limit"):
-                account_id = event.data.get("account_id")
-                if account_id:
-                    try:
-                        daily_pnl = rule.pnl_tracker.get_daily_pnl(str(account_id))
-                        return f" (P&L: ${daily_pnl:+,.2f} / ${rule.limit:,.2f} limit)"
-                    except Exception:
-                        pass
+            if hasattr(rule, "limit"):
+                return f" (limit: ${rule.limit:,.2f})"
 
-        # DailyRealizedProfit - show current P&L vs target
+        # DailyRealizedProfit - show target
         if "DailyRealizedProfit" in rule_name:
-            if hasattr(rule, "pnl_tracker") and hasattr(rule, "target"):
-                account_id = event.data.get("account_id")
-                if account_id:
-                    try:
-                        daily_pnl = rule.pnl_tracker.get_daily_pnl(str(account_id))
-                        return f" (P&L: ${daily_pnl:+,.2f} / ${rule.target:,.2f} target)"
-                    except Exception:
-                        pass
+            if hasattr(rule, "target"):
+                return f" (target: ${rule.target:,.2f})"
 
         # MaxContractsPerInstrument - show position size
         if "MaxContractsPerInstrument" in rule_name:
             symbol = event.data.get("symbol")
-            position = event.data.get("netPosition") or event.data.get("position")
-            if symbol and position is not None:
+            size = event.data.get("size", 0)
+            if symbol and size != 0:
                 limit = rule.limits.get(symbol) if hasattr(rule, "limits") else None
                 if limit is not None:
-                    return f" ({symbol}: {abs(position)}/{limit} max)"
+                    return f" ({symbol}: {abs(size)}/{limit} max)"
 
         # AuthLossGuard - show connection status
         if "AuthLossGuard" in rule_name:

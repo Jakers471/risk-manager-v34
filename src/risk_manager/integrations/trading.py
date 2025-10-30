@@ -376,7 +376,7 @@ class TradingIntegration:
                         }
                         # Cache it
                         self._active_stop_losses[contract_id] = stop_loss_data
-                        logger.info(f"Found stop loss: ${trigger_price:,.2f}")
+                        logger.debug(f"Found stop loss: ${trigger_price:,.2f}")
 
                     elif intent == "take_profit":
                         # Found take profit!
@@ -389,7 +389,7 @@ class TradingIntegration:
                         }
                         # Cache it
                         self._active_take_profits[contract_id] = take_profit_data
-                        logger.info(f"Found take profit: ${trigger_price:,.2f}")
+                        logger.debug(f"Found take profit: ${trigger_price:,.2f}")
 
             # Return stop loss (if found)
             if stop_loss_data:
