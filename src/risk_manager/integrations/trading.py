@@ -72,6 +72,7 @@ from risk_manager.integrations.unrealized_pnl import UnrealizedPnLCalculator
 from risk_manager.integrations.sdk.protective_orders import ProtectiveOrderCache
 from risk_manager.integrations.sdk.market_data import MarketDataHandler
 from risk_manager.integrations.sdk.order_polling import OrderPollingService
+from risk_manager.integrations.sdk.order_correlator import OrderCorrelator
 
 
 class TradingIntegration:
@@ -106,10 +107,9 @@ class TradingIntegration:
         # NEW: Delegated to OrderPollingService module
         self._order_polling = OrderPollingService()
 
-        # Recent order fills tracking (for correlating position updates with stop losses)
-        # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str, "order_id": int, "fill_price": float}}
-        self._recent_fills: dict[str, dict[str, Any]] = {}
-        self._recent_fills_ttl = 2.0  # seconds - window to correlate fills with position updates
+        # Order correlator (correlates fills with position closes for exit type detection)
+        # NEW: Delegated to OrderCorrelator module
+        self._order_correlator = OrderCorrelator(ttl=2.0)
 
         # Protective order cache (stop loss and take profit)
         # NEW: Delegated to ProtectiveOrderCache module
@@ -164,33 +164,6 @@ class TradingIntegration:
         # Mark event as seen
         self._event_cache[cache_key] = current_time
         return False
-
-    def _check_recent_fill_type(self, contract_id: str) -> str | None:
-        """
-        Check if there was a recent order fill for this contract.
-
-        Args:
-            contract_id: Contract ID to check
-
-        Returns:
-            "stop_loss", "take_profit", "manual", or None if no recent fill
-        """
-        current_time = time.time()
-
-        # Clean old entries
-        expired_contracts = [
-            cid for cid, fill_data in self._recent_fills.items()
-            if current_time - fill_data["timestamp"] > self._recent_fills_ttl
-        ]
-        for cid in expired_contracts:
-            del self._recent_fills[cid]
-
-        # Check if we have a recent fill for this contract
-        fill_data = self._recent_fills.get(contract_id)
-        if fill_data:
-            return fill_data["type"]
-
-        return None
 
     async def get_stop_loss_for_position(
         self,
@@ -643,18 +616,18 @@ class TradingIntegration:
             # Remove from known orders (it's filled now) - Delegated to OrderPollingService
             self._order_polling.mark_order_unseen(order.id)
 
-            # Track this fill for correlation with position updates
+            # Track this fill for correlation with position updates - Delegated to OrderCorrelator
             is_sl = self._is_stop_loss(order)
             is_tp = self._is_take_profit(order)
             fill_type = "stop_loss" if is_sl else "take_profit" if is_tp else "manual"
 
-            self._recent_fills[order.contractId] = {
-                "type": fill_type,
-                "timestamp": time.time(),
-                "side": self._get_side_name(order.side),
-                "order_id": order.id,
-                "fill_price": order.filledPrice,  # Store exit price for P&L calculation
-            }
+            self._order_correlator.record_fill(
+                contract_id=order.contractId,
+                fill_type=fill_type,
+                fill_price=order.filledPrice,
+                side=self._get_side_name(order.side),
+                order_id=order.id
+            )
             logger.debug(f"Recorded {fill_type} fill | _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
 
             # Remove from active caches (order is now filled)
@@ -912,10 +885,10 @@ class TradingIntegration:
 
             symbol = self._extract_symbol_from_contract(contract_id)
 
-            # Check if this position update correlates with a recent order fill
-            fill_type = self._check_recent_fill_type(contract_id)
+            # Check if this position update correlates with a recent order fill (delegated to OrderCorrelator)
+            fill_type = self._order_correlator.get_fill_type(contract_id)
             logger.debug(f"🔍 Checking recent fills for {contract_id}: fill_type={fill_type}")
-            logger.debug(f"   Recent fills cache: {list(self._recent_fills.keys())}")
+            logger.debug(f"   Recent fills cache: {self._order_correlator.get_active_contracts()}")
 
             # Build position update label with fill context
             position_label = f"📊 POSITION {action_name}"
@@ -980,19 +953,15 @@ class TradingIntegration:
             # SDK doesn't provide profitAndLoss, so we calculate it ourselves!
             realized_pnl = None
             if action_name == "CLOSED":
-                # Get exit price from recent fill, not from position event!
+                # Get exit price from recent fill (delegated to OrderCorrelator), not from position event!
                 # POSITION_CLOSED gives us avg_price (entry), not exit price
                 # The actual exit price comes from the ORDER_FILLED event
-                exit_price = avg_price  # Fallback
-                if contract_id in self._recent_fills:
-                    fill_data = self._recent_fills[contract_id]
-                    if fill_data.get('fill_price'):
-                        exit_price = fill_data['fill_price']
-                        logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
-                    else:
-                        logger.warning(f"Recent fill found but no fill_price! Using position avg_price: ${avg_price:,.2f}")
+                exit_price = self._order_correlator.get_fill_price(contract_id)
+                if exit_price:
+                    logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
                 else:
                     logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
+                    exit_price = avg_price  # Fallback
 
                 # Calculate realized P&L using consolidated calculator
                 realized_pnl_decimal = self.pnl_calculator.calculate_realized_pnl(contract_id, exit_price)
