@@ -148,6 +148,76 @@ class UnrealizedPnLCalculator:
             )
             return None
 
+    def calculate_realized_pnl(
+        self,
+        contract_id: str,
+        exit_price: float
+    ) -> Optional[Decimal]:
+        """
+        Calculate realized P&L when a position closes.
+
+        This is the ACTUAL profit/loss from entry to exit.
+        Used when POSITION_CLOSED event fires.
+
+        Formula:
+            For LONG: (exit_price - entry_price) / tick_size * tick_value * size
+            For SHORT: (entry_price - exit_price) / tick_size * tick_value * size
+
+        Args:
+            contract_id: Position identifier
+            exit_price: Price at which position was closed
+
+        Returns:
+            Decimal: Realized P&L in USD (positive = profit, negative = loss)
+            None: If position not found or calculation error
+        """
+        if contract_id not in self._open_positions:
+            logger.warning(
+                f"Cannot calculate realized P&L: position {contract_id} not tracked"
+            )
+            return None
+
+        position = self._open_positions[contract_id]
+        symbol = position['symbol']
+
+        try:
+            # Get tick economics
+            tick_info = get_tick_economics_safe(symbol)
+            tick_size = Decimal(str(tick_info['size']))
+            tick_value = Decimal(str(tick_info['tick_value']))
+
+            # Calculate price difference
+            entry_price = position['entry_price']
+            exit = Decimal(str(exit_price))
+
+            if position['side'] == 'long':
+                # Long: profit when exit > entry
+                price_diff = exit - entry_price
+            else:  # short
+                # Short: profit when entry > exit
+                price_diff = entry_price - exit
+
+            # Convert to ticks
+            ticks = price_diff / tick_size
+
+            # Calculate realized P&L
+            realized_pnl = ticks * tick_value * position['size']
+
+            logger.debug(
+                f"Realized P&L calculated for {contract_id}: "
+                f"Entry ${float(entry_price):.2f} → Exit ${float(exit):.2f} = "
+                f"{float(ticks):.1f} ticks × ${float(tick_value):.2f} × {position['size']} = "
+                f"${float(realized_pnl):+,.2f}"
+            )
+
+            return realized_pnl
+
+        except (UnitsError, KeyError, ZeroDivisionError) as e:
+            logger.error(
+                f"Error calculating realized P&L for {contract_id} ({symbol}): {e}"
+            )
+            return None
+
     def calculate_total_unrealized_pnl(self) -> Decimal:
         """
         Calculate total unrealized P&L across all open positions.

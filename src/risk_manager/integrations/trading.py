@@ -115,11 +115,7 @@ class TradingIntegration:
         # NEW: Delegated to ProtectiveOrderCache module
         self._protective_cache = ProtectiveOrderCache()
 
-        # Open positions tracking for P&L calculation
-        # Format: {contract_id: {"entry_price": float, "size": int, "side": "long"|"short"}}
-        self._open_positions: dict[str, dict[str, Any]] = {}
-
-        # Unrealized P&L calculator (for floating P&L from quote updates)
+        # Unrealized P&L calculator (for both floating and realized P&L)
         # MUST be created BEFORE MarketDataHandler (which depends on it)
         self.pnl_calculator = UnrealizedPnLCalculator()
 
@@ -980,85 +976,51 @@ class TradingIntegration:
                 contract_id, avg_price, pos_type
             )
 
-            # Calculate realized P&L for CLOSED positions
+            # Calculate realized P&L for CLOSED positions (delegated to UnrealizedPnLCalculator)
             # SDK doesn't provide profitAndLoss, so we calculate it ourselves!
             realized_pnl = None
             if action_name == "CLOSED":
-                # Check if we tracked this position when it opened
-                if contract_id in self._open_positions:
-                    tracked = self._open_positions[contract_id]
-                    entry_price = tracked['entry_price']
-                    entry_size = tracked['size']
-                    side = tracked['side']  # 'long' or 'short'
-
-                    # Get exit price from recent fill, not from position event!
-                    # POSITION_CLOSED gives us avg_price (entry), not exit price
-                    # The actual exit price comes from the ORDER_FILLED event
-                    exit_price = avg_price  # Fallback
-                    if contract_id in self._recent_fills:
-                        fill_data = self._recent_fills[contract_id]
-                        if fill_data.get('fill_price'):
-                            exit_price = fill_data['fill_price']
-                            logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
-                        else:
-                            logger.warning(f"Recent fill found but no fill_price! Using position avg_price: ${avg_price:,.2f}")
+                # Get exit price from recent fill, not from position event!
+                # POSITION_CLOSED gives us avg_price (entry), not exit price
+                # The actual exit price comes from the ORDER_FILLED event
+                exit_price = avg_price  # Fallback
+                if contract_id in self._recent_fills:
+                    fill_data = self._recent_fills[contract_id]
+                    if fill_data.get('fill_price'):
+                        exit_price = fill_data['fill_price']
+                        logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
                     else:
-                        logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
+                        logger.warning(f"Recent fill found but no fill_price! Using position avg_price: ${avg_price:,.2f}")
+                else:
+                    logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
 
-                    # Calculate P&L: (exit - entry) * size * tick_value
-                    # Get instrument-specific tick economics (FAIL FAST - no silent defaults)
-                    symbol = self._extract_symbol_from_contract(contract_id)
-                    try:
-                        tick_info, tick_value, tick_size = get_tick_economics_and_values(symbol)
-                        logger.debug(f"Using tick economics for {symbol}: size={tick_size}, value=${tick_value}")
-                    except (UnitsError, MappingError) as e:
-                        logger.error(f"❌ Failed to get tick economics for {symbol}: {e}")
-                        logger.error(f"   Contract: {contract_id}")
-                        logger.error(f"   Cannot calculate P&L without tick economics!")
-                        raise
+                # Calculate realized P&L using consolidated calculator
+                realized_pnl_decimal = self.pnl_calculator.calculate_realized_pnl(contract_id, exit_price)
 
-                    if side == 'long':
-                        # Long: profit when price goes up
-                        price_diff = exit_price - entry_price
-                    else:
-                        # Short: profit when price goes down
-                        price_diff = entry_price - exit_price
+                if realized_pnl_decimal is not None:
+                    realized_pnl = float(realized_pnl_decimal)
 
-                    # Convert price difference to ticks
-                    ticks = price_diff / tick_size
-                    realized_pnl = ticks * tick_value * abs(entry_size)
-
-                    logger.info(f"💰 Calculated P&L:")
-                    logger.info(f"   Entry: ${entry_price:,.2f} @ {entry_size} ({side})")
-                    logger.info(f"   Exit: ${exit_price:,.2f}")
-                    logger.info(f"   Price diff: {price_diff:+.2f} = {ticks:+.1f} ticks")
-                    logger.info(f"   Realized P&L: ${realized_pnl:+,.2f}")
-
-                    # Remove from tracking
-                    del self._open_positions[contract_id]
+                    # Log P&L details
+                    logger.info(f"💰 Realized P&L: ${realized_pnl:+,.2f}")
+                    logger.debug(f"   Exit price: ${exit_price:,.2f}")
 
                     # Remove from unrealized P&L calculator
                     self.pnl_calculator.remove_position(contract_id)
                 else:
-                    logger.warning(f"⚠️  Position closed but not in tracking! Can't calculate P&L for {contract_id}")
+                    logger.warning(f"⚠️  Position closed but not tracked! Can't calculate P&L for {contract_id}")
 
-            # Track OPENED positions for P&L calculation
+            # Track OPENED positions for P&L calculation (consolidated in UnrealizedPnLCalculator)
             elif action_name == "OPENED":
                 side = 'long' if size > 0 else 'short'
-                self._open_positions[contract_id] = {
-                    'entry_price': avg_price,
-                    'size': size,
-                    'side': side,
-                }
-                logger.debug(f"📝 Tracking position: {contract_id} @ ${avg_price:,.2f} x {size} ({side})")
 
-                # Add to unrealized P&L calculator
+                # Track position in consolidated calculator (handles both unrealized and realized P&L)
                 self.pnl_calculator.update_position(contract_id, {
                     'price': avg_price,
                     'size': size,
                     'side': side,
                     'symbol': symbol,
                 })
+                logger.debug(f"📝 Position tracked in calculator: {contract_id} @ ${avg_price:,.2f} x {size} ({side})")
 
                 # IMMEDIATE: Try to get current price and seed the calculator
                 # This gives us an initial P&L even if polling hasn't started yet

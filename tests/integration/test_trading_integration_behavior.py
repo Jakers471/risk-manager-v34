@@ -489,8 +489,9 @@ class TestInitialization:
         assert isinstance(trading_integration._event_cache, dict)
         assert len(trading_integration._event_cache) == 0
 
-        assert isinstance(trading_integration._open_positions, dict)
-        assert len(trading_integration._open_positions) == 0
+        # Position tracking is now consolidated in pnl_calculator
+        assert trading_integration.pnl_calculator.get_position_count() == 0
+        assert isinstance(trading_integration.pnl_calculator.get_open_positions(), dict)
 
 
 # ============================================================================
