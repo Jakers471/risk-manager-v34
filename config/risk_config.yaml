@@ -82,6 +82,8 @@ rules:
   trade_frequency_limit:
     enabled: true
     limits:
+
+    
       per_minute: 3                # Max 3 trades per minute
       per_hour: 10                 # Max 10 trades per hour
       per_session: 50              # Max 50 trades per session

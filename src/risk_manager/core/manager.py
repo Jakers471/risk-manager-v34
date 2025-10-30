@@ -24,8 +24,9 @@ class RiskManager:
     Coordinates all components and provides a clean API.
     """
 
-    def __init__(self, config: RiskConfig):
+    def __init__(self, config: RiskConfig, timers_config=None):
         self.config = config
+        self.timers_config = timers_config  # Will be loaded if None
         self.event_bus = EventBus()
 
         # Component references (will be initialized)
@@ -103,11 +104,17 @@ class RiskManager:
             ... )
         """
         # Load config
+        timers_config = None
         if config is None:
             if config_file:
                 config_path = Path(config_file)
                 loader = ConfigLoader(config_dir=config_path.parent if config_path.parent != Path('.') else Path('config'))
                 config = loader.load_risk_config(file_name=config_path.name)
+                # Also load timers_config
+                try:
+                    timers_config = loader.load_timers_config()
+                except Exception as e:
+                    logger.warning(f"Could not load timers_config.yaml: {e}")
             else:
                 # For tests without config file, this won't work with nested structure
                 # Tests should provide a config object directly
@@ -120,7 +127,7 @@ class RiskManager:
                     setattr(config, key, value)
 
         # Create instance
-        manager = cls(config)
+        manager = cls(config, timers_config=timers_config)
 
         # Checkpoint 2: Config loaded
         sdk_logger.info(f"✅ Config loaded: {len(rules) if rules else 0} custom rules, monitoring {len(instruments) if instruments else 0} instruments")
@@ -174,6 +181,39 @@ class RiskManager:
         except ImportError:
             logger.warning("AI integration not available (anthropic package not installed)")
 
+    def _parse_duration(self, duration_str: str) -> int:
+        """
+        Parse duration string to seconds.
+
+        Args:
+            duration_str: Duration string (e.g., "60s", "15m", "1h", "until_reset")
+
+        Returns:
+            Duration in seconds (0 for special values like "until_reset")
+        """
+        if duration_str in ["until_reset", "until_session_start", "permanent"]:
+            return 0  # Special values handled by lockout manager
+
+        # Parse format: \d+[smh]
+        import re
+        match = re.match(r"^(\d+)([smh])$", duration_str)
+        if not match:
+            logger.warning(f"Invalid duration format: {duration_str}, using 0")
+            return 0
+
+        value, unit = match.groups()
+        value = int(value)
+
+        if unit == "s":
+            return value
+        elif unit == "m":
+            return value * 60
+        elif unit == "h":
+            return value * 3600
+        else:
+            logger.warning(f"Unknown duration unit: {unit}, using 0")
+            return 0
+
     async def _add_default_rules(self) -> None:
         """Add default risk rules based on configuration.
 
@@ -211,20 +251,206 @@ class RiskManager:
         lockout_manager = LockoutManager(database=db, timer_manager=timer_manager)
 
         rules_loaded = 0
+        enabled_count = 0
 
-        # NOTE: Rule loading from config is simplified - only rules with direct config mappings
-        # Rules requiring tick economics data (DailyUnrealizedLossRule, MaxUnrealizedProfitRule,
-        # TradeManagementRule) are skipped here and should be added manually with proper tick data.
+        # Count enabled rules to show stats at the end
+        if self.config.rules.daily_realized_loss.enabled:
+            enabled_count += 1
+        if self.config.rules.daily_realized_profit.enabled:
+            enabled_count += 1
+        if self.config.rules.max_contracts_per_instrument.enabled:
+            enabled_count += 1
+        if self.config.rules.no_stop_loss_grace.enabled:
+            enabled_count += 1
+        if self.config.rules.symbol_blocks.enabled:
+            enabled_count += 1
+        if self.config.rules.trade_frequency_limit.enabled:
+            enabled_count += 1
+        if self.config.rules.cooldown_after_loss.enabled:
+            enabled_count += 1
+        if self.config.rules.session_block_outside.enabled:
+            enabled_count += 1
+        if self.config.rules.auth_loss_guard.enabled:
+            enabled_count += 1
+        # These require tick data (count but skip):
+        if self.config.rules.daily_unrealized_loss.enabled:
+            enabled_count += 1
+        if self.config.rules.max_unrealized_profit.enabled:
+            enabled_count += 1
+        if self.config.rules.trade_management.enabled:
+            enabled_count += 1
 
-        # For production use, add rules manually in run_dev.py or via the create() API
+        # RULE-003: Daily Realized Loss
+        if self.config.rules.daily_realized_loss.enabled:
+            rule = DailyRealizedLossRule(
+                limit=self.config.rules.daily_realized_loss.limit,
+                pnl_tracker=pnl_tracker,
+                lockout_manager=lockout_manager,
+                action="flatten",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: DailyRealizedLossRule (limit=${rule.limit})")
 
-        logger.warning("⚠️ Rule loading from config is not yet fully implemented")
-        logger.warning("   Rules requiring tick economics data are skipped")
-        logger.warning("   Add rules manually via manager.add_rule() with proper parameters")
+        # RULE-013: Daily Realized Profit
+        if self.config.rules.daily_realized_profit.enabled:
+            rule = DailyRealizedProfitRule(
+                target=self.config.rules.daily_realized_profit.target,
+                pnl_tracker=pnl_tracker,
+                lockout_manager=lockout_manager,
+                action="flatten",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: DailyRealizedProfitRule (target=${rule.target})")
+
+        # RULE-002: Max Contracts Per Instrument
+        if self.config.rules.max_contracts_per_instrument.enabled:
+            # Build limits dict from config
+            limits = self.config.rules.max_contracts_per_instrument.instrument_limits.copy()
+
+            # If no per-instrument overrides, use default_limit for known instruments
+            if not limits:
+                for symbol in self.config.general.instruments:
+                    limits[symbol] = self.config.rules.max_contracts_per_instrument.default_limit
+
+            rule = MaxContractsPerInstrumentRule(
+                limits=limits,
+                enforcement="reduce_to_limit" if self.config.rules.max_contracts_per_instrument.close_position else "close_all",
+                unknown_symbol_action=f"allow_with_limit:{self.config.rules.max_contracts_per_instrument.default_limit}",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: MaxContractsPerInstrumentRule ({len(limits)} symbols)")
+
+        # RULE-008: No Stop Loss Grace
+        if self.config.rules.no_stop_loss_grace.enabled:
+            rule = NoStopLossGraceRule(
+                grace_period_seconds=self.config.rules.no_stop_loss_grace.grace_period_seconds,
+                enforcement="close_position",
+                timer_manager=timer_manager,
+                enabled=True,
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: NoStopLossGraceRule (grace={rule.grace_period_seconds}s)")
+
+        # RULE-011: Symbol Blocks
+        if self.config.rules.symbol_blocks.enabled:
+            rule = SymbolBlocksRule(
+                blocked_symbols=self.config.rules.symbol_blocks.blocked_symbols,
+                action="close" if self.config.rules.symbol_blocks.close_position else "reject",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: SymbolBlocksRule ({len(rule.blocked_symbols)} blocked)")
+
+        # RULE-006: Trade Frequency Limit
+        if self.config.rules.trade_frequency_limit.enabled and self.timers_config:
+            limits = {
+                "per_minute": self.config.rules.trade_frequency_limit.limits.per_minute,
+                "per_hour": self.config.rules.trade_frequency_limit.limits.per_hour,
+                "per_session": self.config.rules.trade_frequency_limit.limits.per_session,
+            }
+
+            # Parse cooldown durations from timers_config
+            cooldown_on_breach = {
+                "per_minute_breach": self._parse_duration(
+                    self.timers_config.lockout_durations.timer_cooldown.trade_frequency.per_minute_breach
+                ),
+                "per_hour_breach": self._parse_duration(
+                    self.timers_config.lockout_durations.timer_cooldown.trade_frequency.per_hour_breach
+                ),
+                "per_session_breach": self._parse_duration(
+                    self.timers_config.lockout_durations.timer_cooldown.trade_frequency.per_session_breach
+                ),
+            }
+
+            rule = TradeFrequencyLimitRule(
+                limits=limits,
+                cooldown_on_breach=cooldown_on_breach,
+                timer_manager=timer_manager,
+                db=db,
+                action="cooldown",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: TradeFrequencyLimitRule (limits={limits})")
+        elif self.config.rules.trade_frequency_limit.enabled and not self.timers_config:
+            logger.warning("⚠️ TradeFrequencyLimitRule requires timers_config.yaml (skipped)")
+
+        # RULE-007: Cooldown After Loss
+        if self.config.rules.cooldown_after_loss.enabled and self.timers_config:
+            # Parse cooldown duration from timers_config
+            cooldown_seconds = self._parse_duration(
+                self.timers_config.lockout_durations.timer_cooldown.cooldown_after_loss
+            )
+
+            loss_thresholds = [
+                {
+                    "loss_amount": self.config.rules.cooldown_after_loss.loss_threshold,
+                    "cooldown_duration": cooldown_seconds,
+                }
+            ]
+
+            rule = CooldownAfterLossRule(
+                loss_thresholds=loss_thresholds,
+                timer_manager=timer_manager,
+                pnl_tracker=pnl_tracker,
+                lockout_manager=lockout_manager,
+                action="flatten",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: CooldownAfterLossRule (threshold=${self.config.rules.cooldown_after_loss.loss_threshold})")
+        elif self.config.rules.cooldown_after_loss.enabled and not self.timers_config:
+            logger.warning("⚠️ CooldownAfterLossRule requires timers_config.yaml (skipped)")
+
+        # RULE-009: Session Block Outside
+        if self.config.rules.session_block_outside.enabled and self.timers_config:
+            # Build config dict from timers_config.session_hours
+            session_config = {
+                "enabled": self.timers_config.session_hours.enabled,
+                "start": self.timers_config.session_hours.start,
+                "end": self.timers_config.session_hours.end,
+                "timezone": self.timers_config.session_hours.timezone,
+                "allowed_days": self.timers_config.session_hours.allowed_days,
+            }
+
+            rule = SessionBlockOutsideRule(
+                config=session_config,
+                lockout_manager=lockout_manager,
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: SessionBlockOutsideRule (session={session_config['start']}-{session_config['end']})")
+        elif self.config.rules.session_block_outside.enabled and not self.timers_config:
+            logger.warning("⚠️ SessionBlockOutsideRule requires timers_config.yaml (skipped)")
+
+        # RULE-010: Auth Loss Guard
+        if self.config.rules.auth_loss_guard.enabled:
+            rule = AuthLossGuardRule(
+                alert_on_disconnect=True,
+                alert_on_auth_failure=True,
+                log_level="WARNING",
+            )
+            self.add_rule(rule)
+            rules_loaded += 1
+            logger.info(f"✅ Loaded: AuthLossGuardRule")
+
+        # Rules that require tick economics data are skipped
+        skipped_count = enabled_count - rules_loaded
+
+        if skipped_count > 0:
+            logger.warning(f"⚠️ {skipped_count} rules skipped (require tick economics data)")
+            logger.warning("   Rules DailyUnrealizedLoss, MaxUnrealizedProfit, TradeManagement need tick_value")
+            logger.warning("   Add these manually with tick data or implement tick economics integration")
+        else:
+            logger.success(f"🎉 All {rules_loaded} enabled rules loaded successfully!")
 
         # Checkpoint 4: Rules initialized
         sdk_logger.info(f"✅ Rules initialized: {rules_loaded} rules loaded from configuration")
-        logger.info(f"Loaded {rules_loaded} enabled rules")
+        logger.info(f"Loaded {rules_loaded}/{enabled_count} enabled rules")
 
     async def start(self) -> None:
         """Start the risk manager."""
