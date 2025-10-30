@@ -82,6 +82,7 @@ class RiskManager:
         rules: dict[str, Any] | None = None,
         config: RiskConfig | None = None,
         config_file: str | Path | None = None,
+        timers_config=None,  # Optional TimersConfig
         enable_ai: bool = False,
     ) -> "RiskManager":
         """
@@ -104,17 +105,18 @@ class RiskManager:
             ... )
         """
         # Load config
-        timers_config = None
+        loaded_timers_config = timers_config  # Use parameter if provided
         if config is None:
             if config_file:
                 config_path = Path(config_file)
                 loader = ConfigLoader(config_dir=config_path.parent if config_path.parent != Path('.') else Path('config'))
                 config = loader.load_risk_config(file_name=config_path.name)
-                # Also load timers_config
-                try:
-                    timers_config = loader.load_timers_config()
-                except Exception as e:
-                    logger.warning(f"Could not load timers_config.yaml: {e}")
+                # Also load timers_config if not provided
+                if loaded_timers_config is None:
+                    try:
+                        loaded_timers_config = loader.load_timers_config()
+                    except Exception as e:
+                        logger.warning(f"Could not load timers_config.yaml: {e}")
             else:
                 # For tests without config file, this won't work with nested structure
                 # Tests should provide a config object directly
@@ -127,7 +129,7 @@ class RiskManager:
                     setattr(config, key, value)
 
         # Create instance
-        manager = cls(config, timers_config=timers_config)
+        manager = cls(config, timers_config=loaded_timers_config)
 
         # Checkpoint 2: Config loaded
         sdk_logger.info(f"✅ Config loaded: {len(rules) if rules else 0} custom rules, monitoring {len(instruments) if instruments else 0} instruments")

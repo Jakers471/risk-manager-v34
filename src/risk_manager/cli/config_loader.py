@@ -59,7 +59,8 @@ class RuntimeConfig:
         selected_account_id: str,
         config_dir: Path,
         risk_config_path: Path,
-        accounts_config_path: Path
+        accounts_config_path: Path,
+        timers_config=None  # Optional timers config
     ):
         """Initialize runtime configuration."""
         self.risk_config = risk_config
@@ -69,6 +70,7 @@ class RuntimeConfig:
         self.config_dir = config_dir
         self.risk_config_path = risk_config_path
         self.accounts_config_path = accounts_config_path
+        self.timers_config = timers_config
 
     def __repr__(self) -> str:
         """String representation for logging."""
@@ -179,6 +181,25 @@ def load_runtime_config(
 
     console.print()
 
+    # 2b. Load timers configuration (optional)
+    console.print("[bold]2b. Loading timers configuration[/bold]")
+    timers_config = None
+    timers_config_path = config_dir / "timers_config.yaml"
+
+    if timers_config_path.exists():
+        console.print(f"   File: {timers_config_path.absolute()}")
+        try:
+            timers_config = loader.load_timers_config()
+            console.print(f"   OK: Timers configuration loaded")
+            console.print(f"   OK: Daily reset: {timers_config.daily_reset.time} {timers_config.daily_reset.timezone}")
+        except Exception as e:
+            console.print(f"[yellow]   WARN: Timers configuration loading failed: {e}[/yellow]")
+            console.print(f"[yellow]   Timer-based rules will be skipped[/yellow]")
+    else:
+        console.print(f"   SKIP: timers_config.yaml not found (timer-based rules will be skipped)")
+
+    console.print()
+
     # 3. Load accounts configuration
     console.print("[bold]3. Loading accounts configuration[/bold]")
     console.print(f"   File: {accounts_config_path.absolute()}")
@@ -234,7 +255,8 @@ def load_runtime_config(
         selected_account_id=selected_account_id,
         config_dir=config_dir,
         risk_config_path=risk_config_path,
-        accounts_config_path=accounts_config_path
+        accounts_config_path=accounts_config_path,
+        timers_config=timers_config
     )
 
 

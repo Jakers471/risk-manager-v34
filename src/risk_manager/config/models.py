@@ -118,30 +118,20 @@ class HardLockoutConfig(BaseModel):
 
     daily_realized_loss: str = Field(
         default="until_reset",
-        description="RULE-003: Daily Realized Loss lockout. Options: 'until_reset', '24h', 'permanent'",
+        description="RULE-003: Daily Realized Loss lockout. Options: 'until_reset', '24h', 'until_session_start'",
     )
     daily_realized_profit: str = Field(
         default="until_reset",
-        description="RULE-013: Daily Realized Profit lockout. Options: 'until_reset', '24h', 'permanent'",
+        description="RULE-013: Daily Realized Profit lockout. Options: 'until_reset', '24h', 'until_session_start'",
     )
     session_block_outside: str = Field(
         default="until_session_start",
-        description="RULE-009: Session Block Outside lockout. Options: 'until_session_start', '1h', 'permanent'",
+        description="RULE-009: Session Block Outside lockout. Options: 'until_session_start', '1h', 'until_reset'",
     )
     auth_loss_guard: str = Field(
-        default="permanent",
-        description="RULE-010: Auth Loss Guard lockout. Must be 'permanent' (requires admin unlock)",
+        default="until_reset",
+        description="RULE-010: Auth Loss Guard lockout. Options: 'until_reset', '24h', 'until_session_start'",
     )
-
-    @field_validator("auth_loss_guard")
-    @classmethod
-    def validate_auth_loss_guard_permanent(cls, v: str) -> str:
-        """Auth Loss Guard must be permanent (cannot be time-based)."""
-        if v != "permanent":
-            raise ValueError(
-                "auth_loss_guard lockout must be 'permanent' (requires admin unlock)"
-            )
-        return v
 
 
 class LockoutDurationsConfig(BaseModel):

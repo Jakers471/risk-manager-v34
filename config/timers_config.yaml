@@ -1,0 +1,162 @@
+# ==============================================================================
+# TIMERS CONFIGURATION
+# ==============================================================================
+# Purpose: Control daily resets, lockout durations, and trading hours
+# File: config/timers_config.yaml
+# ==============================================================================
+
+# ==============================================================================
+# DAILY RESET CONFIGURATION
+# ==============================================================================
+# When to reset daily P&L counters and unlock daily limit violations
+# Affects: RULE-003 (Daily Realized Loss), RULE-013 (Daily Realized Profit)
+# ==============================================================================
+daily_reset:
+  # Reset time (24-hour format HH:MM)
+  time: "17:00"                    # 5:00 PM Central Time (CME futures close)
+
+  # Timezone (IANA timezone string)
+  timezone: "America/Chicago"      # Central Time (align with futures market)
+
+  # Enable/disable daily reset
+  enabled: true                    # Auto-reset daily counters at 5 PM CT
+
+# ==============================================================================
+# LOCKOUT DURATION CONFIGURATION
+# ==============================================================================
+# How long traders are locked out after violating each rule category
+# ==============================================================================
+lockout_durations:
+
+  # --------------------------------------------------------------------------
+  # Hard Lockout Rules (RULE-003, RULE-013, RULE-009, RULE-010)
+  # --------------------------------------------------------------------------
+  # Characteristic: Close all positions, lock until schedule event
+  # --------------------------------------------------------------------------
+  hard_lockout:
+    # RULE-003: Daily Realized Loss
+    # Locks until daily reset time (5:00 PM CT)
+    daily_realized_loss: "until_reset"
+
+    # RULE-013: Daily Realized Profit
+    # Locks until daily reset time (5:00 PM CT)
+    daily_realized_profit: "until_reset"
+
+    # RULE-009: Session Block Outside Hours
+    # Locks until next session start time (8:30 AM CT)
+    session_block_outside: "until_session_start"
+
+    # RULE-010: Auth Loss Guard (API canTrade=false)
+    # Locks until daily reset time (5:00 PM CT)
+    # Note: If API canTrade remains false, will re-lock immediately
+    auth_loss_guard: "until_reset"
+
+  # --------------------------------------------------------------------------
+  # Timer/Cooldown Rules (RULE-006, RULE-007)
+  # --------------------------------------------------------------------------
+  # Characteristic: Temporary lockout, auto-unlock after duration
+  # --------------------------------------------------------------------------
+  timer_cooldown:
+    # RULE-006: Trade Frequency Limit
+    # Different lockout durations for each breach type
+    trade_frequency:
+      per_minute_breach: "60s"     # 1 minute cooldown (trade too fast)
+      per_hour_breach: "30m"       # 30 minute cooldown (too many trades in hour)
+      per_session_breach: "1h"     # 1 hour cooldown (too many trades in session)
+
+    # RULE-007: Cooldown After Loss
+    # Lock trader for 15 minutes after hitting loss threshold
+    cooldown_after_loss: "15m"     # 15 minute cooldown (emotional control)
+
+# ==============================================================================
+# SESSION HOURS CONFIGURATION
+# ==============================================================================
+# When trading is allowed (RULE-009: Session Block Outside)
+# ==============================================================================
+session_hours:
+  # Trading session hours (24-hour format HH:MM)
+  start: "08:30"                   # Session starts at 8:30 AM CT
+  end: "15:00"                     # Session ends at 3:00 PM CT (before CME close)
+
+  # Timezone (IANA timezone string)
+  timezone: "America/Chicago"      # Central Time (align with futures market)
+
+  # Enable/disable session restrictions
+  enabled: true                    # Enforce trading hours
+
+  # Allowed trading days (0=Monday, 1=Tuesday, ..., 6=Sunday)
+  # Note: Currently not enforced by SessionBlockOutsideRule, but reserved for future
+  allowed_days:                    # Monday through Friday only
+    - 0  # Monday
+    - 1  # Tuesday
+    - 2  # Wednesday
+    - 3  # Thursday
+    - 4  # Friday
+
+# ==============================================================================
+# HOLIDAY CONFIGURATION
+# ==============================================================================
+# Market holidays when trading is blocked (RULE-009: respect_holidays: true)
+# ==============================================================================
+holidays:
+  # Enable/disable holiday checks
+  enabled: true                    # Block trading on market holidays
+
+  # Holiday dates by year (YYYY-MM-DD format)
+  dates:
+    # 2025 US Market Holidays
+    2025:
+      - "2025-01-01"               # New Year's Day
+      - "2025-01-20"               # Martin Luther King Jr. Day
+      - "2025-02-17"               # Presidents' Day
+      - "2025-04-18"               # Good Friday
+      - "2025-05-26"               # Memorial Day
+      - "2025-07-04"               # Independence Day
+      - "2025-09-01"               # Labor Day
+      - "2025-11-27"               # Thanksgiving
+      - "2025-12-25"               # Christmas
+
+    # 2026 US Market Holidays
+    2026:
+      - "2026-01-01"               # New Year's Day
+      - "2026-01-19"               # Martin Luther King Jr. Day
+      - "2026-02-16"               # Presidents' Day
+      - "2026-04-03"               # Good Friday
+      - "2026-05-25"               # Memorial Day
+      - "2026-07-03"               # Independence Day (observed Friday)
+      - "2026-09-07"               # Labor Day
+      - "2026-11-26"               # Thanksgiving
+      - "2026-12-25"               # Christmas
+
+  # Early close days (e.g., day before Thanksgiving)
+  early_close: []                  # Optional: Add early close days if needed
+    # Example format:
+    # - date: "2025-11-26"
+    #   close_time: "13:00"
+
+# ==============================================================================
+# ADVANCED TIMER SETTINGS
+# ==============================================================================
+# Fine-tune timer behavior (optional)
+# ==============================================================================
+advanced:
+  # How often to check time-based conditions (seconds)
+  check_interval: 10               # Check every 10 seconds
+
+  # Grace period before session close enforcement (seconds)
+  session_close_grace: 60          # 1 minute grace before hard position close
+
+  # Auto-unlock behavior
+  auto_unlock:
+    enabled: true                  # Automatically unlock at reset/session start
+    check_interval: 30             # Check for expired lockouts every 30 seconds
+
+# ==============================================================================
+# NOTES
+# ==============================================================================
+# - All lockouts are schedule-based (no manual unlock required)
+# - Daily reset at 5:00 PM CT unlocks RULE-003, RULE-013, RULE-010
+# - Session start at 8:30 AM CT unlocks RULE-009
+# - Timer cooldowns (RULE-006, RULE-007) auto-unlock after duration expires
+# - Timezone is America/Chicago to align with CME futures market hours
+# ==============================================================================

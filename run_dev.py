@@ -178,7 +178,10 @@ async def main():
         from risk_manager.core.manager import RiskManager
 
         # Create RiskManager with loaded config
-        risk_manager = await RiskManager.create(config=runtime_config.risk_config)
+        risk_manager = await RiskManager.create(
+            config=runtime_config.risk_config,
+            timers_config=runtime_config.timers_config
+        )
 
         console.print("[green]Risk Manager initialized![/green]")
 
