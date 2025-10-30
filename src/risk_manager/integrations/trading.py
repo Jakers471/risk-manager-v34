@@ -92,7 +92,7 @@ class TradingIntegration:
         self._known_orders: set[int] = set()  # Track order IDs we've already logged
 
         # Recent order fills tracking (for correlating position updates with stop losses)
-        # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str}}
+        # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str, "order_id": int, "fill_price": float}}
         self._recent_fills: dict[str, dict[str, Any]] = {}
         self._recent_fills_ttl = 2.0  # seconds - window to correlate fills with position updates
 
@@ -103,6 +103,10 @@ class TradingIntegration:
 
         # Active take profit cache (tracks WORKING limit orders before they fill)
         self._active_take_profits: dict[str, dict[str, Any]] = {}
+
+        # Open positions tracking for P&L calculation
+        # Format: {contract_id: {"entry_price": float, "size": int, "side": "long"|"short"}}
+        self._open_positions: dict[str, dict[str, Any]] = {}
 
         logger.info(f"Trading integration initialized for: {instruments}")
 
@@ -880,6 +884,7 @@ class TradingIntegration:
                 "timestamp": time.time(),
                 "side": self._get_side_name(order.side),
                 "order_id": order.id,
+                "fill_price": order.filledPrice,  # Store exit price for P&L calculation
             }
             logger.debug(f"Recorded {fill_type} fill | _is_stop_loss={is_sl}, _is_take_profit={is_tp}")
 
@@ -1234,6 +1239,20 @@ class TradingIntegration:
                     entry_size = tracked['size']
                     side = tracked['side']  # 'long' or 'short'
 
+                    # Get exit price from recent fill, not from position event!
+                    # POSITION_CLOSED gives us avg_price (entry), not exit price
+                    # The actual exit price comes from the ORDER_FILLED event
+                    exit_price = avg_price  # Fallback
+                    if contract_id in self._recent_fills:
+                        fill_data = self._recent_fills[contract_id]
+                        if fill_data.get('fill_price'):
+                            exit_price = fill_data['fill_price']
+                            logger.debug(f"Using exit price from recent fill: ${exit_price:,.2f}")
+                        else:
+                            logger.warning(f"Recent fill found but no fill_price! Using position avg_price: ${avg_price:,.2f}")
+                    else:
+                        logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
+
                     # Calculate P&L: (exit - entry) * size * tick_value
                     # MNQ tick value: $5 per contract per tick (0.25 points)
                     tick_value = 5.0  # TODO: Make this configurable per symbol
@@ -1241,10 +1260,10 @@ class TradingIntegration:
 
                     if side == 'long':
                         # Long: profit when price goes up
-                        price_diff = avg_price - entry_price
+                        price_diff = exit_price - entry_price
                     else:
                         # Short: profit when price goes down
-                        price_diff = entry_price - avg_price
+                        price_diff = entry_price - exit_price
 
                     # Convert price difference to ticks
                     ticks = price_diff / tick_size
@@ -1252,7 +1271,7 @@ class TradingIntegration:
 
                     logger.info(f"💰 Calculated P&L:")
                     logger.info(f"   Entry: ${entry_price:,.2f} @ {entry_size} ({side})")
-                    logger.info(f"   Exit: ${avg_price:,.2f}")
+                    logger.info(f"   Exit: ${exit_price:,.2f}")
                     logger.info(f"   Price diff: {price_diff:+.2f} = {ticks:+.1f} ticks")
                     logger.info(f"   Realized P&L: ${realized_pnl:+,.2f}")
 
