@@ -307,7 +307,14 @@ class RiskManager:
         # RULE-002: Max Contracts Per Instrument
         if self.config.rules.max_contracts_per_instrument.enabled:
             # Build limits dict from config
-            limits = self.config.rules.max_contracts_per_instrument.instrument_limits.copy()
+            instrument_limits = self.config.rules.max_contracts_per_instrument.instrument_limits
+
+            # Defensive: ensure it's a dict (config validation should ensure this, but be safe)
+            if not isinstance(instrument_limits, dict):
+                logger.warning(f"instrument_limits is not a dict (got {type(instrument_limits)}), using empty dict")
+                instrument_limits = {}
+
+            limits = instrument_limits.copy()
 
             # If no per-instrument overrides, use default_limit for known instruments
             if not limits:
@@ -316,7 +323,7 @@ class RiskManager:
 
             rule = MaxContractsPerInstrumentRule(
                 limits=limits,
-                enforcement="reduce_to_limit" if self.config.rules.max_contracts_per_instrument.close_position else "close_all",
+                enforcement="close_all" if self.config.rules.max_contracts_per_instrument.close_all else "reduce_to_limit",
                 unknown_symbol_action=f"allow_with_limit:{self.config.rules.max_contracts_per_instrument.default_limit}",
             )
             self.add_rule(rule)
