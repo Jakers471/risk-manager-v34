@@ -1,5 +1,20 @@
 # Risk Manager V34 - Project Status
 
+> **⚠️ IMPORTANT: This document is outdated (2025-10-29)**
+>
+> **📄 For current status, see**: [`PROJECT_STATUS_2025-10-30.md`](../../PROJECT_STATUS_2025-10-30.md)
+>
+> **Key Updates**:
+> - ✅ Tick value fix completed (2025-10-30)
+> - ❌ Only 4/9 enabled rules loading (missing config + instantiation code)
+> - 🎯 85% complete, 3-4 hours to production-ready
+>
+> The document below reflects the state as of 2025-10-29 evening.
+
+---
+
+# Risk Manager V34 - Project Status (ARCHIVED 2025-10-29)
+
 **Last Updated**: 2025-10-29 Evening (P&L Calculation + Protective Orders Fixed)
 **Current Phase**: PRODUCTION READY 🎉 | P&L TRACKING WORKING ✅ | PROTECTIVE ORDERS WORKING ✅ | DIAGNOSTICS ADDED ✅
 **Test Status**: **1,334 tests passing** | **62 skipped** | **0 failures**
