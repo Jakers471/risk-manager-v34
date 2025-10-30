@@ -71,6 +71,7 @@ from risk_manager.integrations.tick_economics import (
 from risk_manager.integrations.unrealized_pnl import UnrealizedPnLCalculator
 from risk_manager.integrations.sdk.protective_orders import ProtectiveOrderCache
 from risk_manager.integrations.sdk.market_data import MarketDataHandler
+from risk_manager.integrations.sdk.order_polling import OrderPollingService
 
 
 class TradingIntegration:
@@ -101,9 +102,9 @@ class TradingIntegration:
         self._event_cache: dict[tuple[str, str], float] = {}
         self._event_cache_ttl = 5.0  # seconds
 
-        # Order polling task (to detect protective stops that don't emit events)
-        self._order_poll_task = None
-        self._known_orders: set[int] = set()  # Track order IDs we've already logged
+        # Order polling service (to detect protective stops that don't emit events)
+        # NEW: Delegated to OrderPollingService module
+        self._order_polling = OrderPollingService()
 
         # Recent order fills tracking (for correlating position updates with stop losses)
         # Format: {contract_id: {"type": "stop_loss"|"take_profit"|"manual", "timestamp": float, "side": str, "order_id": int, "fill_price": float}}
@@ -375,6 +376,15 @@ class TradingIntegration:
             self._market_data.set_suite(self.suite)
             logger.debug("Wired MarketDataHandler to SDK client and suite")
 
+            # Wire up order polling service with SDK access
+            self._order_polling.set_suite(self.suite)
+            self._order_polling.set_protective_cache(self._protective_cache)
+            self._order_polling.set_helpers(
+                self._extract_symbol_from_contract,
+                self._get_side_name
+            )
+            logger.debug("Wired OrderPollingService to SDK suite and protective cache")
+
         except Exception as e:
             logger.error(f"Failed to connect to trading platform: {e}")
             raise
@@ -386,13 +396,9 @@ class TradingIntegration:
         # Stop background tasks
         self.running = False
 
-        if self._order_poll_task:
-            self._order_poll_task.cancel()
-            try:
-                await self._order_poll_task
-            except asyncio.CancelledError:
-                pass
-            logger.debug("Order polling task stopped")
+        # Stop order polling (delegated to OrderPollingService)
+        await self._order_polling.stop_polling()
+        logger.debug("Order polling task stopped (OrderPollingService)")
 
         # Stop status bar (delegated to MarketDataHandler)
         await self._market_data.stop_status_bar()
@@ -529,9 +535,9 @@ class TradingIntegration:
             logger.success("✅ Trading monitoring started (14 event handlers registered)")
             logger.info("📡 Listening for events: ORDER (8 types), POSITION (3 types), MARKET DATA (4 types)")
 
-            # Start order polling task (to catch protective stops that don't emit events)
-            self._order_poll_task = asyncio.create_task(self._poll_orders())
-            logger.info("🔄 Started order polling task (5s interval)")
+            # Start order polling task (to catch protective stops that don't emit events) - Delegated to OrderPollingService
+            await self._order_polling.start_polling()
+            logger.info("🔄 Started order polling task (5s interval - OrderPollingService)")
 
             # Start status bar update task (for real-time P&L display) - Delegated to MarketDataHandler
             await self._market_data.start_status_bar()
@@ -541,69 +547,6 @@ class TradingIntegration:
         except Exception as e:
             logger.error(f"Failed to register realtime callbacks: {e}")
             raise
-
-    async def _poll_orders(self):
-        """
-        Poll for active orders periodically.
-
-        Some platforms don't emit events when protective stops are placed,
-        so we need to poll the order list to detect them.
-        """
-        logger.debug("Order polling task started")
-
-        while self.running:
-            try:
-                await asyncio.sleep(5)  # Poll every 5 seconds
-
-                if not self.suite:
-                    logger.debug("Suite not available yet")
-                    continue
-
-                # Get all working orders from all instruments
-                # Note: get_position_orders() requires contract_id, so we need to get positions first
-                orders = []
-                for symbol, instrument in self.suite.items():
-                    if not hasattr(instrument, 'positions') or not hasattr(instrument, 'orders'):
-                        continue
-
-                    # Get all positions for this instrument
-                    try:
-                        positions = await instrument.positions.get_all_positions()
-                        for position in positions:
-                            # Get orders for this position's contract (needs await)
-                            position_orders = await instrument.orders.get_position_orders(position.contractId)
-                            orders.extend(position_orders)
-                    except Exception as e:
-                        logger.debug(f"Error getting orders for {symbol}: {e}")
-                        continue
-
-                logger.debug(f"Polling found {len(orders)} working orders")
-
-                for order in orders:
-                    order_id = order.id
-
-                    # Skip if we've already seen this order
-                    if order_id in self._known_orders:
-                        continue
-
-                    # Mark as seen
-                    self._known_orders.add(order_id)
-
-                    # Log new orders at INFO level (concise)
-                    symbol = self._extract_symbol_from_contract(order.contractId)
-                    logger.info(f"🔍 NEW ORDER (polling): {symbol} {order.type_str} {self._get_side_name(order.side)} {order.size}")
-                    logger.debug(f"Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
-
-                    # Check if it's a protective order and cache it
-                    # Use cache module's update method
-                    self._protective_cache.update_from_order_placed(order)
-
-            except Exception as e:
-                logger.warning(f"Error polling orders: {e}")
-                import traceback
-                logger.debug(traceback.format_exc())
-
-        logger.debug("Order polling task stopped")
 
     # ============================================================================
     # SDK EventBus Callbacks (suite.on)
@@ -640,6 +583,9 @@ class TradingIntegration:
 
             # Cache active protective orders (delegated to cache module)
             self._protective_cache.update_from_order_placed(order)
+
+            # Mark order as seen by polling service (prevents duplicate logging)
+            self._order_polling.mark_order_seen(order.id)
 
             # Bridge to risk event bus
             risk_event = RiskEvent(
@@ -698,8 +644,8 @@ class TradingIntegration:
             # Order details at DEBUG level only
             logger.debug(f"Order ID: {order.id}, Type: {order.type} ({order.type_str}), Stop: {order.stopPrice}, Limit: {order.limitPrice}, Status: {order.status}")
 
-            # Remove from known orders (it's filled now)
-            self._known_orders.discard(order.id)
+            # Remove from known orders (it's filled now) - Delegated to OrderPollingService
+            self._order_polling.mark_order_unseen(order.id)
 
             # Track this fill for correlation with position updates
             is_sl = self._is_stop_loss(order)
@@ -797,8 +743,8 @@ class TradingIntegration:
 
             logger.info(f"❌ ORDER CANCELLED - {symbol} | ID: {order.id}")
 
-            # Remove from known orders (it's cancelled now)
-            self._known_orders.discard(order.id)
+            # Remove from known orders (it's cancelled now) - Delegated to OrderPollingService
+            self._order_polling.mark_order_unseen(order.id)
 
             # Remove from active caches (order is now cancelled)
             # Note: Cache removal is idempotent (safe to call even if not in cache)

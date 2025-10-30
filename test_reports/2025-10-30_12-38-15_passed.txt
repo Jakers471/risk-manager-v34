@@ -2,7 +2,7 @@
 Risk Manager V34 - Test Report
 ================================================================================
 Test Run: Test file: test_trading_integration_behavior.py
-Timestamp: 2025-10-30 13:03:42
+Timestamp: 2025-10-30 12:38:15
 Status: PASSED
 Exit Code: 0
 ================================================================================
@@ -53,7 +53,7 @@ tests/integration/test_trading_integration_behavior.py::TestBehaviorSummary::tes
     _warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-[33m======================== [32m30 passed[0m, [33m[1m1 warning[0m[33m in 1.16s[0m[33m =========================[0m
+[33m======================== [32m30 passed[0m, [33m[1m1 warning[0m[33m in 1.15s[0m[33m =========================[0m
 
 
 ================================================================================

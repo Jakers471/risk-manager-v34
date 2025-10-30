@@ -1,0 +1,136 @@
+[32m2025-10-30 12:37:30.044[0m | [1mINFO    [0m | [36mrisk_manager.integrations.trading[0m:[36m__init__[0m:[36m126[0m - [1mTrading integration initialized for: ['MNQ', 'ES'][0m
+[32m2025-10-30 12:37:30.044[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.sdk.protective_orders[0m:[36m_query_sdk_for_stop_loss[0m:[36m289[0m - [34m[1mSDK suite or helpers not available for query[0m
+[32m2025-10-30 12:37:30.045[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.sdk.protective_orders[0m:[36m_query_sdk_for_stop_loss[0m:[36m289[0m - [34m[1mSDK suite or helpers not available for query[0m
+[32m2025-10-30 12:37:30.045[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.trading[0m:[36m_is_duplicate_event[0m:[36m155[0m - [34m[1m\U0001f504 Duplicate test_event event for test_123 - skipping[0m
+[32m2025-10-30 12:37:30.045[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.trading[0m:[36m_is_duplicate_event[0m:[36m155[0m - [34m[1m\U0001f504 Duplicate test_event event for test_123 - skipping[0m
+[32m2025-10-30 12:37:30.045[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.trading[0m:[36m_extract_symbol_from_contract[0m:[36m292[0m - [34m[1mMapped contract CON.F.US.MNQ.Z25 \u2192 MNQ[0m
+[32m2025-10-30 12:37:30.045[0m | [34m[1mDEBUG   [0m | [36mrisk_manager.integrations.trading[0m:[36m_extract_symbol_from_contract[0m:[36m292[0m - [34m[1mMapped contract CON.F.US.ES.H25 \u2192 ES[0m
+
+================================================================================
+  REFACTORING VALIDATION - TradingIntegration
+================================================================================
+Timestamp: 604489.443459
+
+================================================================================
+  Test 1: Import Check
+================================================================================
+[PASS]: TradingIntegration can be imported
+
+================================================================================
+  Test 2: Initialization Check
+================================================================================
+[PASS]: TradingIntegration initialized successfully
+  -> Instruments: ['MNQ', 'ES']
+  -> Connected: False
+  -> Running: False
+
+================================================================================
+  Test 3: Public API Method Existence
+================================================================================
+[PASS]: Method exists: connect()
+[PASS]: Method exists: disconnect()
+[PASS]: Method exists: start()
+[PASS]: Method exists: get_stop_loss_for_position()
+[PASS]: Method exists: get_take_profit_for_position()
+[PASS]: Method exists: get_all_active_stop_losses()
+[PASS]: Method exists: get_all_active_take_profits()
+[PASS]: Method exists: flatten_position()
+[PASS]: Method exists: flatten_all()
+[PASS]: Method exists: get_total_unrealized_pnl()
+[PASS]: Method exists: get_position_unrealized_pnl()
+[PASS]: Method exists: get_open_positions()
+[PASS]: Method exists: get_stats()
+
+================================================================================
+  Test 4: Method Signature Validation
+================================================================================
+[PASS]: Method is async: connect()
+[PASS]: Method is async: disconnect()
+[PASS]: Method is async: start()
+[PASS]: Method is async: get_stop_loss_for_position()
+[PASS]: Method is async: get_take_profit_for_position()
+[PASS]: Method is async: flatten_position()
+[PASS]: Method is async: flatten_all()
+[PASS]: Method is sync: get_all_active_stop_losses()
+[PASS]: Method is sync: get_all_active_take_profits()
+[PASS]: Method is sync: get_total_unrealized_pnl()
+[PASS]: Method is sync: get_position_unrealized_pnl()
+[PASS]: Method is sync: get_open_positions()
+[PASS]: Method is sync: get_stats()
+
+================================================================================
+  Test 5: Stop Loss Caching Behavior
+================================================================================
+[PASS]: Cache empty initially (returns None)
+[PASS]: Cache returns stop loss data
+  -> Order ID: 12345
+  -> Stop Price: $21500.00
+  -> Side: SELL
+  -> Quantity: 1
+[PASS]: Cached data is correct
+[PASS]: Cache cleared after removal
+
+================================================================================
+  Test 6: Take Profit Caching Behavior
+================================================================================
+[PASS]: Take profit cache works
+  -> Order ID: 67890
+  -> TP Price: $21600.00
+
+================================================================================
+  Test 7: Deduplication Behavior
+================================================================================
+[PASS]: First event is NOT duplicate
+[PASS]: Second event IS duplicate
+[PASS]: Third event IS duplicate
+
+================================================================================
+  Test 8: Helper Methods
+================================================================================
+[PASS]: Symbol extraction: CON.F.US.MNQ.Z25 -> MNQ
+[PASS]: Symbol extraction: CON.F.US.ES.H25 -> ES
+[PASS]: Side conversion: 0 -> BUY
+[PASS]: Side conversion: 1 -> SELL
+[PASS]: Position type: 1 -> LONG
+[PASS]: Position type: 2 -> SHORT
+[PASS]: Position type: 0 -> FLAT
+
+================================================================================
+  Test 9: P&L Methods
+================================================================================
+[PASS]: get_total_unrealized_pnl() returns float
+  -> Total P&L: $0.00
+[PASS]: Unknown position returns None
+[PASS]: get_open_positions() returns dict
+  -> Open positions count: 0
+
+================================================================================
+  Test 10: Stats Method
+================================================================================
+[PASS]: get_stats() returns dict
+[PASS]: Stats has key: connected
+[PASS]: Stats has key: running
+[PASS]: Stats has key: instruments
+
+  Stats content:
+    connected: False
+    running: False
+    instruments: ['MNQ', 'ES']
+
+================================================================================
+  VALIDATION COMPLETE
+================================================================================
+
+[SUCCESS] ALL VALIDATION CHECKS PASSED!
+
+TradingIntegration behavior is consistent and correct.
+
+If this is the BASELINE run:
+  Save this output: python tests/validate_refactoring.py > baseline.txt
+
+After refactoring:
+  python tests/validate_refactoring.py > refactored.txt
+  diff baseline.txt refactored.txt
+
+If diff shows no changes, refactoring preserved behavior!
+================================================================================
