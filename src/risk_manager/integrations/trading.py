@@ -1223,16 +1223,53 @@ class TradingIntegration:
                 contract_id, avg_price, pos_type
             )
 
-            # Extract realized P&L for CLOSED positions
-            realized_pnl = data.get('profitAndLoss') if action_name == "CLOSED" else None
-
-            # DEBUG: Show what SDK data we have for CLOSED positions
+            # Calculate realized P&L for CLOSED positions
+            # SDK doesn't provide profitAndLoss, so we calculate it ourselves!
+            realized_pnl = None
             if action_name == "CLOSED":
-                logger.info(f"🔍 POSITION_CLOSED DEBUG:")
-                logger.info(f"   SDK data keys: {list(data.keys())}")
-                logger.info(f"   profitAndLoss from SDK: {data.get('profitAndLoss')}")
-                logger.info(f"   realized_pnl extracted: {realized_pnl}")
-                logger.info(f"   size: {size}, avg_price: {avg_price}")
+                # Check if we tracked this position when it opened
+                if contract_id in self._open_positions:
+                    tracked = self._open_positions[contract_id]
+                    entry_price = tracked['entry_price']
+                    entry_size = tracked['size']
+                    side = tracked['side']  # 'long' or 'short'
+
+                    # Calculate P&L: (exit - entry) * size * tick_value
+                    # MNQ tick value: $5 per contract per tick (0.25 points)
+                    tick_value = 5.0  # TODO: Make this configurable per symbol
+                    tick_size = 0.25
+
+                    if side == 'long':
+                        # Long: profit when price goes up
+                        price_diff = avg_price - entry_price
+                    else:
+                        # Short: profit when price goes down
+                        price_diff = entry_price - avg_price
+
+                    # Convert price difference to ticks
+                    ticks = price_diff / tick_size
+                    realized_pnl = ticks * tick_value * abs(entry_size)
+
+                    logger.info(f"💰 Calculated P&L:")
+                    logger.info(f"   Entry: ${entry_price:,.2f} @ {entry_size} ({side})")
+                    logger.info(f"   Exit: ${avg_price:,.2f}")
+                    logger.info(f"   Price diff: {price_diff:+.2f} = {ticks:+.1f} ticks")
+                    logger.info(f"   Realized P&L: ${realized_pnl:+,.2f}")
+
+                    # Remove from tracking
+                    del self._open_positions[contract_id]
+                else:
+                    logger.warning(f"⚠️  Position closed but not in tracking! Can't calculate P&L for {contract_id}")
+
+            # Track OPENED positions for P&L calculation
+            elif action_name == "OPENED":
+                side = 'long' if size > 0 else 'short'
+                self._open_positions[contract_id] = {
+                    'entry_price': avg_price,
+                    'size': size,
+                    'side': side,
+                }
+                logger.debug(f"📝 Tracking position: {contract_id} @ ${avg_price:,.2f} x {size} ({side})")
 
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
