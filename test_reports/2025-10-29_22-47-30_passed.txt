@@ -1,0 +1,37 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Test file: test_protective_order_detection.py
+Timestamp: 2025-10-29 22:47:30
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 6 items
+
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderDetection::test_cache_invalidation_on_order_modification [32mPASSED[0m[33m [ 16%][0m
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderDetection::test_short_position_take_profit_semantic_detection [32mPASSED[0m[33m [ 33%][0m
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderDetection::test_short_position_stop_loss_semantic_detection [32mPASSED[0m[33m [ 50%][0m
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderDetection::test_second_protective_order_detected_immediately [32mPASSED[0m[33m [ 66%][0m
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderDetection::test_full_protective_order_lifecycle_with_all_fixes [32mPASSED[0m[33m [ 83%][0m
+tests/integration/test_protective_order_detection.py::TestProtectiveOrderPerformance::test_cache_invalidation_doesnt_cause_excessive_queries [32mPASSED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m========================= [32m6 passed[0m, [33m[1m1 warning[0m[33m in 0.56s[0m[33m =========================[0m
+
+
+================================================================================
+End of Report
+================================================================================

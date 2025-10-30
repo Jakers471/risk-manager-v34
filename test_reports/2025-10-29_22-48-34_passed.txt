@@ -1,0 +1,43 @@
+================================================================================
+Risk Manager V34 - Test Report
+================================================================================
+Test Run: Test file: test_no_stop_loss_grace_integration.py
+Timestamp: 2025-10-29 22:48:34
+Status: PASSED
+Exit Code: 0
+================================================================================
+
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/jakers/Desktop/risk-manager-v34
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.2.0, cov-7.0.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 12 items
+
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_grace_period_timer_expires_and_closes_position [32mPASSED[0m[33m [  8%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_stop_loss_placed_cancels_timer_no_enforcement [32mPASSED[0m[33m [ 16%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_multiple_positions_independent_timers [32mPASSED[0m[33m [ 25%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_position_closed_before_grace_expires [32mPASSED[0m[33m [ 33%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_real_async_timer_callback_execution [32mPASSED[0m[33m [ 41%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_order_type_detection_only_stops_cancel_timer [32mPASSED[0m[33m [ 50%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_event_bus_integration_with_rule_events [32mPASSED[0m[33m [ 58%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_timer_recreated_after_manager_restart [32mPASSED[0m[33m [ 66%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_concurrent_timer_operations [32mPASSED[0m[33m [ 75%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_enforcement_failure_does_not_crash [32mPASSED[0m[33m [ 83%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_rule_status_shows_active_timers [32mPASSED[0m[33m [ 91%][0m
+tests/integration/test_no_stop_loss_grace_integration.py::TestNoStopLossGraceIntegration::test_disabled_rule_integration [32mPASSED[0m[33m [100%][0m
+
+[33m=============================== warnings summary ===============================[0m
+.venv/lib/python3.13/site-packages/uvloop/__init__.py:154
+  /mnt/c/Users/jakers/Desktop/risk-manager-v34/.venv/lib/python3.13/site-packages/uvloop/__init__.py:154: DeprecationWarning: uvloop.install() is deprecated in favor of uvloop.run() starting with Python 3.12.
+    _warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m======================== [32m12 passed[0m, [33m[1m1 warning[0m[33m in 26.04s[0m[33m ========================[0m
+
+
+================================================================================
+End of Report
+================================================================================

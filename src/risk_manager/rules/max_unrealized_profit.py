@@ -22,6 +22,11 @@ from datetime import datetime, timezone
 
 from risk_manager.core.events import EventType, RiskEvent
 from risk_manager.rules.base import RiskRule
+from risk_manager.integrations.tick_economics import (
+    get_tick_value_safe,
+    get_tick_size_safe,
+    UnitsError,
+)
 
 if TYPE_CHECKING:
     from risk_manager.core.engine import RiskEngine
@@ -169,12 +174,25 @@ class MaxUnrealizedProfitRule(RiskRule):
         if size == 0:
             return 0.0
 
-        # Get tick value and size for this symbol
-        tick_value = self.tick_values.get(symbol, 0.0)
-        tick_size = self.tick_sizes.get(symbol, 0.25)
+        # Get tick value and size for this symbol (FAIL FAST - no silent defaults)
+        # NOTE: We use the rule's own tick_values/tick_sizes for flexibility
+        # but validate they exist rather than using silent defaults
+        if symbol not in self.tick_values:
+            raise UnitsError(
+                f"Unknown symbol: {symbol}. "
+                f"Tick economics must be configured for all traded symbols. "
+                f"Known symbols: {list(self.tick_values.keys())}"
+            )
+
+        tick_value = self.tick_values[symbol]
+        tick_size = self.tick_sizes.get(symbol, 0.25)  # tick_size is less critical
 
         if tick_value == 0.0 or tick_size == 0.0:
-            return 0.0
+            raise UnitsError(
+                f"Invalid tick economics for {symbol}: "
+                f"tick_value={tick_value}, tick_size={tick_size}. "
+                f"Values must be > 0."
+            )
 
         # Calculate price difference
         if size > 0:

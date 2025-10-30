@@ -279,8 +279,21 @@ class RiskEngine:
             await self.flatten_all_positions()
         elif action == "close_position":
             # Checkpoint 8: Enforcement triggered (close position)
+            # CRITICAL: Must have contract_id and symbol for close_position enforcement
             contract_id = violation.get("contractId")
             symbol = violation.get("symbol")
+
+            if not contract_id or not symbol:
+                logger.error(
+                    f"❌ Cannot close position: Missing required fields! "
+                    f"contractId={contract_id}, symbol={symbol}, rule={rule_name}"
+                )
+                sdk_logger.error(f"⚠️ Enforcement FAILED: Missing contract_id or symbol - Rule: {rule_name}")
+                raise ValueError(
+                    f"close_position enforcement requires 'contractId' and 'symbol' in violation. "
+                    f"Rule: {rule_name}, violation: {violation}"
+                )
+
             logger.critical(f"🛑 ENFORCING: Closing position {symbol} ({rule_name})")
             sdk_logger.warning(f"⚠️ Enforcement triggered: CLOSE POSITION - Rule: {rule_name}")
             await self.close_position(contract_id, symbol)

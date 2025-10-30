@@ -26,6 +26,10 @@ from datetime import datetime, timezone
 
 from risk_manager.core.events import EventType, RiskEvent
 from risk_manager.rules.base import RiskRule
+from risk_manager.integrations.tick_economics import (
+    get_tick_size_safe,
+    UnitsError,
+)
 
 if TYPE_CHECKING:
     from risk_manager.core.engine import RiskEngine
@@ -168,8 +172,23 @@ class TradeManagementRule(RiskRule):
         if not entry_price or size == 0:
             return None
 
-        # Get tick size for this symbol
-        tick_size = self.tick_sizes.get(symbol, 0.25)
+        # Get tick size for this symbol (FAIL FAST - no silent defaults)
+        # NOTE: We use the rule's own tick_sizes for flexibility
+        # but validate it exists rather than using silent defaults
+        if symbol not in self.tick_sizes:
+            raise UnitsError(
+                f"Unknown symbol: {symbol}. "
+                f"Tick size must be configured for all traded symbols. "
+                f"Known symbols: {list(self.tick_sizes.keys())}"
+            )
+
+        tick_size = self.tick_sizes[symbol]
+
+        if tick_size == 0.0:
+            raise UnitsError(
+                f"Invalid tick size for {symbol}: {tick_size}. "
+                f"Tick size must be > 0."
+            )
 
         # Initialize price extremes for trailing stop
         self._position_extremes[symbol] = entry_price
@@ -297,8 +316,24 @@ class TradeManagementRule(RiskRule):
                 # Price hasn't moved lower, don't adjust stop
                 return None
 
-        # Calculate new trailing stop price
-        tick_size = self.tick_sizes.get(symbol, 0.25)
+        # Calculate new trailing stop price (FAIL FAST - no silent defaults)
+        # NOTE: We use the rule's own tick_sizes for flexibility
+        # but validate it exists rather than using silent defaults
+        if symbol not in self.tick_sizes:
+            raise UnitsError(
+                f"Unknown symbol: {symbol}. "
+                f"Tick size must be configured for all traded symbols. "
+                f"Known symbols: {list(self.tick_sizes.keys())}"
+            )
+
+        tick_size = self.tick_sizes[symbol]
+
+        if tick_size == 0.0:
+            raise UnitsError(
+                f"Invalid tick size for {symbol}: {tick_size}. "
+                f"Tick size must be > 0."
+            )
+
         new_stop_price = self._calculate_trailing_stop_price(
             extreme_price, self.trailing_stop_distance, tick_size, side
         )

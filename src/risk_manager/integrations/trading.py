@@ -57,23 +57,18 @@ from project_x_py.realtime import ProjectXRealtimeClient
 
 from risk_manager.config.models import RiskConfig
 from risk_manager.core.events import EventBus, EventType, RiskEvent
-
-
-# Tick economics for common futures instruments
-# Format: {symbol: {"size": tick_size, "tick_value": tick_value_in_dollars}}
-TICK_VALUES = {
-    "NQ":  {"size": 0.25, "tick_value": 5.00},    # NASDAQ-100 E-mini
-    "MNQ": {"size": 0.25, "tick_value": 0.50},    # Micro NASDAQ-100 E-mini
-    "ES":  {"size": 0.25, "tick_value": 12.50},   # S&P 500 E-mini
-    "MES": {"size": 0.25, "tick_value": 1.25},    # Micro S&P 500 E-mini
-    "YM":  {"size": 1.00, "tick_value": 5.00},    # Dow E-mini
-    "MYM": {"size": 1.00, "tick_value": 0.50},    # Micro Dow E-mini
-    "RTY": {"size": 0.10, "tick_value": 5.00},    # Russell 2000 E-mini
-    "M2K": {"size": 0.10, "tick_value": 0.50},    # Micro Russell 2000 E-mini
-}
-
-# Symbol aliases (some brokers use different names)
-ALIASES = {"ENQ": "NQ"}
+from risk_manager.integrations.adapters import adapter
+from risk_manager.errors import MappingError, UnitsError
+from risk_manager.integrations.tick_economics import (
+    get_tick_economics_safe,
+    get_tick_economics_and_values,
+    normalize_symbol,
+    UnitsError,
+    MappingError,
+    TICK_VALUES,
+    ALIASES,
+)
+from risk_manager.integrations.unrealized_pnl import UnrealizedPnLCalculator
 
 
 class TradingIntegration:
@@ -124,6 +119,12 @@ class TradingIntegration:
         # Open positions tracking for P&L calculation
         # Format: {contract_id: {"entry_price": float, "size": int, "side": "long"|"short"}}
         self._open_positions: dict[str, dict[str, Any]] = {}
+
+        # Unrealized P&L calculator (for floating P&L from quote updates)
+        self.pnl_calculator = UnrealizedPnLCalculator()
+
+        # Status bar update task
+        self._status_bar_task = None
 
         logger.info(f"Trading integration initialized for: {instruments}")
 
@@ -593,8 +594,9 @@ class TradingIntegration:
         """Disconnect from trading platform."""
         logger.info("Disconnecting from trading platform...")
 
-        # Stop polling task
+        # Stop background tasks
         self.running = False
+
         if self._order_poll_task:
             self._order_poll_task.cancel()
             try:
@@ -602,6 +604,14 @@ class TradingIntegration:
             except asyncio.CancelledError:
                 pass
             logger.debug("Order polling task stopped")
+
+        if self._status_bar_task:
+            self._status_bar_task.cancel()
+            try:
+                await self._status_bar_task
+            except asyncio.CancelledError:
+                pass
+            logger.debug("Status bar task stopped")
 
         # Disconnect in reverse order
         if self.suite:
@@ -674,18 +684,73 @@ class TradingIntegration:
             await self.suite.on(SDKEventType.POSITION_UPDATED, self._on_position_updated)
             logger.info("✅ Registered: POSITION_UPDATED")
 
+            # Subscribe to market data events for unrealized P&L tracking
+            # Try multiple event types since realtime_data manager doesn't exist
+            logger.info("📊 Registering market data event handlers...")
+
+            # QUOTE_UPDATE (primary)
+            await self.suite.on(SDKEventType.QUOTE_UPDATE, self._on_quote_update)
+            logger.info("✅ Registered: QUOTE_UPDATE")
+
+            # DATA_UPDATE (alternative - might contain price data)
+            await self.suite.on(SDKEventType.DATA_UPDATE, self._on_data_update)
+            logger.info("✅ Registered: DATA_UPDATE")
+
+            # TRADE_TICK (alternative - trade executions with prices)
+            await self.suite.on(SDKEventType.TRADE_TICK, self._on_trade_tick)
+            logger.info("✅ Registered: TRADE_TICK")
+
+            # NEW_BAR (from timeframes - contains OHLC data including close price)
+            await self.suite.on(SDKEventType.NEW_BAR, self._on_new_bar)
+            logger.info("✅ Registered: NEW_BAR (1min, 5min timeframes)")
+
+            # Check instrument structure and initial prices
+            logger.info("Checking instruments for price data...")
+            for symbol in self.instruments:
+                try:
+                    instrument = self.suite[symbol]
+                    attrs = [attr for attr in dir(instrument) if not attr.startswith('_')]
+                    logger.debug(f"{symbol} attributes: {attrs[:20]}")
+                    logger.debug(f"{symbol} type: {type(instrument)}")
+
+                    # SDK v3.5.9 doesn't have last_price on instruments
+                    # Prices come via QUOTE_UPDATE events instead
+                    logger.info(f"  ℹ️  {symbol} - prices will come from QUOTE_UPDATE events")
+
+                    if hasattr(instrument, 'data'):
+                        logger.debug(f"  {symbol} has data attribute: {type(instrument.data)}")
+                        # Try to access data
+                        try:
+                            if instrument.data and hasattr(instrument.data, '1min'):
+                                bars_1min = instrument.data['1min']
+                                if bars_1min and len(bars_1min) > 0:
+                                    latest_bar = bars_1min[-1]
+                                    logger.info(f"  📊 {symbol} has 1min bar data, latest close: ${latest_bar.get('close', 'N/A')}")
+                        except Exception as e:
+                            logger.debug(f"  Error accessing {symbol} bar data: {e}")
+
+                    if hasattr(instrument, 'current_price'):
+                        logger.debug(f"  {symbol} has current_price: ${instrument.current_price}")
+
+                except Exception as e:
+                    logger.debug(f"Error inspecting {symbol}: {e}")
+
             # Catch-all disabled - too noisy with market data events
             # If you need to debug new events, uncomment this block:
             # for event_type in SDKEventType:
             #     if event_type.name not in [...known events...]:
             #         await self.suite.on(event_type, self._on_unknown_event)
 
-            logger.success("✅ Trading monitoring started (10 event handlers registered)")
-            logger.info("📡 Listening for events: ORDER (8 types), POSITION (3 types), + catch-all")
+            logger.success("✅ Trading monitoring started (14 event handlers registered)")
+            logger.info("📡 Listening for events: ORDER (8 types), POSITION (3 types), MARKET DATA (4 types)")
 
             # Start order polling task (to catch protective stops that don't emit events)
             self._order_poll_task = asyncio.create_task(self._poll_orders())
             logger.info("🔄 Started order polling task (5s interval)")
+
+            # Start status bar update task (for real-time P&L display)
+            self._status_bar_task = asyncio.create_task(self._update_pnl_status_bar())
+            logger.info("📊 Started unrealized P&L status bar (0.5s refresh)")
             logger.info("=" * 80)
 
         except Exception as e:
@@ -1271,15 +1336,16 @@ class TradingIntegration:
                         logger.warning(f"No recent fill found for {contract_id}, using position avg_price: ${avg_price:,.2f}")
 
                     # Calculate P&L: (exit - entry) * size * tick_value
-                    # Get instrument-specific tick economics
+                    # Get instrument-specific tick economics (FAIL FAST - no silent defaults)
                     symbol = self._extract_symbol_from_contract(contract_id)
-                    # Check for aliases first (e.g., ENQ -> NQ)
-                    symbol = ALIASES.get(symbol, symbol)
-                    # Get tick values, default to NQ if unknown
-                    tick_info = TICK_VALUES.get(symbol, {"size": 0.25, "tick_value": 5.0})
-                    tick_value = tick_info["tick_value"]
-                    tick_size = tick_info["size"]
-                    logger.debug(f"Using tick economics for {symbol}: size={tick_size}, value=${tick_value}")
+                    try:
+                        tick_info, tick_value, tick_size = get_tick_economics_and_values(symbol)
+                        logger.debug(f"Using tick economics for {symbol}: size={tick_size}, value=${tick_value}")
+                    except (UnitsError, MappingError) as e:
+                        logger.error(f"❌ Failed to get tick economics for {symbol}: {e}")
+                        logger.error(f"   Contract: {contract_id}")
+                        logger.error(f"   Cannot calculate P&L without tick economics!")
+                        raise
 
                     if side == 'long':
                         # Long: profit when price goes up
@@ -1300,6 +1366,9 @@ class TradingIntegration:
 
                     # Remove from tracking
                     del self._open_positions[contract_id]
+
+                    # Remove from unrealized P&L calculator
+                    self.pnl_calculator.remove_position(contract_id)
                 else:
                     logger.warning(f"⚠️  Position closed but not in tracking! Can't calculate P&L for {contract_id}")
 
@@ -1312,6 +1381,26 @@ class TradingIntegration:
                     'side': side,
                 }
                 logger.debug(f"📝 Tracking position: {contract_id} @ ${avg_price:,.2f} x {size} ({side})")
+
+                # Add to unrealized P&L calculator
+                self.pnl_calculator.update_position(contract_id, {
+                    'price': avg_price,
+                    'size': size,
+                    'side': side,
+                    'symbol': symbol,
+                })
+
+                # IMMEDIATE: Try to get current price and seed the calculator
+                # This gives us an initial P&L even if polling hasn't started yet
+                try:
+                    instrument = self.suite.get(symbol)
+                    if instrument and hasattr(instrument, 'last_price') and instrument.last_price:
+                        current_price = instrument.last_price
+                        if current_price > 0:
+                            self.pnl_calculator.update_quote(symbol, current_price)
+                            logger.info(f"  💹 Initial price loaded: {symbol} @ ${current_price:.2f}")
+                except Exception as e:
+                    logger.debug(f"Could not get initial price for {symbol}: {e}")
 
             risk_event = RiskEvent(
                 event_type=event_type_map.get(action_name, EventType.POSITION_UPDATED),
@@ -1333,6 +1422,57 @@ class TradingIntegration:
                 },
                 source="trading_sdk",
             )
+
+            # ============================================================================
+            # SHADOW MODE: Canonical Domain Model (No Behavior Change)
+            # ============================================================================
+            # Convert SDK position to canonical Position type
+            # This runs in parallel with existing dict-based event.data
+            # Rules can gradually migrate from event.data to event.position
+            try:
+                # Skip adapter for FLAT/CLOSED positions (type=0)
+                # Adapter only handles LONG (1) and SHORT (2)
+                if action_name == "CLOSED" or pos_type == 0 or size == 0:
+                    logger.debug(f"  ⚠️  Skipping adapter for FLAT position (shadow mode)")
+                    risk_event.position = None
+                else:
+                    # Get current market price for P&L calculation
+                    current_price = None
+                    if self.suite and hasattr(self.suite, 'get'):
+                        try:
+                            instrument = self.suite.get(symbol)
+                            if instrument and hasattr(instrument, 'last_price'):
+                                current_price = instrument.last_price
+                        except (KeyError, AttributeError):
+                            pass  # No market price available yet
+
+                    # Convert to canonical Position
+                    canonical_position = adapter.normalize_position_from_dict(
+                        position_data={
+                            "contractId": contract_id,
+                            "avgPrice": avg_price,
+                            "size": size,
+                            "type": pos_type,
+                        },
+                        current_price=current_price,
+                        account_id=None,  # Will be added when we have account context
+                    )
+
+                    # Attach canonical position to event (shadow mode - doesn't break existing code)
+                    risk_event.position = canonical_position
+
+                    # Log the normalization for visibility
+                    logger.info(
+                        f"  🔄 CANONICAL: {symbol} → {canonical_position.symbol_root} | "
+                        f"Side: {canonical_position.side.value.upper()} | "
+                        f"Qty: {canonical_position.quantity} | "
+                        f"P&L: {canonical_position.unrealized_pnl}"
+                    )
+
+            except (MappingError, UnitsError) as e:
+                # Log adapter errors but don't crash - shadow mode is best-effort
+                logger.warning(f"  ⚠️  Adapter error (shadow mode): {e}")
+                risk_event.position = None
 
             await self.event_bus.publish(risk_event)
 
@@ -1695,7 +1835,7 @@ class TradingIntegration:
         except Exception as e:
             logger.error(f"Error handling account update: {e}")
 
-    async def _on_quote_update(self, data: Any) -> None:
+    async def _on_quote_update(self, event: Any) -> None:
         """
         Handle market quote update from SignalR.
 
@@ -1704,44 +1844,181 @@ class TradingIntegration:
         - RULE-004 (Daily Unrealized Loss)
         - RULE-005 (Max Unrealized Profit)
         - Position monitoring
+
+        NOTE: This fires MULTIPLE TIMES PER SECOND. Logging is DEBUG only.
+
+        Data structure (from SDK v3.5.9):
+        event.data = {
+            'symbol': 'F.US.MNQ',  # Full contract format
+            'last_price': 0.0,      # Often zero
+            'bid': 26271.00,        # Valid
+            'ask': 26271.75         # Valid
+        }
         """
         try:
-            if not isinstance(data, list):
+            # Extract quote data from event
+            if not hasattr(event, 'data'):
+                logger.debug(f"Quote event has no data attribute: {type(event)}")
+                logger.debug(f"Event attributes: {dir(event)}")
                 return
 
-            for update in data:
-                quote_data = update.get('data', {})
+            quote_data = event.data
 
-                # Extract quote details
-                symbol = quote_data.get('symbol', 'UNKNOWN')
-                bid = quote_data.get('bid', 0.0)
-                ask = quote_data.get('ask', 0.0)
-                last = quote_data.get('last', 0.0)
+            # Validate quote_data is a dict
+            if not isinstance(quote_data, dict):
+                logger.debug(f"Quote data is not a dict: {type(quote_data)}, value: {quote_data}")
+                return
 
-                # Use last price or midpoint for PnL calculations
-                market_price = last if last > 0 else (bid + ask) / 2
+            # Extract quote details with safe defaults
+            full_symbol = quote_data.get('symbol', 'UNKNOWN')
+            bid = float(quote_data.get('bid', 0.0) or 0.0)
+            ask = float(quote_data.get('ask', 0.0) or 0.0)
+            last_price = float(quote_data.get('last_price', 0.0) or 0.0)
 
-                if market_price > 0:
-                    logger.trace(f"Quote update: {symbol} @ {market_price:.2f} (bid: {bid:.2f}, ask: {ask:.2f})")
+            # Strip "F.US." prefix to get just "MNQ", "ES", etc.
+            # F.US.MNQ → MNQ
+            if isinstance(full_symbol, str):
+                symbol = full_symbol.replace('F.US.', '') if 'F.US.' in full_symbol else full_symbol
+            else:
+                logger.debug(f"Symbol is not a string: {type(full_symbol)}, value: {full_symbol}")
+                return
 
-                    # Publish market price event for rules that need it
-                    risk_event = RiskEvent(
-                        event_type=EventType.MARKET_DATA_UPDATED,
-                        data={
-                            "symbol": symbol,
-                            "price": market_price,
-                            "bid": bid,
-                            "ask": ask,
-                            "last": last,
-                            "timestamp": quote_data.get('timestamp'),
-                        },
-                        source="trading_sdk",
-                    )
+            # Use last_price if available, otherwise use bid/ask midpoint
+            if last_price and last_price > 0:
+                market_price = last_price
+            elif bid > 0 and ask > 0:
+                market_price = (bid + ask) / 2.0
+            else:
+                # No valid price data
+                logger.debug(f"No valid price for {symbol}: last={last_price}, bid={bid}, ask={ask}")
+                return
 
-                    await self.event_bus.publish(risk_event)
+            # DEBUG logging only - quote updates are too frequent for INFO
+            logger.debug(f"Quote: {symbol} @ ${market_price:.2f} (bid: ${bid:.2f}, ask: ${ask:.2f})")
+
+            # Update unrealized P&L calculator (silent)
+            self.pnl_calculator.update_quote(symbol, market_price)
+
+            # Check if any position has significant P&L change
+            # Only emit UNREALIZED_PNL_UPDATE if P&L changed by $10+
+            positions_to_check = self.pnl_calculator.get_positions_by_symbol(symbol)
+            for contract_id in positions_to_check:
+                if self.pnl_calculator.has_significant_pnl_change(contract_id, threshold=10.0):
+                    # Get updated P&L
+                    unrealized_pnl = self.pnl_calculator.calculate_unrealized_pnl(contract_id)
+                    if unrealized_pnl is not None:
+                        # Emit unrealized P&L update event
+                        await self.event_bus.publish(RiskEvent(
+                            event_type=EventType.UNREALIZED_PNL_UPDATE,
+                            data={
+                                'contract_id': contract_id,
+                                'symbol': symbol,
+                                'unrealized_pnl': float(unrealized_pnl),
+                            },
+                            source="trading_sdk"
+                        ))
+                        logger.info(f"💹 Unrealized P&L update: {symbol} ${float(unrealized_pnl):+.2f}")
+
+            # Also publish MARKET_DATA_UPDATED for backward compatibility
+            risk_event = RiskEvent(
+                event_type=EventType.MARKET_DATA_UPDATED,
+                data={
+                    "symbol": symbol,
+                    "price": market_price,
+                    "bid": bid,
+                    "ask": ask,
+                    "last": last_price,
+                    "timestamp": quote_data.get('timestamp'),
+                },
+                source="trading_sdk",
+            )
+
+            await self.event_bus.publish(risk_event)
 
         except Exception as e:
             logger.error(f"Error handling quote update: {e}")
+            logger.exception(e)
+
+    async def _on_data_update(self, data: Any) -> None:
+        """
+        Handle DATA_UPDATE event (alternative market data source).
+
+        This might contain price/quote data if QUOTE_UPDATE doesn't work.
+        """
+        try:
+            logger.debug(f"_on_data_update called: data type={type(data)}")
+            logger.debug(f"DATA_UPDATE content: {data}")
+
+            # Try to extract price information
+            # Data structure is unknown, so we'll log it and adapt
+            if hasattr(data, '__dict__'):
+                logger.debug(f"DATA_UPDATE attributes: {data.__dict__}")
+
+        except Exception as e:
+            logger.error(f"Error handling data update: {e}")
+
+    async def _on_trade_tick(self, data: Any) -> None:
+        """
+        Handle TRADE_TICK event (trade executions with prices).
+
+        Might provide market price information from actual trades.
+        """
+        try:
+            logger.debug(f"_on_trade_tick called: data type={type(data)}")
+            logger.debug(f"TRADE_TICK content: {data}")
+
+            # Try to extract price information
+            if hasattr(data, '__dict__'):
+                logger.debug(f"TRADE_TICK attributes: {data.__dict__}")
+            elif isinstance(data, dict):
+                symbol = data.get('symbol')
+                price = data.get('price') or data.get('last') or data.get('tradePrice')
+                if symbol and price:
+                    logger.debug(f"Trade tick: {symbol} @ ${price:.2f}")
+                    # Update P&L calculator
+                    self.pnl_calculator.update_quote(symbol, price)
+
+        except Exception as e:
+            logger.error(f"Error handling trade tick: {e}")
+
+    async def _on_new_bar(self, data: Any) -> None:
+        """
+        Handle NEW_BAR event (from 1min/5min timeframes).
+
+        Bars contain OHLC data - we can use close price for P&L calculations.
+        This fires every 1 minute and 5 minutes based on our timeframes.
+        """
+        try:
+            logger.debug(f"_on_new_bar called: data type={type(data)}")
+
+            # Extract bar data (structure varies by SDK version)
+            if hasattr(data, 'data'):
+                bar_data = data.data
+            elif isinstance(data, dict):
+                bar_data = data
+            else:
+                bar_data = data
+
+            # Try to extract symbol and close price
+            symbol = None
+            close_price = None
+
+            if hasattr(bar_data, '__dict__'):
+                attrs = bar_data.__dict__
+                symbol = attrs.get('symbol')
+                close_price = attrs.get('close') or attrs.get('closePrice')
+                logger.debug(f"NEW_BAR attributes: {list(attrs.keys())}")
+            elif isinstance(bar_data, dict):
+                symbol = bar_data.get('symbol')
+                close_price = bar_data.get('close') or bar_data.get('closePrice')
+
+            if symbol and close_price:
+                logger.debug(f"Bar complete: {symbol} close @ ${close_price:.2f}")
+                # Update P&L calculator with bar close price
+                self.pnl_calculator.update_quote(symbol, close_price)
+
+        except Exception as e:
+            logger.error(f"Error handling new bar: {e}")
 
     async def flatten_position(self, symbol: str) -> None:
         """Flatten a specific position."""
@@ -1780,6 +2057,103 @@ class TradingIntegration:
 
         for symbol in self.instruments:
             await self.flatten_position(symbol)
+
+    async def _update_pnl_status_bar(self) -> None:
+        """
+        Background task that updates the unrealized P&L status bar.
+
+        Updates every 0.5 seconds with current unrealized P&L.
+        Uses carriage return (\\r) to overwrite the same line.
+
+        When other logs print, they interrupt the status bar (new line),
+        but the status bar resumes on the next update. Since position/rule
+        logs are infrequent, this creates a clean display.
+
+        ALSO POLLS PRICES: Since quote events don't fire, we poll
+        instrument.last_price every 0.5s to update the calculator.
+        """
+        logger.debug("Status bar update task started")
+        poll_count = 0
+        prices_found = False
+
+        while self.running:
+            try:
+                # Poll prices from instruments (since quote events don't fire)
+                if self.suite:
+                    for symbol in self.instruments:
+                        try:
+                            instrument = self.suite.get(symbol)
+                            if instrument and hasattr(instrument, 'last_price'):
+                                price = instrument.last_price
+                                if price and price > 0:
+                                    # Update calculator with polled price
+                                    self.pnl_calculator.update_quote(symbol, price)
+                                    logger.debug(f"Polled price: {symbol} @ ${price:.2f}")
+                                    if not prices_found:
+                                        prices_found = True
+                                        logger.info(f"💹 Price polling active: {symbol} @ ${price:.2f}")
+                                else:
+                                    # Log when prices are None/0 (but only occasionally)
+                                    if poll_count % 10 == 0:  # Every 5 seconds
+                                        logger.debug(f"Polled {symbol}: last_price is None/0")
+                        except Exception as e:
+                            logger.debug(f"Error polling price for {symbol}: {e}")
+
+                poll_count += 1
+
+                # Calculate total unrealized P&L
+                total_pnl = self.pnl_calculator.calculate_total_unrealized_pnl()
+
+                # Print status bar (overwrites same line)
+                # \r = carriage return, end='' prevents newline, flush=True ensures immediate print
+                print(f"\r📊 Unrealized P&L: ${float(total_pnl):+.2f}  ", end="", flush=True)
+
+                # Wait 0.5 seconds before next update
+                await asyncio.sleep(0.5)
+
+            except asyncio.CancelledError:
+                logger.debug("Status bar task cancelled")
+                print()  # Print newline to move cursor to next line
+                break
+            except Exception as e:
+                logger.debug(f"Error in status bar update: {e}")
+                await asyncio.sleep(1.0)  # Back off on error
+
+    def get_total_unrealized_pnl(self) -> float:
+        """
+        Get total unrealized P&L across all open positions.
+
+        Used by RULE-004 (Daily Unrealized Loss).
+
+        Returns:
+            Total unrealized P&L in USD
+        """
+        total = self.pnl_calculator.calculate_total_unrealized_pnl()
+        return float(total)
+
+    def get_position_unrealized_pnl(self, contract_id: str) -> float | None:
+        """
+        Get unrealized P&L for a specific position.
+
+        Used by RULE-005 (Max Unrealized Profit).
+
+        Args:
+            contract_id: Position identifier
+
+        Returns:
+            Unrealized P&L in USD, or None if position not found
+        """
+        pnl = self.pnl_calculator.calculate_unrealized_pnl(contract_id)
+        return float(pnl) if pnl is not None else None
+
+    def get_open_positions(self) -> dict[str, dict[str, Any]]:
+        """
+        Get all currently open positions.
+
+        Returns:
+            Dictionary of {contract_id: position_data}
+        """
+        return self.pnl_calculator.get_open_positions()
 
     def get_stats(self) -> dict[str, Any]:
         """Get trading integration statistics."""

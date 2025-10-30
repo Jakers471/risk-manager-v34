@@ -29,6 +29,7 @@ class EventType(str, Enum):
 
     # P&L events
     PNL_UPDATED = "pnl_updated"
+    UNREALIZED_PNL_UPDATE = "unrealized_pnl_update"  # Floating P&L from quote updates
     DAILY_LOSS_LIMIT = "daily_loss_limit"
     DRAWDOWN_ALERT = "drawdown_alert"
 
@@ -65,6 +66,9 @@ class RiskEvent:
     data: dict[str, Any] = field(default_factory=dict)
     source: str = "risk_manager"
     severity: str = "info"  # info, warning, error, critical
+
+    # Shadow mode: Canonical domain types (optional, populated by adapter)
+    position: Any = None  # Will be risk_manager.domain.types.Position when available
 
     def to_dict(self) -> dict[str, Any]:
         """Convert event to dictionary."""

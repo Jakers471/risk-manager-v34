@@ -12,7 +12,7 @@ general:
   # Instruments to monitor
   instruments:
     - MNQ                          # E-mini NASDAQ
-    - NQ                           # NASDAQ
+    - ENQ                           # NASDAQ
     - ES                           # E-mini S&P 500
 
   # Timezone (IANA timezone string)
