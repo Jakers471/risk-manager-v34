@@ -252,6 +252,10 @@ class RiskManager:
         pnl_tracker = PnLTracker(db=db)
         lockout_manager = LockoutManager(database=db, timer_manager=timer_manager)
 
+        # Wire lockout_manager to engine for PRE-CHECK layer
+        self.engine.lockout_manager = lockout_manager
+        logger.info("✅ Lockout manager wired to engine (PRE-CHECK layer enabled)")
+
         rules_loaded = 0
         enabled_count = 0
 
@@ -525,6 +529,17 @@ class RiskManager:
 
         self.running = True
         logger.info("Starting Risk Manager...")
+
+        # 🔍 STARTUP STATE CHECK: Show restored state before accepting events
+        if hasattr(self.engine, 'lockout_manager') and self.engine.lockout_manager:
+            active_lockouts = len(self.engine.lockout_manager.lockout_state)
+            if active_lockouts > 0:
+                logger.warning(
+                    f"🛡️  STARTUP STATE: {active_lockouts} active lockout(s) in effect "
+                    f"(PRE-CHECK layer will block events for locked accounts)"
+                )
+            else:
+                logger.info("✅ STARTUP STATE: No active lockouts, all accounts operational")
 
         # Start risk engine
         await self.engine.start()

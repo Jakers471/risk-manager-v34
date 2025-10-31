@@ -466,7 +466,17 @@ class LockoutManager:
                 "created_at": locked_at
             }
 
-        logger.info(f"Loaded {len(self.lockout_state)} lockouts from database")
+            # Log each restored lockout for visibility
+            remaining = (expires_at - now).total_seconds()
+            logger.warning(
+                f"🔒 RESTORED LOCKOUT: Account {account_id} locked until {expires_at.isoformat()} "
+                f"({int(remaining)}s remaining) - Reason: {reason}"
+            )
+
+        if len(self.lockout_state) > 0:
+            logger.warning(f"⚠️  {len(self.lockout_state)} active lockout(s) restored from database")
+        else:
+            logger.info(f"Loaded {len(self.lockout_state)} lockouts from database")
 
     async def start_background_task(self) -> None:
         """

@@ -60,10 +60,36 @@ class TestDailyUnrealizedLossRule:
 
     @pytest.fixture
     def mock_engine(self):
-        """Create mock risk engine."""
+        """Create mock risk engine with mocked trading_integration."""
         engine = Mock(spec=RiskEngine)
         engine.current_positions = {}
         engine.market_prices = {}  # Real-time market prices
+
+        # Mock trading_integration for get_total_unrealized_pnl()
+        # The rule now calls engine.trading_integration.get_total_unrealized_pnl()
+        # We calculate it from mock_engine.current_positions and market_prices
+        def calculate_total_pnl():
+            total_pnl = 0.0
+            for symbol, position in engine.current_positions.items():
+                if symbol in engine.market_prices:
+                    size = position.get("size", 0)
+                    entry_price = position.get("avgPrice", 0)
+                    current_price = engine.market_prices[symbol]
+
+                    # Calculate P&L using tick economics
+                    price_diff = current_price - entry_price
+                    tick_size = 0.25  # Default for most contracts
+                    tick_value = 5.0 if symbol == "MNQ" else 50.0  # MNQ=$5, ES=$50
+
+                    ticks = price_diff / tick_size
+                    position_pnl = ticks * size * tick_value
+                    total_pnl += position_pnl
+
+            return total_pnl
+
+        engine.trading_integration = Mock()
+        engine.trading_integration.get_total_unrealized_pnl = Mock(side_effect=calculate_total_pnl)
+
         return engine
 
     # ========================================================================
@@ -202,7 +228,7 @@ class TestDailyUnrealizedLossRule:
 
         # At exact limit, should trigger (<= comparison)
         assert violation is not None
-        assert abs(violation["unrealized_pnl"] - (-300.0)) < 0.01
+        assert abs(violation["current_pnl"] - (-300.0)) < 0.01
 
     # ========================================================================
     # Test 4: Loss Exceeds Limit (Should VIOLATE)
@@ -234,7 +260,7 @@ class TestDailyUnrealizedLossRule:
         assert violation is not None
         assert violation["action"] == "close_position"
         assert violation["symbol"] == "MNQ"
-        assert violation["unrealized_pnl"] <= -1200.0
+        assert violation["current_pnl"] <= -1200.0
         assert violation["loss_limit"] == -300.0
         assert "loss limit" in violation["message"].lower()
 
@@ -262,7 +288,7 @@ class TestDailyUnrealizedLossRule:
 
         # Should violate (loss <= -$300)
         assert violation is not None
-        assert violation["unrealized_pnl"] <= -2000.0
+        assert violation["current_pnl"] <= -2000.0
 
     # ========================================================================
     # Test 5: Violation Closes Only That Position (Trade-by-Trade)
@@ -405,7 +431,7 @@ class TestDailyUnrealizedLossRule:
         violation = await rule.evaluate(event, mock_engine)
         assert violation is not None
         # Allow small floating point difference
-        assert abs(violation["unrealized_pnl"] - (-1200.0)) < 0.01
+        assert abs(violation["current_pnl"] - (-1200.0)) < 0.01
 
     @pytest.mark.asyncio
     async def test_es_position_pnl_calculation(self, rule, mock_engine):
@@ -429,7 +455,7 @@ class TestDailyUnrealizedLossRule:
 
         violation = await rule.evaluate(event, mock_engine)
         assert violation is not None
-        assert abs(violation["unrealized_pnl"] - (-2000.0)) < 0.01
+        assert abs(violation["current_pnl"] - (-2000.0)) < 0.01
 
     # ========================================================================
     # Test 9: Event Type Handling
@@ -596,7 +622,7 @@ class TestDailyUnrealizedLossRule:
 
         violation = await rule.evaluate(event, mock_engine)
         assert violation is not None
-        assert abs(violation["unrealized_pnl"] - (-1000.0)) < 0.01
+        assert abs(violation["current_pnl"] - (-1000.0)) < 0.01
 
     # ========================================================================
     # Test 15: Position Opened Event

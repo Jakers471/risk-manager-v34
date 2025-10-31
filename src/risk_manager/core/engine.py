@@ -17,10 +17,11 @@ sdk_logger = ProjectXLogger.get_logger(__name__)
 class RiskEngine:
     """Core risk evaluation and enforcement engine."""
 
-    def __init__(self, config: RiskConfig, event_bus: EventBus, trading_integration: Any | None = None):
+    def __init__(self, config: RiskConfig, event_bus: EventBus, trading_integration: Any | None = None, lockout_manager: Any | None = None):
         self.config = config
         self.event_bus = event_bus
         self.trading_integration = trading_integration  # Reference to TradingIntegration for enforcement
+        self.lockout_manager = lockout_manager  # Reference to LockoutManager for PRE-CHECK layer
         self.rules: list[Any] = []  # Will be filled with rule objects
         self.running = False
 
@@ -75,6 +76,56 @@ class RiskEngine:
             logger.info(f"📨 Event: {event.event_type.value} → evaluating {len(self.rules)} rules")
         else:
             logger.debug(f"📨 Event received: {event.event_type.value} - no rules configured")
+
+        # ═══════════════════════════════════════════════════════════════
+        # ⭐ PRE-CHECK LAYER: Respect timers/schedules from ALL rules
+        # ═══════════════════════════════════════════════════════════════
+        # This ensures ALL 13 rules respect lockouts created by ANY rule.
+        # If account is locked out (from any rule), skip ALL rule evaluation.
+        # ═══════════════════════════════════════════════════════════════
+
+        if self.lockout_manager:
+            account_id = event.data.get("account_id")
+
+            if account_id and self.lockout_manager.is_locked_out(account_id):
+                lockout_info = self.lockout_manager.get_lockout_info(account_id)
+                lockout_type = lockout_info.get('type', 'unknown')
+                reason = lockout_info.get('reason', 'Unknown')
+
+                # Enhanced logging based on lockout type
+                if lockout_type == 'hard':
+                    until = lockout_info.get('until', 'Unknown')
+                    logger.opt(colors=True).warning(
+                        f"<yellow>🔒 HARD LOCKOUT ACTIVE</yellow>\n"
+                        f"   Reason: {reason}\n"
+                        f"   Until: {until}\n"
+                        f"   ❌ Skipping ALL {len(self.rules)} rules (account locked)"
+                    )
+                elif lockout_type == 'cooldown':
+                    remaining = lockout_info.get('remaining_seconds', 0)
+                    logger.opt(colors=True).warning(
+                        f"<yellow>⏱️  COOLDOWN ACTIVE</yellow>\n"
+                        f"   Reason: {reason}\n"
+                        f"   Remaining: {remaining}s\n"
+                        f"   ❌ Skipping ALL {len(self.rules)} rules (cooldown active)"
+                    )
+                else:
+                    logger.opt(colors=True).warning(
+                        f"<yellow>⚠️  LOCKOUT ACTIVE ({lockout_type})</yellow>\n"
+                        f"   Reason: {reason}\n"
+                        f"   ❌ Skipping ALL {len(self.rules)} rules (lockout active)"
+                    )
+
+                # Log each rule being skipped (debug level for detailed troubleshooting)
+                for rule in self.rules:
+                    rule_name = rule.__class__.__name__.replace('Rule', '')
+                    logger.debug(f"   ❌ {rule_name} - NOT EVALUATED (lockout active)")
+
+                # Return empty violations list - don't evaluate ANY rules!
+                return []
+
+        # ✅ PRE-CHECK PASSED - No lockout active, evaluate rules normally
+        logger.opt(colors=True).debug(f"<green>✅ PRE-CHECK PASSED: No lockout active, evaluating {len(self.rules)} rules</green>")
 
         violations = []
         rule_results = []  # Track results for summary
@@ -251,11 +302,14 @@ class RiskEngine:
 
     async def _handle_violation(self, rule: Any, violation: dict[str, Any]) -> None:
         """Handle a rule violation."""
+        logger.info(f"DEBUG: _handle_violation() ENTERED for rule={rule.__class__.__name__}")
+
         # Format violation for clear logging
         rule_name = rule.__class__.__name__.replace('Rule', '')
         message = violation.get("message", "No details provided")
 
         logger.opt(colors=True).critical(f"<red><bold>🚨 VIOLATION: {rule_name} - {message}</bold></red>")
+        logger.info(f"DEBUG: After violation log for {rule_name}")
 
         await self.event_bus.publish(
             RiskEvent(
@@ -268,15 +322,40 @@ class RiskEngine:
             )
         )
 
+        # ⭐ CRITICAL: Call rule's enforce() method for lockouts, timers, etc. FIRST
+        # This MUST happen BEFORE enforcement actions in case SDK calls hang
+        # Rules like DailyRealizedLoss need this to set hard lockouts
+        logger.info(f"DEBUG: Reached rule.enforce() block for {rule_name}")
+        logger.info(f"DEBUG: hasattr(rule, 'enforce') = {hasattr(rule, 'enforce')}")
+        logger.info(f"DEBUG: violation keys = {list(violation.keys())}")
+
+        if hasattr(rule, 'enforce'):
+            try:
+                account_id = violation.get("account_id")
+                logger.info(f"DEBUG: account_id = {account_id}")
+                if account_id:
+                    logger.info(f"🔒 Calling {rule_name}.enforce() for lockout/timer management")
+                    await rule.enforce(account_id, violation, self)
+                    logger.info(f"✅ {rule_name}.enforce() completed successfully")
+                else:
+                    logger.warning(f"❌ Cannot call {rule_name}.enforce(): missing account_id in violation")
+            except Exception as e:
+                logger.error(f"❌ Error calling {rule_name}.enforce(): {e}", exc_info=True)
+        else:
+            logger.info(f"DEBUG: Rule {rule_name} has no enforce() method")
+
         # Execute enforcement action if specified
         action = violation.get("action")
         rule_name = rule.__class__.__name__.replace('Rule', '')
+
+        logger.info(f"DEBUG: action = '{action}' for {rule_name}")
 
         if action == "flatten":
             # Checkpoint 8: Enforcement triggered (flatten)
             logger.opt(colors=True).critical(f"<red><bold>🛑 ENFORCING: Closing all positions ({rule_name})</bold></red>")
             sdk_logger.warning(f"⚠️ Enforcement triggered: FLATTEN ALL - Rule: {rule_name}")
             await self.flatten_all_positions()
+            logger.info(f"DEBUG: flatten_all_positions() completed for {rule_name}")
         elif action == "close_position":
             # Checkpoint 8: Enforcement triggered (close position)
             # CRITICAL: Must have contract_id and symbol for close_position enforcement

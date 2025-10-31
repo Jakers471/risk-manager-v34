@@ -56,10 +56,36 @@ class TestMaxUnrealizedProfitRule:
 
     @pytest.fixture
     def mock_engine(self):
-        """Create mock risk engine."""
+        """Create mock risk engine with mocked trading_integration."""
         engine = Mock(spec=RiskEngine)
         engine.current_positions = {}
         engine.market_prices = {}  # Real-time market prices
+
+        # Mock trading_integration for get_position_unrealized_pnl()
+        def get_position_pnl(symbol):
+            if symbol in engine.current_positions and symbol in engine.market_prices:
+                position = engine.current_positions[symbol]
+                size = position.get("size", 0)
+                entry_price = position.get("avgPrice", 0)
+                current_price = engine.market_prices[symbol]
+
+                # Calculate P&L using tick economics
+                price_diff = current_price - entry_price
+                tick_size = 0.25  # Default for most contracts
+                tick_value = 5.0 if symbol == "MNQ" else 50.0  # MNQ=$5, ES=$50
+
+                ticks = price_diff / tick_size
+                position_pnl = ticks * size * tick_value
+                return position_pnl
+            return None
+
+        def get_open_positions():
+            return list(engine.current_positions.keys())
+
+        engine.trading_integration = Mock()
+        engine.trading_integration.get_position_unrealized_pnl = Mock(side_effect=get_position_pnl)
+        engine.trading_integration.get_open_positions = Mock(side_effect=get_open_positions)
+
         return engine
 
     # ========================================================================

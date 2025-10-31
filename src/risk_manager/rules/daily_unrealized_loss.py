@@ -112,6 +112,7 @@ class DailyUnrealizedLossRule(RiskRule):
         if event.event_type not in [
             EventType.UNREALIZED_PNL_UPDATE,
             EventType.POSITION_OPENED,
+            EventType.POSITION_UPDATED,  # Check P&L when position data changes
             EventType.POSITION_CLOSED,
         ]:
             return None

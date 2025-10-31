@@ -126,8 +126,8 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        # Should evaluate (result True = breach, False = no breach)
-        assert isinstance(result, bool)
+        # Should evaluate (result dict = breach, False = no breach)
+        assert result is not None  # Returns dict on breach
 
     @pytest.mark.asyncio
     async def test_evaluates_position_updated_event(self):
@@ -141,7 +141,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert isinstance(result, bool)
+        assert result is not None  # Returns dict on breach
 
     # ========================================================================
     # Test 3: Position Within Limit (No Breach)
@@ -205,7 +205,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Breach!
+        assert isinstance(result, dict)  # Breach returns dict!
 
     @pytest.mark.asyncio
     async def test_position_one_over_limit_triggers_breach(self):
@@ -219,7 +219,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
     @pytest.mark.asyncio
     async def test_large_position_exceeds_limit(self):
@@ -233,7 +233,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
     # ========================================================================
     # Test 5: Short Positions (Absolute Value)
@@ -265,7 +265,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Absolute value checked
+        assert isinstance(result, dict)  # Breach returns dict  # Absolute value checked
 
     @pytest.mark.asyncio
     async def test_short_position_at_limit_no_breach(self):
@@ -335,7 +335,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
             data={"symbol": "ES", "contract_id": "456", "size": 2}
         )
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
     @pytest.mark.asyncio
     async def test_different_limits_for_different_symbols(self):
@@ -357,7 +357,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
             data={"symbol": "ES", "contract_id": "456", "size": 2}
         )
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
     # ========================================================================
     # Test 7: Unknown Symbol - Block Mode
@@ -378,7 +378,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Block any unknown symbol position
+        assert isinstance(result, dict)  # Breach returns dict  # Block any unknown symbol position
 
     @pytest.mark.asyncio
     async def test_unknown_symbol_block_mode_zero_position(self):
@@ -473,7 +473,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Exceeds default limit
+        assert isinstance(result, dict)  # Breach returns dict  # Exceeds default limit
 
     @pytest.mark.asyncio
     async def test_unknown_symbol_default_limit_at_boundary(self):
@@ -498,7 +498,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
             data={"symbol": "UNKNOWN", "contract_id": "123", "size": 6}
         )
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
     # ========================================================================
     # Test 10: Context Storage for Enforcement
@@ -516,14 +516,14 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True
+        assert isinstance(result, dict)  # Breach returns dict
 
-        # Check context was stored
-        assert rule.context is not None
-        assert rule.context["symbol"] == "MNQ"
-        assert rule.context["contract_id"] == "123"
-        assert rule.context["current_size"] == 5
-        assert rule.context["limit"] == 2
+        # Check result dict contains the details (new API returns dict, not stores on rule.context)
+        assert result is not None
+        assert result["symbol"] == "MNQ"
+        assert result["contract_id"] == "123"
+        assert result["current_size"] == 5
+        assert result["limit"] == 2
 
     @pytest.mark.asyncio
     async def test_breach_context_includes_enforcement_type(self):
@@ -540,8 +540,8 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True
-        assert rule.context["enforcement"] == "close_all"
+        assert isinstance(result, dict)  # Breach returns dict
+        assert result["enforcement"] == "close_all"  # Check result dict, not rule.context
 
     @pytest.mark.asyncio
     async def test_unknown_symbol_breach_stores_reason(self):
@@ -558,9 +558,9 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True
-        assert "reason" in rule.context
-        assert rule.context["reason"] == "unknown_symbol_blocked"
+        assert isinstance(result, dict)  # Breach returns dict
+        assert "reason" in result  # Check result dict, not rule.context
+        assert result["reason"] == "unknown_symbol_blocked"
 
     # ========================================================================
     # Test 11: Enforcement Execution - Reduce to Limit
@@ -815,7 +815,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # abs(-5) = 5 > 2
+        assert isinstance(result, dict)  # Breach returns dict  # abs(-5) = 5 > 2
 
     @pytest.mark.asyncio
     async def test_enforcement_failure_logged(self):
@@ -851,7 +851,7 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Any size > 0 should breach
+        assert isinstance(result, dict)  # Breach returns dict  # Any size > 0 should breach
 
     @pytest.mark.asyncio
     async def test_large_limit_allows_large_positions(self):
@@ -873,4 +873,4 @@ class TestMaxContractsPerInstrumentRuleUnit:
         )
 
         result = await rule.evaluate(event, engine)
-        assert result is True  # Exceeds limit
+        assert isinstance(result, dict)  # Breach returns dict  # Exceeds limit
